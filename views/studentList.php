@@ -62,92 +62,101 @@
 
 <body>
     <div class="container">
-        <div class="container">
-            <h1>
-                <?php
-                // Nếu có biến $keyword (tức là đang tìm kiếm), thì
+        <div style="text-align: right; margin-bottom: 15px;">
+            Chào mừng, <strong><?php echo
+
+                                htmlspecialchars($_SESSION['user_name']); ?></strong>!
+
+            <a href="index.php?action=logout"
+                style="margin-left: 15px;">Đăng xuất</a>
+
+            <div class="container">
+                <div class="container">
+                    <h1>
+                        <?php
+                        // Nếu có biến $keyword (tức là đang tìm kiếm), thì
 
 
-                if (isset($keyword) && !empty($keyword)) {
-                    echo "Kết quả tìm kiếm cho: '" .
+                        if (isset($keyword) && !empty($keyword)) {
+                            echo "Kết quả tìm kiếm cho: '" .
 
-                        htmlspecialchars($keyword) . "'";
-                } else {
-                    // Nếu không thì hiển thị tiêu đề mặc định
-                    echo "Danh sách sinh viên";
-                }
-                ?>
-            </h1>
-            <form action="index.php" method="GET"
+                                htmlspecialchars($keyword) . "'";
+                        } else {
+                            // Nếu không thì hiển thị tiêu đề mặc định
+                            echo "Danh sách sinh viên";
+                        }
+                        ?>
+                    </h1>
+                    <form action="index.php" method="GET"
 
-                style="margin-bottom: 20px;">
+                        style="margin-bottom: 20px;">
 
-                <input type="text" name="keyword" placeholder="Tìm
+                        <input type="text" name="keyword" placeholder="Tìm
 
 kiếm theo tên..."
 
-                    value="<?php echo htmlspecialchars($keyword ??
+                            value="<?php echo htmlspecialchars($keyword ??
 
-                                ''); ?>">
+                                        ''); ?>">
 
-                <button type="submit">Tìm kiếm</button>
-            </form>
-            <table>
-            </table>
-        </div>
-        <form action="index.php?action=add" method="POST">
-            <h3>Thêm sinh viên mới</h3>
-            <input type="text" name="name" placeholder="Họ và
+                        <button type="submit">Tìm kiếm</button>
+                    </form>
+                    <table>
+                    </table>
+                </div>
+                <form action="index.php?action=add" method="POST">
+                    <h3>Thêm sinh viên mới</h3>
+                    <input type="text" name="name" placeholder="Họ và
 
 Tên" required>
 
-            <input type="email" name="email" placeholder="Email"
+                    <input type="email" name="email" placeholder="Email"
 
-                required>
+                        required>
 
-            <input type="text" name="phone" placeholder="Số điện
+                    <input type="text" name="phone" placeholder="Số điện
 
 thoại" required>
 
-            <button type="submit">Thêm mới</button>
-        </form>
-        <h2>Danh sách sinh viên</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
+                    <button type="submit">Thêm mới</button>
+                </form>
+                <h2>Danh sách sinh viên</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
 
-                    Bài mẫu
+                            Bài mẫu
 
-                    <th>Họ và Tên</th>
-                    <th>Email</th>
-                    <th>Số điện thoại</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($students as $student): ?>
-                    <tr>
-                        <td><?php echo $student['id']; ?></td>
-                        <td><?php echo
-                            htmlspecialchars($student['name']); ?></td>
-                        <td><?php echo
-                            htmlspecialchars($student['email']); ?></td>
-                        <td><?php echo
-                            htmlspecialchars($student['phone']); ?></td>
+                            <th>Họ và Tên</th>
+                            <th>Email</th>
+                            <th>Số điện thoại</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($students as $student): ?>
+                            <tr>
+                                <td><?php echo $student['id']; ?></td>
+                                <td><?php echo
+                                    htmlspecialchars($student['name']); ?></td>
+                                <td><?php echo
+                                    htmlspecialchars($student['email']); ?></td>
+                                <td><?php echo
+                                    htmlspecialchars($student['phone']); ?></td>
 
-                    </tr>
-                <?php endforeach; ?>
-                <?php if (empty($students)): ?>
-                    <tr>
-                        <td colspan="4">Chưa có sinh viên
+                            </tr>
+                        <?php endforeach; ?>
+                        <?php if (empty($students)): ?>
+                            <tr>
+                                <td colspan="4">Chưa có sinh viên
 
-                            nào.</td>
-                    </tr>
+                                    nào.</td>
+                            </tr>
 
-                <?php endif; ?>
-            </tbody>
-        </table>
-    </div>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
 </body>
 
 </html>
