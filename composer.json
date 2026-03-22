@@ -1,0 +1,15 @@
+{
+    "name": "tinhl/bai01_quanly_sv",
+    "description": "Hien thi danh sach sinh vien",
+    "autoload": {
+        "psr-4": {
+            "Tinhl\\Bai01QuanlySv\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Tinh Van"
+        }
+    ],
+    "require": {}
+}
