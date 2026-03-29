@@ -59,6 +59,12 @@ switch ($action) {
     case 'index':
         $controller->index();
         break;
+    case 'edit':
+        $controller->edit();
+        break;
+    case 'update':
+        $controller->update();
+        break;
     case 'dashboard':
         $controller->dashboard();
         break;

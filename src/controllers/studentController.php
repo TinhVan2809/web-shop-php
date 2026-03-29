@@ -18,6 +18,7 @@ class StudentController
     {
         $keyword = $_GET['keyword'] ?? null;
         $students = $this->studentModel->getAllStudents($keyword);
+        $editingStudent = null;
 
         require_once __DIR__ . '/../../views/studentList.php';
     }
@@ -58,6 +59,111 @@ class StudentController
 
         header('Location: index.php');
         exit();
+    }
+
+    public function edit()
+    {
+        $studentId = (int) ($_GET['id'] ?? 0);
+
+        if ($studentId <= 0) {
+            FlashMessage::set('student_action', 'Không tìm thấy sinh viên cần sửa.', 'error');
+            header('Location: index.php');
+            exit();
+        }
+
+        $editingStudent = $this->studentModel->getStudentById($studentId);
+
+        if (!$editingStudent) {
+            FlashMessage::set('student_action', 'Sinh viên không tồn tại.', 'error');
+            header('Location: index.php');
+            exit();
+        }
+
+        $keyword = $_GET['keyword'] ?? null;
+        $students = $this->studentModel->getAllStudents($keyword);
+
+        require_once __DIR__ . '/../../views/studentList.php';
+    }
+
+    public function update()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: index.php');
+            exit();
+        }
+
+        $studentId = (int) ($_POST['id'] ?? 0);
+        $name = $_POST['name'] ?? '';
+        $email = $_POST['email'] ?? '';
+        $phone = $_POST['phone'] ?? '';
+
+        if ($studentId <= 0) {
+            FlashMessage::set('student_action', 'Không tìm thấy sinh viên cần cập nhật.', 'error');
+            header('Location: index.php');
+            exit();
+        }
+
+        $currentStudent = $this->studentModel->getStudentById($studentId);
+
+        if (!$currentStudent) {
+            FlashMessage::set('student_action', 'Sinh viên không tồn tại.', 'error');
+            header('Location: index.php');
+            exit();
+        }
+
+        if (empty($name) || empty($email) || empty($phone)) {
+            FlashMessage::set('student_action', 'Vui lòng nhập đầy đủ thông tin sinh viên.', 'error');
+            header('Location: index.php?action=edit&id=' . $studentId);
+            exit();
+        }
+
+        $uploadResult = $this->handleAvatarUpload($_FILES['avatar'] ?? null);
+
+        if (!$uploadResult['success']) {
+            FlashMessage::set('student_action', $uploadResult['message'], 'error');
+            header('Location: index.php?action=edit&id=' . $studentId);
+            exit();
+        }
+
+        $avatarFile = $currentStudent['avatar'] ?? null;
+        $oldAvatarFile = $avatarFile;
+
+        if (!empty($uploadResult['filename'])) {
+            $avatarFile = $uploadResult['filename'];
+        }
+
+        $isUpdated = $this->studentModel->updateStudent(
+            $studentId,
+            $name,
+            $email,
+            $phone,
+            $avatarFile
+        );
+
+        if ($isUpdated) {
+            if (!empty($uploadResult['filename']) && !empty($oldAvatarFile) && $oldAvatarFile !== $avatarFile) {
+                $this->deleteAvatarFile($oldAvatarFile);
+            }
+
+            FlashMessage::set('student_action', 'Cập nhật sinh viên thành công!', 'success');
+            header('Location: index.php');
+            exit();
+        }
+
+        if (!empty($uploadResult['filename'])) {
+            $this->deleteAvatarFile($uploadResult['filename']);
+        }
+
+        FlashMessage::set('student_action', 'Cập nhật sinh viên thất bại!', 'error');
+        header('Location: index.php?action=edit&id=' . $studentId);
+        exit();
+    }
+
+    public function dashboard()
+    {
+        $stats = $this->studentModel->getStatistics();
+
+        require_once __DIR__ . '/../../views/dashboard.php';
     }
 
     private function handleAvatarUpload($file)
@@ -123,16 +229,5 @@ class StudentController
         }
 
         return dirname(__DIR__, 2) . '/public/uploads/avatars';
-    }
-
-    /**
-     * Hiển thị trang dashboard thống kê
-     */
-    public function dashboard()
-    {
-        // Gọi model để lấy dữ liệu thống kê
-        $stats = $this->studentModel->getStatistics();
-        // Nạp file view và truyền biến $stats ra
-        require_once PROJECT_ROOT . '/views/dashboard.php';
     }
 }
