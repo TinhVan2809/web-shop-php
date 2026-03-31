@@ -13,7 +13,7 @@ $defaultAvatarUrl = $avatarBaseUrl . '/default-avatar.png';
 $isEditing = !empty($editingStudent);
 $formAction = $isEditing ? 'index.php?action=update' : 'index.php?action=add';
 $formTitle = $isEditing ? 'Sửa thông tin sinh viên' : 'Thêm sinh viên mới';
-$submitLabel = $isEditing ? 'Cập nhật' : 'Thêm mới';
+$submitLabel = $isEditing ? 'Cập nhật' : 'Lưu sinh viên';
 $helperText = $isEditing
     ? 'Chọn ảnh mới nếu muốn thay avatar hiện tại. Bỏ trống để giữ nguyên.'
     : 'Ảnh đại diện là tùy chọn. Hỗ trợ JPG, PNG, GIF, WEBP, tối đa 2MB.';
@@ -35,6 +35,9 @@ $keyword = (string) ($keyword ?? '');
 $sortby = (string) ($sortby ?? 'id');
 $order = strtolower((string) ($order ?? 'desc')) === 'asc' ? 'asc' : 'desc';
 $nextOrder = $order === 'asc' ? 'desc' : 'asc';
+$showStudentForm = $isEditing;
+$formContainerVisibilityClass = $showStudentForm ? 'flex' : 'hidden';
+$openButtonVisibilityClass = $showStudentForm ? 'hidden' : 'inline-flex';
 
 $buildListUrl = static function (int $page, ?string $sortColumn = null, ?string $sortDirection = null) use ($keyword, $sortby, $order): string {
     $params = [];
@@ -57,6 +60,36 @@ $buildListUrl = static function (int $page, ?string $sortColumn = null, ?string 
     return 'index.php' . (!empty($params) ? '?' . http_build_query($params) : '');
 };
 
+$buildActionUrl = static function (string $action, int $id) use ($currentPage, $keyword, $sortby, $order): string {
+    $params = [
+        'action' => $action,
+        'id' => $id,
+    ];
+
+    if ($currentPage > 1) {
+        $params['page'] = $currentPage;
+    }
+
+    if ($keyword !== '') {
+        $params['keyword'] = $keyword;
+    }
+
+    if ($sortby !== 'id' || $order !== 'desc') {
+        $params['sortby'] = $sortby;
+        $params['order'] = $order;
+    }
+
+    return 'index.php?' . http_build_query($params);
+};
+
+$sortIndicator = static function (string $column) use ($sortby, $order): string {
+    if ($sortby !== $column) {
+        return '↕';
+    }
+
+    return $order === 'asc' ? '↑' : '↓';
+};
+
 $cancelUrl = $buildListUrl($currentPage);
 
 ?>
@@ -66,250 +99,253 @@ $cancelUrl = $buildListUrl($currentPage);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <title>Quản lý sinh viên</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: auto;
-        }
-
-        .topbar,
-        .toolbar,
-        .pagination-summary {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        form {
-            margin-bottom: 20px;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        form input {
-            display: block;
-            width: 95%;
-            margin-bottom: 10px;
-            padding: 8px;
-        }
-
-        input[type="file"] {
-            padding: 6px 0;
-        }
-
-        form button,
-        .button-link,
-        .action-link,
-        .page-link {
-            display: inline-block;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            color: #fff;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        form button {
-            background-color: #28a745;
-        }
-
-        .button-link {
-            background-color: #17a2b8;
-        }
-
-        .button-link.cancel {
-            background-color: #6c757d;
-        }
-
-        .action-link {
-            padding: 8px 12px;
-            background-color: #007bff;
-        }
-
-        .delete {
-            background-color: #dc3545 !important;
-        }
-
-        .detail {
-            background-color: #198754;
-        }
-
-        .action-cell {
-            white-space: nowrap;
-        }
-
-        .current-avatar {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-
-        .current-avatar img {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th,
-        td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-            vertical-align: middle;
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
-
-        .flash-message {
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-            color: #fff;
-            font-weight: bold;
-            opacity: 1;
-            transition: opacity 0.5s ease-out;
-        }
-
-        .flash-success {
-            background-color: #28a745;
-        }
-
-        .flash-error {
-            background-color: #dc3545;
-        }
-
-        .avatar-image,
-        .avatar-placeholder {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-        }
-
-        .avatar-image {
-            display: block;
-            object-fit: cover;
-        }
-
-        .avatar-placeholder {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #e9ecef;
-            color: #495057;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .helper-text,
-        .pagination-summary {
-            color: #666;
-            font-size: 13px;
-        }
-
-        .helper-text {
-            margin-top: -4px;
-            margin-bottom: 12px;
-        }
-
-        .pagination {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-top: 16px;
-        }
-
-        .page-link {
-            background-color: #6c757d;
-            padding: 8px 12px;
-        }
-
-        .page-link.active {
-            background-color: #0d6efd;
-            font-weight: bold;
-        }
-
-        /* views/sinhvien_list.php -> bên trong thẻ <style> */
-        th a {
-            text-decoration: none;
-            color: #333;
-            display: block;
-            position: relative;
-        }
-
-        th a .sort-arrow {
-            display: none;
-            position: absolute;
-            right: 5px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        th a.sort-asc .sort-arrow::after {
-            content: " ▲";
-        }
-
-        th a.sort-desc .sort-arrow::after {
-            content: " ▼";
-        }
-
-        th a.active .sort-arrow {
-            display: inline-block;
-        }
-    </style>
 </head>
 
-<body>
-    <div class="container">
-        <?php FlashMessage::display(); ?>
+<body class="min-h-screen bg-stone-100 text-slate-900">
+    <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div id="flash-messages" class="mb-6 space-y-3">
+            <?php FlashMessage::display(); ?>
+        </div>
+
+        <header class="mb-8 overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm">
+            <div class="bg-[radial-gradient(circle_at_top_left,_rgba(14,165,233,0.14),_transparent_38%),radial-gradient(circle_at_bottom_right,_rgba(245,158,11,0.12),_transparent_34%)] p-6 sm:p-8">
+                <div class="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+                    <div class="max-w-3xl">
+                        <span class="inline-flex rounded-full border border-slate-200 bg-white/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">
+                            Student Hub
+                        </span>
+                        <h1 class="mt-4 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
+                            Students Management System
+                        </h1>
+                        <p class="mt-3 max-w-2xl text-sm leading-6 text-slate-600 sm:text-base">
+                            Theo dõi, tìm kiếm và cập nhật hồ sơ sinh viên trong một giao diện gọn gàng,
+                            rõ ràng và tập trung vào dữ liệu.
+                        </p>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-3">
+                        <a
+                            href="index.php?action=dashboard"
+                            class="inline-flex items-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50">
+                            Xem thống kê
+                        </a>
+                        <button
+                            type="button"
+                            id="open-student-form-button"
+                            class="<?php echo $openButtonVisibilityClass; ?> items-center rounded-full bg-slate-950 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800">
+                            Thêm sinh viên mới
+                        </button>
+                        <a
+                            href="index.php?action=logout"
+                            class="inline-flex items-center rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50">
+                            Đăng xuất
+                        </a>
+                    </div>
+                </div>
+
+                <div class="mt-8 grid gap-4 md:grid-cols-3">
+                    <div class="rounded-3xl border border-slate-200 bg-white/90 p-5">
+                        <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Tổng sinh viên</p>
+                        <p class="mt-3 text-3xl font-semibold text-slate-950"><?php echo $totalStudents; ?></p>
+                        <p class="mt-1 text-sm text-slate-500">Hồ sơ đang có trong hệ thống</p>
+                    </div>
+                    <div class="rounded-3xl border border-slate-200 bg-white/90 p-5">
+                        <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Hiển thị</p>
+                        <p class="mt-3 text-3xl font-semibold text-slate-950">
+                            <?php echo $totalStudents > 0 ? $listStart . '-' . $listEnd : '0'; ?>
+                        </p>
+                        <p class="mt-1 text-sm text-slate-500">Phạm vi bản ghi của trang hiện tại</p>
+                    </div>
+                    <div class="rounded-3xl border border-slate-200 bg-white/90 p-5">
+                        <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">Chế độ xem</p>
+                        <p class="mt-3 text-3xl font-semibold text-slate-950"><?php echo $currentPage; ?>/<?php echo $totalPages; ?></p>
+                        <p class="mt-1 text-sm text-slate-500">
+                            <?php echo $keyword !== '' ? "Đang lọc theo từ khóa: " . htmlspecialchars($keyword) : 'Đang xem toàn bộ dữ liệu'; ?>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <section class="mb-6 rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+            <form action="index.php" method="GET" class="flex flex-col gap-3 md:flex-row md:items-center">
+                <div class="relative flex-1">
+                    <input
+                        type="text"
+                        name="keyword"
+                        placeholder="Tìm kiếm theo tên sinh viên..."
+                        value="<?php echo htmlspecialchars($keyword); ?>"
+                        class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-400 focus:bg-white">
+                    <input type="hidden" name="sortby" value="<?php echo htmlspecialchars($sortby); ?>">
+                    <input type="hidden" name="order" value="<?php echo htmlspecialchars($order); ?>">
+                </div>
+                <button
+                    type="submit"
+                    class="inline-flex items-center justify-center rounded-2xl bg-slate-950 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-800">
+                    Tìm kiếm
+                </button>
+            </form>
+        </section>
+
+        <section class="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm">
+            <div class="flex flex-col gap-3 border-b border-slate-200 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                <div>
+                    <h2 class="text-lg font-semibold text-slate-950">Bảng sinh viên</h2>
+                    <p class="mt-1 text-sm text-slate-500">
+                        <?php if ($totalStudents > 0): ?>
+                            Hiển thị <?php echo $listStart; ?>-<?php echo $listEnd; ?> trên tổng <?php echo $totalStudents; ?> sinh viên
+                        <?php else: ?>
+                            Chưa có sinh viên nào trong hệ thống
+                        <?php endif; ?>
+                    </p>
+                </div>
+                <div class="text-sm text-slate-500">
+                    Sắp xếp hiện tại: <span class="font-medium text-slate-700"><?php echo strtoupper(htmlspecialchars($sortby)); ?></span>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-slate-200">
+                    <thead class="bg-slate-50">
+                        <tr class="text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                            <?php foreach (['id' => 'ID', 'name' => 'Họ và tên', 'email' => 'Email', 'phone' => 'Số điện thoại'] as $column => $label): ?>
+                                <?php $currentColOrder = $sortby === $column ? $nextOrder : 'asc'; ?>
+                                <th class="px-4 py-4 sm:px-6">
+                                    <a
+                                        href="<?php echo htmlspecialchars($buildListUrl($currentPage, $column, $currentColOrder)); ?>"
+                                        class="inline-flex items-center gap-2 transition hover:text-slate-900">
+                                        <span><?php echo $label; ?></span>
+                                        <span class="<?php echo $sortby === $column ? 'text-slate-900' : 'text-slate-300'; ?>">
+                                            <?php echo $sortIndicator($column); ?>
+                                        </span>
+                                    </a>
+                                </th>
+                            <?php endforeach; ?>
+                            <th class="px-4 py-4 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 sm:px-6">Avatar</th>
+                            <th class="px-4 py-4 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 sm:px-6">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        <?php foreach ($students as $student): ?>
+                            <?php
+                            $avatarFile = $student['avatar'] ?? '';
+                            $avatarAbsolutePath = __DIR__ . '/../public/uploads/avatars/' . $avatarFile;
+                            $avatarUrl = $avatarBaseUrl . '/' . rawurlencode($avatarFile);
+                            $editUrl = $buildActionUrl('edit', (int) $student['id']);
+                            $deleteUrl = $buildActionUrl('delete', (int) $student['id']);
+                            $detailUrl = $buildActionUrl('detail', (int) $student['id']);
+                            $avatarLabel = strtoupper(substr((string) ($student['name'] ?? 'N'), 0, 1));
+                            ?>
+                            <tr class="transition hover:bg-slate-50/80">
+                                <td class="px-4 py-4 text-sm font-medium text-slate-600 sm:px-6">#<?php echo $student['id']; ?></td>
+                                <td class="px-4 py-4 sm:px-6">
+                                    <div class="min-w-[180px]">
+                                        <p class="font-medium text-slate-900"><?php echo htmlspecialchars($student['name']); ?></p>
+                                        <p class="mt-1 text-sm text-slate-500">
+                                            <?php echo htmlspecialchars($student['major'] ?? 'Chưa cập nhật ngành học'); ?>
+                                        </p>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-4 text-sm text-slate-600 sm:px-6"><?php echo htmlspecialchars($student['email']); ?></td>
+                                <td class="px-4 py-4 text-sm text-slate-600 sm:px-6"><?php echo htmlspecialchars($student['phone']); ?></td>
+                                <td class="px-4 py-4 sm:px-6">
+                                    <?php if (!empty($avatarFile) && is_file($avatarAbsolutePath)): ?>
+                                        <img
+                                            src="<?php echo htmlspecialchars($avatarUrl); ?>"
+                                            alt="Avatar của <?php echo htmlspecialchars($student['name']); ?>"
+                                            class="h-11 w-11 rounded-2xl object-cover ring-1 ring-slate-200">
+                                    <?php elseif (is_file($defaultAvatarAbsolutePath)): ?>
+                                        <img
+                                            src="<?php echo htmlspecialchars($defaultAvatarUrl); ?>"
+                                            alt="Avatar mặc định"
+                                            class="h-11 w-11 rounded-2xl object-cover ring-1 ring-slate-200">
+                                    <?php else: ?>
+                                        <span class="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-100 text-sm font-semibold text-slate-500">
+                                            <?php echo htmlspecialchars($avatarLabel); ?>
+                                        </span>
+                                    <?php endif; ?>
+                                </td>
+                                <td class="px-4 py-4 sm:px-6">
+                                    <div class="flex flex-wrap items-center gap-3 text-sm font-medium">
+                                        <a href="<?php echo htmlspecialchars($editUrl); ?>" class="text-sky-600 transition hover:text-sky-800">
+                                            Sửa
+                                        </a>
+                                        <a
+                                            href="<?php echo htmlspecialchars($deleteUrl); ?>"
+                                            onclick="return confirm('Bạn có chắc muốn xóa sinh viên này?');"
+                                            class="text-rose-600 transition hover:text-rose-800">
+                                            Xóa
+                                        </a>
+                                        <a href="<?php echo htmlspecialchars($detailUrl); ?>" class="text-emerald-600 transition hover:text-emerald-800">
+                                            Chi tiết
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+
+                        <?php if (empty($students)): ?>
+                            <tr>
+                                <td colspan="6" class="px-4 py-16 text-center sm:px-6">
+                                    <div class="mx-auto max-w-md">
+                                        <p class="text-lg font-medium text-slate-900">Không có dữ liệu phù hợp</p>
+                                        <p class="mt-2 text-sm text-slate-500">
+                                            Hãy thử tìm kiếm với từ khóa khác hoặc thêm sinh viên mới để bắt đầu.
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <?php if ($totalPages > 1): ?>
+                <div class="flex flex-col gap-4 border-t border-slate-200 px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+                    <p class="text-sm text-slate-500">
+                        Trang <?php echo $currentPage; ?> / <?php echo $totalPages; ?>
+                    </p>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <?php if ($currentPage > 1): ?>
+                            <a
+                                href="<?php echo htmlspecialchars($buildListUrl($currentPage - 1)); ?>"
+                                class="inline-flex items-center rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50">
+                                Trước
+                            </a>
+                        <?php endif; ?>
+
+                        <?php for ($page = 1; $page <= $totalPages; $page++): ?>
+                            <a
+                                href="<?php echo htmlspecialchars($buildListUrl($page)); ?>"
+                                class="inline-flex h-10 w-10 items-center justify-center rounded-full text-sm font-medium transition <?php echo $page === $currentPage ? 'bg-slate-950 text-white' : 'border border-slate-200 text-slate-600 hover:border-slate-300 hover:bg-slate-50'; ?>">
+                                <?php echo $page; ?>
+                            </a>
+                        <?php endfor; ?>
+
+                        <?php if ($currentPage < $totalPages): ?>
+                            <a
+                                href="<?php echo htmlspecialchars($buildListUrl($currentPage + 1)); ?>"
+                                class="inline-flex items-center rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50">
+                                Sau
+                            </a>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+        </section>
     </div>
 
-    <div class="container">
-        <div class="topbar" style="margin-bottom: 15px;">
-            <div>
-                Chào mừng, <strong><?php echo htmlspecialchars($_SESSION['user_name']); ?></strong>!
-            </div>
-            <a href="index.php?action=logout" class="button-link cancel">Đăng xuất</a>
-        </div>
-
-        <div class="toolbar" style="margin-bottom: 15px;">
-            <h1 style="margin: 0;">
-                <?php if ($keyword !== ''): ?>
-                    Kết quả tìm kiếm cho: '<?php echo htmlspecialchars($keyword); ?>'
-                <?php else: ?>
-                    Danh sách sinh viên
-                <?php endif; ?>
-            </h1>
-            <a href="index.php?action=dashboard" class="button-link">Xem thống kê</a>
-        </div>
-
-        <form action="index.php" method="GET">
-            <input type="text" name="keyword" placeholder="Tìm kiếm theo tên..." value="<?php echo htmlspecialchars($keyword); ?>">
-            <input type="hidden" name="sortby" value="<?php echo htmlspecialchars($sortby); ?>">
-            <input type="hidden" name="order" value="<?php echo htmlspecialchars($order); ?>">
-            <button type="submit">Tìm kiếm</button>
-        </form>
-
-        <form action="<?php echo htmlspecialchars($formAction); ?>" method="POST" enctype="multipart/form-data">
-            <h3><?php echo htmlspecialchars($formTitle); ?></h3>
+    <div
+        id="student-form-container"
+        class="<?php echo $formContainerVisibilityClass; ?> fixed inset-0 z-50 items-center justify-center bg-slate-950/50 p-4 backdrop-blur-sm">
+        <form
+            id="student-form"
+            action="<?php echo htmlspecialchars($formAction); ?>"
+            method="POST"
+            enctype="multipart/form-data"
+            class="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-[2rem] border border-slate-200 bg-white p-6 shadow-2xl sm:p-8">
             <input type="hidden" name="page" value="<?php echo $currentPage; ?>">
             <input type="hidden" name="keyword" value="<?php echo htmlspecialchars($keyword); ?>">
             <input type="hidden" name="sortby" value="<?php echo htmlspecialchars($sortby); ?>">
@@ -317,202 +353,167 @@ $cancelUrl = $buildListUrl($currentPage);
 
             <?php if ($isEditing): ?>
                 <input type="hidden" name="id" value="<?php echo (int) $editingStudent['id']; ?>">
-                <div class="current-avatar">
-                    <?php if (!empty($editAvatar) && is_file($editAvatarAbsolutePath)): ?>
-                        <img src="<?php echo htmlspecialchars($editAvatarUrl); ?>" alt="Avatar hiện tại">
-                    <?php elseif (is_file($defaultAvatarAbsolutePath)): ?>
-                        <img src="<?php echo htmlspecialchars($defaultAvatarUrl); ?>" alt="Avatar mặc định">
-                    <?php else: ?>
-                        <span class="avatar-placeholder">N/A</span>
-                    <?php endif; ?>
-                    <span>Ảnh hiện tại</span>
+            <?php endif; ?>
+
+            <div class="flex flex-col gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+                        <?php echo $isEditing ? 'Chế độ chỉnh sửa' : 'Thêm hồ sơ mới'; ?>
+                    </p>
+                    <h3 class="mt-2 text-2xl font-semibold tracking-tight text-slate-950">
+                        <?php echo htmlspecialchars($formTitle); ?>
+                    </h3>
+                    <p class="mt-2 text-sm leading-6 text-slate-500">
+                        <?php echo htmlspecialchars($helperText); ?>
+                    </p>
                 </div>
-            <?php endif; ?>
 
-            <input type="text" name="name" placeholder="Họ và tên" value="<?php echo htmlspecialchars($editName); ?>" required>
-            <input type="email" name="email" placeholder="Email" value="<?php echo htmlspecialchars($editEmail); ?>" required>
-            <input type="text" name="phone" placeholder="Số điện thoại" value="<?php echo htmlspecialchars($editPhone); ?>" required>
-            <input type="file" name="avatar" accept=".jpg,.jpeg,.png,.gif,.webp,image/*">
-            <div class="helper-text"><?php echo htmlspecialchars($helperText); ?></div>
-
-            <input type="text" name="course" placeholder="Khóa học" value="<?php echo htmlspecialchars($editCourse); ?>">
-            <input type="text" name="class_name" placeholder="Tên lớp" value="<?php echo htmlspecialchars($editClassName); ?>">
-            <input type="text" name="major" placeholder="Ngành học" value="<?php echo htmlspecialchars($editMajor); ?>">
-
-            <button type="submit"><?php echo htmlspecialchars($submitLabel); ?></button>
-            <?php if ($isEditing): ?>
-                <a href="<?php echo htmlspecialchars($cancelUrl); ?>" class="button-link cancel">Hủy sửa</a>
-            <?php endif; ?>
-        </form>
-
-        <div class="pagination-summary" style="margin-bottom: 10px;">
-            <h2 style="margin: 0;">Danh sách sinh viên</h2>
-            <span>
-                <?php if ($totalStudents > 0): ?>
-                    Hiển thị <?php echo $listStart; ?>-<?php echo $listEnd; ?> / <?php echo $totalStudents; ?> sinh viên
-                <?php else: ?>
-                    Chưa có sinh viên nào
-                <?php endif; ?>
-            </span>
-        </div>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>
-                        <?php
-
-
-                        $currentColOrder = ($sortby === 'id') ?
-                            $nextOrder : 'asc';
-                        $activeClass = ($sortby === 'id') ? 'active sort-' . $order : '';
-
-                        ?>
-
-                        <a href="?keyword=<?php echo
-                                            urlencode($keyword ?? ''); ?>&page=<?php echo $currentPage;
-                                                                                ?>&sortby=id&order=<?php echo $currentColOrder; ?>"
-                            class="<?php echo $activeClass; ?>">
-                            ID <span class="sort-arrow"></span>
+                <div class="flex flex-wrap items-center gap-3">
+                    <?php if (!$isEditing): ?>
+                        <button
+                            type="button"
+                            id="close-student-form-button"
+                            class="inline-flex items-center rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50">
+                            Đóng form
+                        </button>
+                    <?php endif; ?>
+                    <?php if ($isEditing): ?>
+                        <a
+                            href="<?php echo htmlspecialchars($cancelUrl); ?>"
+                            class="inline-flex items-center rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-50">
+                            Hủy sửa
                         </a>
-                    </th>
-                    <th>Ảnh đại diện</th>
-                    <th>
-                        <?php
-
-                        $currentColOrder = ($sortby === 'name') ?
-                            $nextOrder : 'asc';
-                        $activeClass = ($sortby === 'name') ? 'active sort-' . $order : '';
-                        ?>
-
-                        <a href="?keyword=<?php echo
-                                            urlencode($keyword ?? ''); ?>&page=<?php echo $currentPage;
-                                                                                ?>&sortby=name&order=<?php echo $currentColOrder; ?>"
-                            class="<?php echo $activeClass; ?>">
-                            Họ và Tên <span class="sort-arrow"></span>
-                        </a>
-                    </th>
-                    <th>
-                        <?php
-                        $currentColOrder = ($sortby === 'email') ?
-                            $nextOrder : 'asc';
-                        $activeClass = ($sortby === 'email') ?
-                            'active sort-' . $order : '';
-                        ?>
-
-                        <a href="?keyword=<?php echo
-                                            urlencode($keyword ?? ''); ?>&page=<?php echo $currentPage;
-                                    ?>&sortby=email&order=<?php echo $currentColOrder; ?>"
-                            class="<?php echo $activeClass; ?>">
-                            Email <span class="sort-arrow"></span>
-                        </a>
-                    </th>
-                    <th>
-                        <?php
-
-                        $currentColOrder = ($sortby === 'phone') ?
-                            $nextOrder : 'asc';
-                        $activeClass = ($sortby === 'phone') ?
-                            'active sort-' . $order : '';
-                        ?>
-
-                        <a href="?keyword=<?php echo
-                                            urlencode($keyword ?? ''); ?>&page=<?php echo $currentPage;
-                                    ?>&sortby=phone&order=<?php echo $currentColOrder; ?>"
-                            class="<?php echo $activeClass; ?>">
-                            Số điện thoại <span
-                                class="sort-arrow"></span>
-                        </a>
-                    </th>
-                    <th>Thao tác</th>
-                </tr>
-            </thead>
-            <tbody> 
-                <?php foreach ($students as $student): ?>
-                    <?php
-                    $avatarFile = $student['avatar'] ?? '';
-                    $avatarAbsolutePath = __DIR__ . '/../public/uploads/avatars/' . $avatarFile;
-                    $avatarUrl = $avatarBaseUrl . '/' . rawurlencode($avatarFile);
-                    $urlParams = ['id' => (int) $student['id']];
-
-                    if ($currentPage > 1) {
-                        $urlParams['page'] = $currentPage;
-                    }
-
-                    if ($keyword !== '') {
-                        $urlParams['keyword'] = $keyword;
-                    }
-
-                    if ($sortby !== 'id' || $order !== 'desc') {
-                        $urlParams['sortby'] = $sortby;
-                        $urlParams['order'] = $order;
-                    }
-
-                    $editUrl = 'index.php?' . http_build_query(['action' => 'edit'] + $urlParams);
-                    $deleteUrl = 'index.php?' . http_build_query(['action' => 'delete'] + $urlParams);
-                    $detailUrl = 'index.php?' . http_build_query(['action' => 'detail'] + $urlParams);
-                    ?>
-                    <tr>
-                        <td><?php echo $student['id']; ?></td>
-                        <td>
-                            <?php if (!empty($avatarFile) && is_file($avatarAbsolutePath)): ?>
-                                <img
-                                    src="<?php echo htmlspecialchars($avatarUrl); ?>"
-                                    alt="Avatar của <?php echo htmlspecialchars($student['name']); ?>"
-                                    class="avatar-image">
-                            <?php elseif (is_file($defaultAvatarAbsolutePath)): ?>
-                                <img
-                                    src="<?php echo htmlspecialchars($defaultAvatarUrl); ?>"
-                                    alt="Avatar mặc định"
-                                    class="avatar-image">
-                            <?php else: ?>
-                                <span class="avatar-placeholder">N/A</span>
-                            <?php endif; ?>
-                        </td>
-                        <td><?php echo htmlspecialchars($student['name']); ?></td>
-                        <td><?php echo htmlspecialchars($student['email']); ?></td>
-                        <td><?php echo htmlspecialchars($student['phone']); ?></td>
-                        <td class="action-cell">
-                            <a href="<?php echo htmlspecialchars($editUrl); ?>" class="action-link">Sửa</a>
-                            <a
-                                href="<?php echo htmlspecialchars($deleteUrl); ?>"
-                                class="action-link delete"
-                                onclick="return confirm('Bạn có chắc muốn xóa sinh viên này?');">Xóa</a>
-                            <a href="<?php echo htmlspecialchars($detailUrl); ?>" class="action-link detail">Chi tiết</a>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-                <?php if (empty($students)): ?>
-                    <tr>
-                        <td colspan="6">Chưa có sinh viên nào.</td>
-                    </tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
-
-        <?php if ($totalPages > 1): ?>
-            <div class="pagination">
-                <?php if ($currentPage > 1): ?>
-                    <a href="<?php echo htmlspecialchars($buildListUrl($currentPage - 1)); ?>" class="page-link">Trước</a>
-                <?php endif; ?>
-
-                <?php for ($page = 1; $page <= $totalPages; $page++): ?>
-                    <a
-                        href="<?php echo htmlspecialchars($buildListUrl($page)); ?>"
-                        class="page-link<?php echo $page === $currentPage ? ' active' : ''; ?>">
-                        <?php echo $page; ?>
-                    </a>
-                <?php endfor; ?>
-
-                <?php if ($currentPage < $totalPages): ?>
-                    <a href="<?php echo htmlspecialchars($buildListUrl($currentPage + 1)); ?>" class="page-link">Sau</a>
-                <?php endif; ?>
+                    <?php endif; ?>
+                </div>
             </div>
-        <?php endif; ?>
+
+            <div class="mt-6 grid gap-6 lg:grid-cols-[1.4fr_0.9fr]">
+                <div class="space-y-5">
+                    <div class="grid gap-5 sm:grid-cols-2">
+                        <label class="block">
+                            <span class="mb-2 block text-sm font-medium text-slate-700">Họ và tên</span>
+                            <input
+                                type="text"
+                                name="name"
+                                value="<?php echo htmlspecialchars($editName); ?>"
+                                required
+                                class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:bg-white">
+                        </label>
+
+                        <label class="block">
+                            <span class="mb-2 block text-sm font-medium text-slate-700">Email</span>
+                            <input
+                                type="email"
+                                name="email"
+                                value="<?php echo htmlspecialchars($editEmail); ?>"
+                                required
+                                class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:bg-white">
+                        </label>
+                    </div>
+
+                    <div class="grid gap-5 sm:grid-cols-3">
+                        <label class="block">
+                            <span class="mb-2 block text-sm font-medium text-slate-700">Số điện thoại</span>
+                            <input
+                                type="text"
+                                name="phone"
+                                value="<?php echo htmlspecialchars($editPhone); ?>"
+                                required
+                                class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:bg-white">
+                        </label>
+
+                        <label class="block">
+                            <span class="mb-2 block text-sm font-medium text-slate-700">Khóa học</span>
+                            <input
+                                type="text"
+                                name="course"
+                                value="<?php echo htmlspecialchars($editCourse); ?>"
+                                class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:bg-white">
+                        </label>
+
+                        <label class="block">
+                            <span class="mb-2 block text-sm font-medium text-slate-700">Tên lớp</span>
+                            <input
+                                type="text"
+                                name="class_name"
+                                value="<?php echo htmlspecialchars($editClassName); ?>"
+                                class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:bg-white">
+                        </label>
+                    </div>
+
+                    <label class="block">
+                        <span class="mb-2 block text-sm font-medium text-slate-700">Ngành học</span>
+                        <input
+                            type="text"
+                            name="major"
+                            value="<?php echo htmlspecialchars($editMajor); ?>"
+                            class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 focus:bg-white">
+                    </label>
+                </div>
+
+                <div class="rounded-3xl border border-slate-200 bg-slate-50 p-5">
+                    <div class="flex items-start justify-between gap-4">
+                        <div>
+                            <p class="text-sm font-medium text-slate-700">Ảnh đại diện</p>
+                            <p class="mt-1 text-sm leading-6 text-slate-500">Tải lên ảnh hồ sơ rõ nét để bảng dữ liệu trực quan hơn.</p>
+                        </div>
+                        <?php if (!empty($editAvatar) && is_file($editAvatarAbsolutePath)): ?>
+                            <img src="<?php echo htmlspecialchars($editAvatarUrl); ?>" alt="Avatar hiện tại" class="h-16 w-16 rounded-2xl object-cover ring-1 ring-slate-200">
+                        <?php elseif (is_file($defaultAvatarAbsolutePath)): ?>
+                            <img src="<?php echo htmlspecialchars($defaultAvatarUrl); ?>" alt="Avatar mặc định" class="h-16 w-16 rounded-2xl object-cover ring-1 ring-slate-200">
+                        <?php else: ?>
+                            <span class="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-white text-sm font-semibold text-slate-400 ring-1 ring-slate-200">N/A</span>
+                        <?php endif; ?>
+                    </div>
+
+                    <label class="mt-5 block">
+                        <span class="mb-2 block text-sm font-medium text-slate-700">Chọn tệp</span>
+                        <input
+                            type="file"
+                            name="avatar"
+                            accept=".jpg,.jpeg,.png,.gif,.webp,image/*"
+                            class="block w-full text-sm text-slate-500 file:mr-4 file:rounded-full file:border-0 file:bg-slate-900 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-slate-800">
+                    </label>
+                </div>
+            </div>
+
+            <div class="mt-8 flex flex-wrap items-center gap-3">
+                <button
+                    type="submit"
+                    class="inline-flex items-center rounded-full bg-slate-950 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-800">
+                    <?php echo htmlspecialchars($submitLabel); ?>
+                </button>
+                <span class="text-sm text-slate-500">Dữ liệu sẽ được lưu ngay sau khi xác nhận.</span>
+            </div>
+        </form>
     </div>
 
     <script>
         const flashMessages = document.querySelectorAll('.flash-message');
+        const studentFormContainer = document.getElementById('student-form-container');
+        const studentForm = document.getElementById('student-form');
+        const openStudentFormButton = document.getElementById('open-student-form-button');
+        const closeStudentFormButton = document.getElementById('close-student-form-button');
+
+        flashMessages.forEach((message) => {
+            message.classList.add(
+                'rounded-3xl',
+                'border',
+                'px-4',
+                'py-3',
+                'text-sm',
+                'font-medium',
+                'shadow-sm',
+                'transition',
+                'duration-500'
+            );
+
+            if (message.classList.contains('flash-success')) {
+                message.classList.add('border-emerald-200', 'bg-emerald-50', 'text-emerald-700');
+            } else {
+                message.classList.add('border-rose-200', 'bg-rose-50', 'text-rose-700');
+            }
+        });
 
         if (flashMessages.length > 0) {
             setTimeout(() => {
@@ -524,6 +525,43 @@ $cancelUrl = $buildListUrl($currentPage);
                     }, 500);
                 });
             }, 5000);
+        }
+
+        const openStudentForm = () => {
+            if (!studentFormContainer || !openStudentFormButton) {
+                return;
+            }
+
+            studentFormContainer.classList.remove('hidden');
+            studentFormContainer.classList.add('flex');
+            openStudentFormButton.classList.add('hidden');
+            openStudentFormButton.classList.remove('inline-flex');
+        };
+
+        const closeStudentForm = () => {
+            if (!studentFormContainer || !studentForm || !openStudentFormButton) {
+                return;
+            }
+
+            studentForm.reset();
+            studentFormContainer.classList.add('hidden');
+            studentFormContainer.classList.remove('flex');
+            openStudentFormButton.classList.remove('hidden');
+            openStudentFormButton.classList.add('inline-flex');
+        };
+
+        if (studentFormContainer && openStudentFormButton) {
+            openStudentFormButton.addEventListener('click', openStudentForm);
+        }
+
+        if (studentFormContainer && studentForm && openStudentFormButton && closeStudentFormButton) {
+            closeStudentFormButton.addEventListener('click', closeStudentForm);
+
+            studentFormContainer.addEventListener('click', (event) => {
+                if (event.target === studentFormContainer) {
+                    closeStudentForm();
+                }
+            });
         }
     </script>
 </body>
