@@ -1,4 +1,4 @@
 ### Run Client and Server
 ```
-http://localhost/web-banhang/public/index.php
+http://localhost/web-shop-php/public/index.php
 ```
