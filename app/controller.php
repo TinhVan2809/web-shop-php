@@ -127,4 +127,52 @@ class Controller
 <?php endif;
         echo "</body></html>";
     }
+
+    public function login()
+    {
+        include_once PROJECT_ROOT . '/views/login.php';
+    }
+
+    public function handleLogin()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $username = $_POST['username'] ?? '';
+            $password = $_POST['password'] ?? '';
+
+            $database = new Database();
+            $db = $database->getConnection();
+
+            $query = "SELECT * FROM users WHERE username = :username LIMIT 1";
+            $stmt = $db->prepare($query);
+            $stmt->bindParam(':username', $username);
+            $stmt->execute();
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            // Ghi chú: Trong thực tế nên dùng password_hash và password_verify
+            // Ở đây tôi giả định password lưu trong DB đang ở dạng text thuần hoặc khớp trực tiếp
+            if ($user && $password === $user['password']) {
+                $_SESSION['user_id'] = $user['user_id'];
+                $_SESSION['user_name'] = $user['name'];
+                $_SESSION['user_role'] = $user['role'];
+
+                // Chuyển hướng dựa trên role
+                if ($user['role'] === 'admin' || $user['role'] === 'staff') {
+                    header("Location: index.php?action=admin_dashboard");
+                } else {
+                    header("Location: index.php");
+                }
+                exit;
+            } else {
+                $error = "Tên đăng nhập hoặc mật khẩu không đúng!";
+                include_once PROJECT_ROOT . '/views/login.php';
+            }
+        }
+    }
+
+    public function logout()
+    {
+        session_destroy();
+        header("Location: index.php");
+        exit;
+    }
 }
