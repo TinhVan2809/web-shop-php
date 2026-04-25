@@ -10,7 +10,7 @@ class Database
     private static $instance = null;
     private $conn;
     private $host = 'localhost';
-    private $db_name = 'quanlysinhvien';
+    private $db_name = 'web-shop-php';
     private $username = 'root';
     private $password = '';
     private function __construct()
