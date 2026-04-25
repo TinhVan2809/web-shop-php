@@ -9,3 +9,5 @@ http://localhost/webshopphp/public/index.php
 
 **Not found coulunm**
 => Không tìm thấy bảng trong database. Kiểm tra lại đã import đúng database chưa, chú ý tên database (web_shop_php) 
+
+**Đọc thêm ![Tại đây](./docs/doc.md)** 
