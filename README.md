@@ -39,11 +39,11 @@ http://localhost/webshopphp/public/index.php
 - **Số thẻ:** 9704198526191432198
 - **Tên chủ thẻ:** NGUYEN VAN A
 - **Ngày phát hành:** 07/15
-- **Mật khẩu OTP:** :!RO]ww1
+- **Mật khẩu OTP:** 123456
 
 **2. PayPal Sandbox:**
 - **Email:** sb-x3m3g30000000@personal.example.com (Vui lòng thay thế bằng email Buyer Sandbox của bạn nếu có)
-- **Password:** 12345678
+- **Password:** :!RO]ww1
 
 **3. Email Test (Nhận hóa đơn):**
 - **Email:** tathainguyen24@gmail.com
