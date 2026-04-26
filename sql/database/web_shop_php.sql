@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.3
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th4 26, 2026 lúc 09:23 AM
+-- Thời gian đã tạo: Th4 26, 2026 lúc 03:28 PM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
--- Phiên bản PHP: 8.2.12
+-- Phiên bản PHP: 8.1.25
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -31,16 +31,17 @@ CREATE TABLE `carts` (
   `cart_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `product_id` int(11) NOT NULL,
-  `quantity` int(11) DEFAULT 1,
-  `add_at` timestamp NULL DEFAULT current_timestamp()
+  `add_at` timestamp NULL DEFAULT current_timestamp(),
+  `quantity` int(11) DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `carts`
 --
 
-INSERT INTO `carts` (`cart_id`, `user_id`, `product_id`, `quantity`, `add_at`) VALUES
-(1, 3, 2, 1, '2026-04-22 18:00:41');
+INSERT INTO `carts` (`cart_id`, `user_id`, `product_id`, `add_at`, `quantity`) VALUES
+(1, 3, 2, '2026-04-22 18:00:41', 1),
+(16, 12, 13, '2026-04-26 12:15:20', 1);
 
 -- --------------------------------------------------------
 
@@ -174,7 +175,21 @@ INSERT INTO `orders` (`order_id`, `user_id`, `order_code`, `status`, `payment_st
 (7, 8, 'ORD00007', 'confirmed', 'paid', 2603900.00, 0.00, 0.00, 2603900.00, NULL, NULL, NULL, 'Ng╞░ß╗¥i nhß║¡n mß║½u', '0987654321', 'TP. Hß╗ô Ch├¡ Minh', 'Quß║¡n 1', 'Ph╞░ß╗¥ng Bß║┐n Ngh├⌐', '123 L├¬ Lß╗úi', NULL, '2026-04-25 12:54:35', '2026-04-25 12:54:35'),
 (8, 9, 'ORD00008', 'shipping', 'paid', 8402612.00, 0.00, 0.00, 8402612.00, NULL, NULL, NULL, 'Ng╞░ß╗¥i nhß║¡n mß║½u', '0987654321', 'TP. Hß╗ô Ch├¡ Minh', 'Quß║¡n 1', 'Ph╞░ß╗¥ng Bß║┐n Ngh├⌐', '123 L├¬ Lß╗úi', NULL, '2026-04-25 12:54:35', '2026-04-25 12:54:35'),
 (9, 10, 'ORD00009', 'completed', 'paid', 9150404.00, 0.00, 0.00, 9150404.00, NULL, NULL, NULL, 'Ng╞░ß╗¥i nhß║¡n mß║½u', '0987654321', 'TP. Hß╗ô Ch├¡ Minh', 'Quß║¡n 1', 'Ph╞░ß╗¥ng Bß║┐n Ngh├⌐', '123 L├¬ Lß╗úi', NULL, '2026-04-25 12:54:35', '2026-04-25 12:54:35'),
-(10, 9, 'ORD00010', 'completed', 'paid', 1676544.00, 0.00, 0.00, 1676544.00, NULL, NULL, NULL, 'Ng╞░ß╗¥i nhß║¡n mß║½u', '0987654321', 'TP. Hß╗ô Ch├¡ Minh', 'Quß║¡n 1', 'Ph╞░ß╗¥ng Bß║┐n Ngh├⌐', '123 L├¬ Lß╗úi', NULL, '2026-04-25 12:54:35', '2026-04-25 12:54:35');
+(10, 9, 'ORD00010', 'completed', 'paid', 1676544.00, 0.00, 0.00, 1676544.00, NULL, NULL, NULL, 'Ng╞░ß╗¥i nhß║¡n mß║½u', '0987654321', 'TP. Hß╗ô Ch├¡ Minh', 'Quß║¡n 1', 'Ph╞░ß╗¥ng Bß║┐n Ngh├⌐', '123 L├¬ Lß╗úi', NULL, '2026-04-25 12:54:35', '2026-04-25 12:54:35'),
+(11, 14, 'ORD20260426133133712', 'pending', 'unpaid', 12300000.00, 0.00, 30000.00, 13560000.00, NULL, NULL, NULL, 'tathainguyen', '913775566', '', '', '', '', NULL, '2026-04-26 11:31:33', '2026-04-26 11:31:33'),
+(12, 14, 'ORD20260426133153414', 'pending', 'unpaid', 2900000.00, 0.00, 30000.00, 3220000.00, NULL, NULL, NULL, 'tathainguyen', '913775566', '', '', '', '', NULL, '2026-04-26 11:31:53', '2026-04-26 11:31:53'),
+(13, 14, 'ORD20260426133608224', 'pending', 'failed', 850000.00, 0.00, 30000.00, 965000.00, NULL, NULL, NULL, 'tathainguyen', '913775566', '', '', '', '', NULL, '2026-04-26 11:36:08', '2026-04-26 11:47:38'),
+(14, 14, 'ORD20260426134801518', 'pending', 'unpaid', 2900000.00, 0.00, 0.00, 3190000.00, NULL, NULL, NULL, 'tathainguyen', '913775566', '123', '123', '123', '123', NULL, '2026-04-26 11:48:01', '2026-04-26 11:48:01'),
+(15, 14, 'ORD20260426134848653', 'pending', 'paid', 2800000.00, 0.00, 30000.00, 3110000.00, NULL, NULL, NULL, 'tathainguyen', '913775566', '123', '123', '123', '123', NULL, '2026-04-26 11:48:48', '2026-04-26 11:49:06'),
+(16, 14, 'ORD20260426134947902', 'pending', 'unpaid', 4500000.00, 0.00, 30000.00, 4980000.00, NULL, NULL, NULL, 'tathainguyen', '913775566', '', '', '', '', NULL, '2026-04-26 11:49:47', '2026-04-26 11:49:47'),
+(17, 14, 'ORD20260426135418739', 'completed', 'paid', 3900000.00, 0.00, 30000.00, 4320000.00, NULL, NULL, NULL, 'tathainguyen', '913775566', '', '', '', '', NULL, '2026-04-26 11:54:18', '2026-04-26 12:07:14'),
+(18, 14, 'ORD20260426141414486', 'pending', 'unpaid', 2800000.00, 0.00, 30000.00, 3110000.00, NULL, NULL, NULL, 'tathainguyen', '913775566', '', '', '', '', NULL, '2026-04-26 12:14:14', '2026-04-26 12:14:14'),
+(19, 14, 'ORD20260426141640603', 'pending', 'paid', 2520000.00, 0.00, 50000.00, 2822000.00, NULL, NULL, NULL, 'tathainguyen', '913775566', '', '', '', '', NULL, '2026-04-26 12:16:40', '2026-04-26 12:18:30'),
+(20, 14, 'ORD20260426143014639', 'pending', 'unpaid', 2900000.00, 0.00, 0.00, 3190000.00, NULL, NULL, NULL, 'tathainguyen', '913775566', 'Cần Thơ', 'Quận Ninh Kiều', 'Phường An Nghiệp', '', NULL, '2026-04-26 12:30:14', '2026-04-26 12:30:14'),
+(21, 14, 'ORD20260426145724534', 'pending', 'unpaid', 2800000.00, 0.00, 30000.00, 3110000.00, NULL, NULL, NULL, 'tathainguyen', '913775566', '', '', '', '', NULL, '2026-04-26 12:57:24', '2026-04-26 12:57:24'),
+(22, 14, 'ORD20260426152318926', 'pending', 'unpaid', 3900000.00, 0.00, 30000.00, 4320000.00, NULL, NULL, NULL, 'tathainguyen', '913775566', 'Hà Nội', 'Quận Ba Đình', 'Phường Trúc Bạch', '', NULL, '2026-04-26 13:23:18', '2026-04-26 13:23:18'),
+(23, 14, 'ORD20260426152340380', 'pending', 'paid', 2900000.00, 0.00, 30000.00, 3220000.00, NULL, NULL, NULL, 'tathainguyen', '913775566', '', '', '', '', NULL, '2026-04-26 13:23:40', '2026-04-26 13:24:19'),
+(24, 14, 'ORD20260426152523275', 'pending', 'paid', 8700000.00, 0.00, 30000.00, 9600000.00, NULL, NULL, NULL, 'tathainguyen', '913775566', '', '', '', '', NULL, '2026-04-26 13:25:23', '2026-04-26 13:25:57');
 
 -- --------------------------------------------------------
 
@@ -219,7 +234,23 @@ INSERT INTO `order_items` (`order_item_id`, `order_id`, `product_id`, `variant_i
 (17, 9, 1, NULL, 'Sß║ún phß║⌐m mß║½u', NULL, NULL, 500000.00, 1, 500000.00),
 (18, 9, 1, NULL, 'Sß║ún phß║⌐m mß║½u', NULL, NULL, 500000.00, 1, 500000.00),
 (19, 10, 1, NULL, 'Sß║ún phß║⌐m mß║½u', NULL, NULL, 500000.00, 1, 500000.00),
-(20, 10, 1, NULL, 'Sß║ún phß║⌐m mß║½u', NULL, NULL, 500000.00, 1, 500000.00);
+(20, 10, 1, NULL, 'Sß║ún phß║⌐m mß║½u', NULL, NULL, 500000.00, 1, 500000.00),
+(21, 11, 15, NULL, 'Nike Jordan 1 Retro', 'nike_pegasus_40.jpg', NULL, 4500000.00, 1, 4500000.00),
+(22, 11, 13, NULL, 'Adidas Ultraboost 22', 'adidas_ultraboost_22.jpg', NULL, 3900000.00, 2, 7800000.00),
+(23, 12, 14, NULL, 'Puma Velocity Nitro', 'puma_tshirt.jpg', NULL, 2900000.00, 1, 2900000.00),
+(24, 13, 17, NULL, 'Nike Dri-FIT Shorts', 'nike_drifit_pants.jpg', NULL, 850000.00, 1, 850000.00),
+(25, 14, 2, NULL, 'Nike Air Zoom Pegasus 40', 'nike_pegasus_40.jpg', NULL, 2900000.00, 1, 2900000.00),
+(26, 15, 12, NULL, 'Nike Air Zoom Pegasus', 'nike_pegasus_40.jpg', NULL, 2800000.00, 1, 2800000.00),
+(27, 16, 15, NULL, 'Nike Jordan 1 Retro', 'nike_pegasus_40.jpg', NULL, 4500000.00, 1, 4500000.00),
+(28, 17, 13, NULL, 'Adidas Ultraboost 22', 'adidas_ultraboost_22.jpg', NULL, 3900000.00, 1, 3900000.00),
+(29, 18, 12, NULL, 'Nike Air Zoom Pegasus', 'nike_pegasus_40.jpg', NULL, 2800000.00, 1, 2800000.00),
+(30, 19, 18, NULL, 'NB Classic 574', 'nb_shorts.jpg', NULL, 1800000.00, 1, 1800000.00),
+(31, 19, 6, NULL, 'Nike Dri-FIT Pants', 'nike_drifit_pants.jpg', NULL, 720000.00, 1, 720000.00),
+(32, 20, 14, NULL, 'Puma Velocity Nitro', 'puma_tshirt.jpg', NULL, 2900000.00, 1, 2900000.00),
+(33, 21, 12, NULL, 'Nike Air Zoom Pegasus', 'nike_pegasus_40.jpg', NULL, 2800000.00, 1, 2800000.00),
+(34, 22, 13, NULL, 'Adidas Ultraboost 22', 'adidas_ultraboost_22.jpg', NULL, 3900000.00, 1, 3900000.00),
+(35, 23, 14, NULL, 'Puma Velocity Nitro', 'puma_tshirt.jpg', NULL, 2900000.00, 1, 2900000.00),
+(36, 24, 14, NULL, 'Puma Velocity Nitro', 'puma_tshirt.jpg', NULL, 2900000.00, 3, 8700000.00);
 
 -- --------------------------------------------------------
 
@@ -236,6 +267,18 @@ CREATE TABLE `payments` (
   `transaction_code` varchar(255) DEFAULT NULL COMMENT 'ma giao dich',
   `paid_at` timestamp NULL DEFAULT current_timestamp() COMMENT 'ngay giao dich'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `payments`
+--
+
+INSERT INTO `payments` (`payment_id`, `order_id`, `amount`, `method`, `status`, `transaction_code`, `paid_at`) VALUES
+(1, 13, '965000.00', 'paypal', 'success', '9BY47744W4245320P', '2026-04-26 11:39:32'),
+(2, 15, '3110000.00', 'paypal', 'success', '7A42076429312794U', '2026-04-26 11:49:06'),
+(3, 17, '4320000.00', 'vnpay', 'success', '15514572', '2026-04-26 11:55:57'),
+(4, 19, '2822000.00', 'vnpay', 'success', '15514578', '2026-04-26 12:18:30'),
+(5, 23, '3220000.00', 'vnpay', 'success', '15514605', '2026-04-26 13:24:19'),
+(6, 24, '9600000.00', 'paypal', 'success', '99C981735L7693028', '2026-04-26 13:25:57');
 
 -- --------------------------------------------------------
 
@@ -367,7 +410,8 @@ INSERT INTO `users` (`user_id`, `name`, `username`, `password`, `role`, `status`
 (3, 'tinhvan', '1', '1', 'admin', 'active', '1', 818177533, 'tinhlu703@gmail.com', 'default_avatar.png', '2026-04-19 20:06:15'),
 (4, 'T├¡nh V─ân', 'tinhlu703@gmail.com', '$2b$10$Q.o5HJ4sMfrW5Qt1rQnSVuBdyoc8OjQxbEhWm91qIVV2tGlN3fODu', 'customer', 'active', '1', 0, '', 'default_avatar.png', '2026-04-24 07:40:36'),
 (12, 'Tính Văn ', 'username12345', '$2y$10$YNZIEDYKYFeWhAN2InDlnOZVASzo.3I2XnGeHz4u7ia6wfTs0kxta', 'customer', 'active', '1', 0, '', 'default_avatar.png', '2026-04-26 07:19:52'),
-(13, 'Admin', 'admin', '$2y$10$uIlQiJFyJsCFbEanXxDeEeX7geY9vISXiyZ5xRpbF.uLBJadg9OEy', 'admin', 'active', '1', 0, '', 'default_avatar.png', '2026-04-26 07:20:32');
+(13, 'Admin', 'admin', '$2y$10$uIlQiJFyJsCFbEanXxDeEeX7geY9vISXiyZ5xRpbF.uLBJadg9OEy', 'admin', 'active', '1', 0, '', 'default_avatar.png', '2026-04-26 07:20:32'),
+(14, 'tathainguyen', 'thainguyen24', '$2y$10$Ijy7rD4l00LE6UkiKG9c0ueRuVnl1vDLuiOZTP2FKSRXDit.oaDIa', 'customer', 'active', '1', 913775566, 'tathainguyen686@gmail.com', 'default_avatar.png', '2026-04-26 08:56:10');
 
 -- --------------------------------------------------------
 
@@ -602,7 +646,7 @@ ALTER TABLE `voucher_products`
 -- AUTO_INCREMENT cho bảng `carts`
 --
 ALTER TABLE `carts`
-  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
 -- AUTO_INCREMENT cho bảng `categories`
@@ -626,19 +670,19 @@ ALTER TABLE `manufacturers`
 -- AUTO_INCREMENT cho bảng `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID ????n h??ng', AUTO_INCREMENT=11;
+  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID ????n h??ng', AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT cho bảng `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `order_item_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID chi ti???t ????n h??ng', AUTO_INCREMENT=21;
+  MODIFY `order_item_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID chi ti???t ????n h??ng', AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT cho bảng `payments`
 --
 ALTER TABLE `payments`
-  MODIFY `payment_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `payment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT cho bảng `products`
@@ -662,7 +706,7 @@ ALTER TABLE `reviews`
 -- AUTO_INCREMENT cho bảng `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT cho bảng `user_address`
@@ -695,83 +739,83 @@ ALTER TABLE `voucher_products`
   MODIFY `voucher_product_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- Ràng buộc đối với các bảng kết xuất
+-- Các ràng buộc cho các bảng đã đổ
 --
 
 --
--- Ràng buộc cho bảng `carts`
+-- Các ràng buộc cho bảng `carts`
 --
 ALTER TABLE `carts`
   ADD CONSTRAINT `carts_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`),
   ADD CONSTRAINT `carts_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`);
 
 --
--- Ràng buộc cho bảng `inventory`
+-- Các ràng buộc cho bảng `inventory`
 --
 ALTER TABLE `inventory`
   ADD CONSTRAINT `fk_variant` FOREIGN KEY (`variant_id`) REFERENCES `product_variants` (`variant_id`),
   ADD CONSTRAINT `inventory_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`);
 
 --
--- Ràng buộc cho bảng `order_items`
+-- Các ràng buộc cho bảng `order_items`
 --
 ALTER TABLE `order_items`
   ADD CONSTRAINT `order_items_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`) ON DELETE CASCADE,
   ADD CONSTRAINT `order_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`);
 
 --
--- Ràng buộc cho bảng `payments`
+-- Các ràng buộc cho bảng `payments`
 --
 ALTER TABLE `payments`
   ADD CONSTRAINT `payments_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`);
 
 --
--- Ràng buộc cho bảng `products`
+-- Các ràng buộc cho bảng `products`
 --
 ALTER TABLE `products`
   ADD CONSTRAINT `products_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `categories` (`category_id`),
   ADD CONSTRAINT `products_ibfk_2` FOREIGN KEY (`manufacturer_id`) REFERENCES `manufacturers` (`manufacturer_id`);
 
 --
--- Ràng buộc cho bảng `product_images`
+-- Các ràng buộc cho bảng `product_images`
 --
 ALTER TABLE `product_images`
   ADD CONSTRAINT `product_images_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`);
 
 --
--- Ràng buộc cho bảng `product_variants`
+-- Các ràng buộc cho bảng `product_variants`
 --
 ALTER TABLE `product_variants`
   ADD CONSTRAINT `product_variants_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`) ON DELETE CASCADE;
 
 --
--- Ràng buộc cho bảng `reviews`
+-- Các ràng buộc cho bảng `reviews`
 --
 ALTER TABLE `reviews`
   ADD CONSTRAINT `reviews_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`),
   ADD CONSTRAINT `reviews_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`);
 
 --
--- Ràng buộc cho bảng `user_address`
+-- Các ràng buộc cho bảng `user_address`
 --
 ALTER TABLE `user_address`
   ADD CONSTRAINT `user_address_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
 
 --
--- Ràng buộc cho bảng `variant_attributes`
+-- Các ràng buộc cho bảng `variant_attributes`
 --
 ALTER TABLE `variant_attributes`
   ADD CONSTRAINT `variant_attributes_ibfk_1` FOREIGN KEY (`variant_id`) REFERENCES `product_variants` (`variant_id`) ON DELETE CASCADE;
 
 --
--- Ràng buộc cho bảng `voucher_categories`
+-- Các ràng buộc cho bảng `voucher_categories`
 --
 ALTER TABLE `voucher_categories`
   ADD CONSTRAINT `voucher_categories_ibfk_1` FOREIGN KEY (`voucher_id`) REFERENCES `vouchers` (`voucher_id`),
   ADD CONSTRAINT `voucher_categories_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `categories` (`category_id`);
 
 --
--- Ràng buộc cho bảng `voucher_products`
+-- Các ràng buộc cho bảng `voucher_products`
 --
 ALTER TABLE `voucher_products`
   ADD CONSTRAINT `voucher_products_ibfk_1` FOREIGN KEY (`voucher_id`) REFERENCES `vouchers` (`voucher_id`),
