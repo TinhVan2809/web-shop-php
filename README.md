@@ -25,7 +25,7 @@ http://localhost/webshopphp/public/index.php
 **Page Crash** 
 => Bật Xampp lên
 
-**Lỗi file CheckoutController.php dòng 16 hoặc dòng 5 
+**Lỗi file CheckoutController.php dòng 16 hoặc dòng 5**
 => Kiểm tra cấu hình file [config](/config.example.php) (Liên hệ người giữ repo gốc)
 
 Đọc thêm [tại đây](./docs/doc.md)
