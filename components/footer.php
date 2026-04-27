@@ -70,10 +70,36 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 3000);
     }
 
+    // Xử lý chọn biến thể
+    const variantOptions = document.querySelectorAll('.variant-option');
+    variantOptions.forEach(opt => {
+        opt.addEventListener('click', function() {
+            // Xóa highlight cũ
+            variantOptions.forEach(el => el.classList.remove('border-black', 'ring-2', 'ring-black'));
+            // Thêm highlight mới
+            this.classList.add('border-black', 'ring-2', 'ring-black');
+
+            // Cập nhật variant_id vào nút Add to Cart
+            const variantId = this.getAttribute('data-variant-id');
+            const btnAddToCart = document.querySelector('.btn-add-to-cart');
+            if (btnAddToCart) {
+                btnAddToCart.setAttribute('data-variant-id', variantId);
+            }
+
+            // Cập nhật ảnh chính nếu biến thể có ảnh riêng
+            const variantImg = this.getAttribute('data-image');
+            if (variantImg) {
+                const mainImg = document.getElementById('main-image');
+                if (mainImg) mainImg.src = variantImg;
+            }
+        });
+    });
+
     document.querySelectorAll('.btn-add-to-cart').forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
             let productId = this.getAttribute('data-id');
+            let variantId = this.getAttribute('data-variant-id') || '';
             // Check if there is a quantity input for details page
             let quantityInput = document.getElementById('product-quantity');
             let quantity = quantityInput ? quantityInput.value : 1;
@@ -83,7 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: `product_id=${productId}&quantity=${quantity}`
+                body: `product_id=${productId}&quantity=${quantity}&variant_id=${variantId}`
             })
             .then(response => response.json())
             .then(data => {

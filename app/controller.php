@@ -101,11 +101,12 @@ class Controller
 
         $user_id = $_SESSION['user_id'] ?? 0;
 
-        $query = "SELECT p.*, c.category_name, m.manufacturer_name, f.farority_id AS is_favorited
+        $query = "SELECT p.*, c.category_name, m.manufacturer_name, m.logo_img, f.farority_id AS is_favorited, i.available_quantity	
                   FROM products p 
                   LEFT JOIN categories c ON p.category_id = c.category_id 
                   LEFT JOIN manufacturers m ON p.manufacturer_id = m.manufacturer_id
-                   LEFT JOIN favority f ON p.product_id = f.product_id AND f.user_id = :user_id
+                  LEFT JOIN inventory i ON i.product_id = p.product_id
+                  LEFT JOIN favority f ON p.product_id = f.product_id AND f.user_id = :user_id
                   WHERE p.product_id = :id";
 
         $stmt = $db->prepare($query);
@@ -118,6 +119,27 @@ class Controller
         $imgStmt->execute(['id' => $id]);
         $extra_images = $imgStmt->fetchAll(PDO::FETCH_ASSOC);
 
+        // Lấy danh sách biến thể và thuộc tính của từng biến thể
+        $variantQuery = "SELECT pv.*, va.attribute_name, va.attribute_value 
+                        FROM product_variants pv 
+                        LEFT JOIN variant_attributes va ON pv.variant_id = va.variant_id 
+                        WHERE pv.product_id = :id";
+        $vStmt = $db->prepare($variantQuery);
+        $vStmt->execute(['id' => $id]);
+        $rawVariants = $vStmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $variants = [];
+        foreach ($rawVariants as $row) {
+            $vid = $row['variant_id'];
+            if (!isset($variants[$vid])) {
+                $variants[$vid] = $row;
+                $variants[$vid]['attrs'] = [];
+            }
+            if ($row['attribute_name']) {
+                $variants[$vid]['attrs'][$row['attribute_name']] = $row['attribute_value'];
+            }
+        }
+
         include_once PROJECT_ROOT . '/components/header.php';
 
         if (!$product): ?>
@@ -129,7 +151,7 @@ class Controller
             <main class="container mx-auto px-7 py-10 mt-30">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
                     <div>
-                        <img id="main-image" src="/web-shop-php/asset/<?php echo $product['thumbnail']; ?>" alt="<?php echo $product['name']; ?>" class="w-full rounded-2xl shadow-lg transition-all duration-300">
+                        <img id="main-image" src="/web-shop-php/asset/<?php echo $product['thumbnail']; ?>" alt="<?php echo $product['name']; ?>" class="w-full rounded-2xl transition-all duration-300">
                         
                         <?php if (!empty($extra_images)): ?>
                             <div class="grid grid-cols-4 gap-4 mt-4">
@@ -158,18 +180,49 @@ class Controller
                         <div class="prose max-w-none text-gray-700 mb-8 leading-relaxed">
                             <?php echo nl2br($product['description'] ?: $product['short_description']); ?>
                         </div>
+
+                        <?php if (!empty($variants)): ?>
+                            <div class="mb-8">
+                                <h3 class="text-sm font-bold text-gray-900 uppercase mb-4">Tùy chọn sản phẩm:</h3>
+                                <div class="flex flex-wrap gap-3" id="variant-container">
+                                    <?php foreach ($variants as $v): ?>
+                                        <div class="variant-option border rounded-xl p-3 cursor-pointer hover:border-black transition-all group relative" 
+                                             data-variant-id="<?php echo $v['variant_id']; ?>"
+                                             data-price="<?php echo $v['price'] ?: $product['discount_price'] ?? $product['price']; ?>"
+                                             data-image="<?php echo $v['image'] ? '/web-shop-php/asset/' . $v['image'] : ''; ?>">
+                                            
+                                            <div class="text-xs font-bold text-gray-500 mb-1"><?php echo $v['sku']; ?></div>
+                                            <div class="text-sm">
+                                                <?php foreach ($v['attrs'] as $name => $val): ?>
+                                                    <span class="bg-gray-100 px-2 py-0.5 rounded text-[10px] mr-1">
+                                                        <strong><?php echo $name; ?>:</strong> <?php echo $val; ?>
+                                                    </span>
+                                                <?php endforeach; ?>
+                                            </div>
+                                            <?php if ($v['price']): ?>
+                                                <div class="mt-1 text-sm font-bold text-blue-600"><?php echo number_format($v['price'], 0, ',', '.'); ?>₫</div>
+                                            <?php endif; ?>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
                         <div class="flex items-center gap-4 mb-6">
                             <div class="flex items-center border border-gray-300 rounded-full px-4 py-2 w-32">
                                 <button type="button" class="text-xl px-2 hover:text-red-500" onclick="document.getElementById('product-quantity').stepDown()">-</button>
                                 <input type="number" id="product-quantity" value="1" min="1" class="w-full text-center outline-none bg-transparent font-medium">
                                 <button type="button" class="text-xl px-2 hover:text-green-500" onclick="document.getElementById('product-quantity').stepUp()">+</button>
                             </div>
-                            <button class="bg-black text-white px-10 py-4 rounded-full font-bold hover:bg-gray-800 transition-all btn-add-to-cart flex-1" data-id="<?php echo $product['product_id']; ?>">
+                            <button class="bg-black text-white px-10 py-4 rounded-full font-bold hover:bg-gray-800 transition-all btn-add-to-cart flex-1" data-id="<?php echo $product['product_id']; ?>" data-variant-id="">
                                 THÊM VÀO GIỎ HÀNG
                             </button>
                             <button class="py-3 px-3.5 border border-gray-200 rounded-full hover:bg-gray-50 transition-colors btn-toggle-favorite" data-id="<?php echo $product['product_id']; ?>">
                                 <i class="<?php echo !empty($product['is_favorited']) ? 'ri-heart-fill text-red-500' : 'ri-heart-line'; ?> text-2xl"></i>
                             </button>
+                        </div>
+                        <div class="">
+                            <span>Tồn kho (<?php echo $product['available_quantity']; ?>)</span>
                         </div>
                     </div>
                 </div>

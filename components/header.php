@@ -79,7 +79,7 @@
     </header>
 
     <!-- Mobile Menu Drawer -->
-    <div id="mobile-menu" class="hidden fixed inset-0 z-40 bg-white pt-24 px-7 transition-all duration-300">
+    <div id="mobile-menu" class="hidden fixed inset-0 z-500 bg-white pt-24 px-7 transition-all duration-300">
         <nav>
             <ul class="flex flex-col gap-6 text-xl font-medium">
                 <li><a href="index.php" class="hover:text-green-700">Home</a></li>
