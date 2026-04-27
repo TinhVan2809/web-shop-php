@@ -85,5 +85,43 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
+
+    // Xử lý Favorite Toggle bằng Event Delegation
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.btn-toggle-favorite');
+        if (!btn) return;
+
+        // Ngăn chặn chuyển trang nếu nút nằm trong thẻ <a>
+        e.preventDefault();
+        e.stopPropagation();
+
+        const productId = btn.getAttribute('data-id');
+        const icon = btn.querySelector('i');
+
+        fetch('index.php?action=toggle_favorite', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `product_id=${productId}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast(data.message, 'success');
+                if (data.isFavorited) {
+                    icon.className = icon.className.replace('-line', '-fill');
+                    icon.classList.add('text-red-500');
+                } else {
+                    icon.className = icon.className.replace('-fill', '-line');
+                    icon.classList.remove('text-red-500');
+                }
+            } else {
+                showToast(data.message, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Không thể kết nối đến máy chủ!', 'error');
+        });
+    });
 });
 </script>

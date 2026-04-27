@@ -10,14 +10,18 @@ class Controller
         $db = $database->getConnection();
 
         // Truy vấn lấy sản phẩm kèm tên danh mục
-        $query = "SELECT p.*, c.category_name 
+        $user_id = $_SESSION['user_id'] ?? 0;
+
+        // Truy vấn lấy sản phẩm kèm tên danh mục và trạng thái yêu thích
+        $query = "SELECT p.*, c.category_name, f.farority_id AS is_favorited
                   FROM products p 
                   LEFT JOIN categories c ON p.category_id = c.category_id 
+                  LEFT JOIN favority f ON p.product_id = f.product_id AND f.user_id = :user_id
                   WHERE p.status = 'active' 
                   ORDER BY p.created_at DESC";
 
         $stmt = $db->prepare($query);
-        $stmt->execute();
+        $stmt->execute(['user_id' => $user_id]);
         $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // Include header (đã có sẵn HTML, Head, Body mở)
@@ -49,9 +53,9 @@ class Controller
                             <?php if ($product['is_new']): ?>
                                 <span class="absolute top-2 left-2 text-black font-[550] text-xs px-2 py-1 rounded">New</span>
                             <?php endif; ?>
-                            <div class="absolute top-0 right-0 p-3">
-                                <i class="ri-heart-3-line text-2xl"></i>
-                            </div>
+                            <button class="absolute top-0 right-0 p-3 btn-toggle-favorite" data-id="<?php echo $product['product_id']; ?>">
+                                <i class="<?php echo !empty($product['is_favorited']) ? 'ri-heart-3-fill text-red-500' : 'ri-heart-3-line'; ?> text-2xl hover:text-red-500 transition-colors"></i>
+                            </button>
                         </a>
 
                         <div class="p-4">
@@ -91,15 +95,17 @@ class Controller
         $database = new Database();
         $db = $database->getConnection();
 
-        $query = "SELECT p.*, c.category_name, m.manufacturer_name 
+        $user_id = $_SESSION['user_id'] ?? 0;
+
+        $query = "SELECT p.*, c.category_name, m.manufacturer_name, f.farority_id AS is_favorited
                   FROM products p 
                   LEFT JOIN categories c ON p.category_id = c.category_id 
                   LEFT JOIN manufacturers m ON p.manufacturer_id = m.manufacturer_id
+                   LEFT JOIN favority f ON p.product_id = f.product_id AND f.user_id = :user_id
                   WHERE p.product_id = :id";
 
         $stmt = $db->prepare($query);
-        $stmt->bindParam(':id', $id);
-        $stmt->execute();
+        $stmt->execute(['id' => $id, 'user_id' => $user_id]);
         $product = $stmt->fetch(PDO::FETCH_ASSOC);
 
         include_once PROJECT_ROOT . '/components/header.php';
@@ -136,7 +142,9 @@ class Controller
                             <button class="bg-black text-white px-10 py-4 rounded-full font-bold hover:bg-gray-800 transition-all btn-add-to-cart flex-1" data-id="<?php echo $product['product_id']; ?>">
                                 THÊM VÀO GIỎ HÀNG
                             </button>
-                            <button class="py-3 px-3.5 border border-gray-200 rounded-full hover:bg-gray-50 transition-colors"><i class="ri-heart-line text-2xl"></i></button>
+                            <button class="py-3 px-3.5 border border-gray-200 rounded-full hover:bg-gray-50 transition-colors btn-toggle-favorite" data-id="<?php echo $product['product_id']; ?>">
+                                <i class="<?php echo !empty($product['is_favorited']) ? 'ri-heart-fill text-red-500' : 'ri-heart-line'; ?> text-2xl"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -151,6 +159,7 @@ class Controller
         $sort = $_GET['sort'] ?? 'newest';
         $manufacturer_id = $_GET['manufacturer_id'] ?? 'all'; // Lấy tham số hãng sản xuất
         $price_range = $_GET['price_range'] ?? 'all';
+        $user_id = $_SESSION['user_id'] ?? 0;
         if (!$id) {
             header("Location: index.php");
             exit;
@@ -196,7 +205,7 @@ class Controller
 
         // Xác định điều kiện lọc theo hãng sản xuất
         $manufacturerCondition = "";
-        $params = ['id' => $id];
+        $params = ['id' => $id, 'user_id' => $user_id];
         if ($manufacturer_id !== 'all') {
             $manufacturerCondition = " AND p.manufacturer_id = :manufacturer_id";
             $params['manufacturer_id'] = $manufacturer_id;
@@ -204,10 +213,11 @@ class Controller
 
 
         // 2. Truy vấn lấy tất cả sản phẩm thuộc danh mục này
-        $query = "SELECT p.*, c.category_name, m.manufacturer_name 
+        $query = "SELECT p.*, c.category_name, m.manufacturer_name, f.farority_id AS is_favorited
                   FROM products p 
                   LEFT JOIN categories c ON p.category_id = c.category_id 
                    LEFT JOIN manufacturers m ON p.manufacturer_id = m.manufacturer_id
+                   LEFT JOIN favority f ON p.product_id = f.product_id AND f.user_id = :user_id
                   WHERE p.category_id = :id AND p.status = 'active' $priceCondition $manufacturerCondition
                   ORDER BY $orderBy";
 
@@ -614,5 +624,56 @@ class Controller
         session_destroy();
         header("Location: index.php");
         exit;
+    }
+
+    public function toggleFavorite()
+    {
+        header('Content-Type: application/json');
+        
+        if (!isset($_SESSION['user_id'])) {
+            echo json_encode(['success' => false, 'message' => 'Vui lòng đăng nhập để thực hiện!']);
+            exit;
+        }
+
+        $user_id = $_SESSION['user_id'];
+        $product_id = $_POST['product_id'] ?? null;
+
+        if (!$product_id) {
+            echo json_encode(['success' => false, 'message' => 'Sản phẩm không hợp lệ!']);
+            exit;
+        }
+
+        $database = new Database();
+        $db = $database->getConnection();
+
+        // Kiểm tra xem sản phẩm đã nằm trong mục yêu thích của User này chưa
+        $checkQuery = "SELECT farority_id FROM favority WHERE user_id = :user_id AND product_id = :product_id";
+        $checkStmt = $db->prepare($checkQuery);
+        $checkStmt->execute(['user_id' => $user_id, 'product_id' => $product_id]);
+        $favorite = $checkStmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($favorite) {
+            // Nếu đã tồn tại thì thực hiện xóa (Unlike)
+            $deleteQuery = "DELETE FROM favority WHERE farority_id = :id";
+            $deleteStmt = $db->prepare($deleteQuery);
+            $deleteStmt->execute(['id' => $favorite['farority_id']]);
+            
+            echo json_encode([
+                'success' => true, 
+                'isFavorited' => false, 
+                'message' => 'Đã xóa khỏi danh sách yêu thích!'
+            ]);
+        } else {
+            // Nếu chưa tồn tại thì thực hiện thêm mới (Like)
+            $insertQuery = "INSERT INTO favority (user_id, product_id) VALUES (:user_id, :product_id)";
+            $insertStmt = $db->prepare($insertQuery);
+            $insertStmt->execute(['user_id' => $user_id, 'product_id' => $product_id]);
+            
+            echo json_encode([
+                'success' => true, 
+                'isFavorited' => true, 
+                'message' => 'Đã thêm vào danh sách yêu thích!'
+            ]);
+        }
     }
 }

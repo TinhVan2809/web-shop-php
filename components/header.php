@@ -110,5 +110,6 @@
                 menuIcon.classList.replace('ri-menu-3-line', 'ri-close-line');
             }
         });
+
     </script>
 </body>

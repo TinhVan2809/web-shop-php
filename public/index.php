@@ -87,6 +87,9 @@ switch ($action) {
     case 'logout':
         $controller->logout();
         break;
+    case 'toggle_favorite':
+        $controller->toggleFavorite();
+        break;
     case 'profile':
         $controller->getProfileByUser();
         break;
