@@ -1,0 +1,3 @@
+- Cần thêm các variants và attributes (Size, màu sắc)
+- Cập nhật tồn kho
+- Thêm ảnh phụ cho từng sản phẩm

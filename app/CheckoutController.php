@@ -82,7 +82,7 @@ class CheckoutController
         $district_name = $_POST['district_name'] ?? '';
         $ward_name = $_POST['ward_name'] ?? '';
         $specific_address = $_POST['specific_address'] ?? '';
-        
+
         $shipping_method = $_POST['shipping_method'] ?? 'standard';
         $payment_method = $_POST['payment_method'] ?? 'cod';
 
@@ -158,15 +158,36 @@ class CheckoutController
                 VALUES (:order_id, :product_id, :variant_id, :product_name, :product_image, :sku, :price, :quantity, :total_price)
             ");
 
+            // Câu lệnh cập nhật kho hàng (trừ số lượng tồn kho)
+            $stmtUpdateStock = $this->db->prepare("
+                UPDATE inventory 
+                SET quantity = quantity - :qty 
+                WHERE product_id = :pid AND variant_id <=> :vid AND quantity >= :qty
+            ");
+
             foreach ($cartItems as $item) {
                 $price = $item['variant_price'] ?: ($item['discount_price'] ?? $item['price']);
                 $total_price = $price * $item['quantity'];
-                
+
                 // Lưu tên sản phẩm kèm thông tin biến thể để làm snapshot dữ liệu
                 $product_name = $item['name'];
                 if (!empty($item['variant_details'])) {
                     $product_name .= ' (' . $item['variant_details'] . ')';
                 }
+
+                // 1. Thực hiện trừ tồn kho ngay trong transaction
+                $stmtUpdateStock->execute([
+                    'qty' => $item['quantity'],
+                    'pid' => $item['product_id'],
+                    'vid' => $item['variant_id']
+                ]);
+
+                // Nếu rowCount bằng 0, nghĩa là không tìm thấy bản ghi kho hoặc không đủ số lượng (do điều kiện quantity >= :qty)
+                if ($stmtUpdateStock->rowCount() === 0) {
+                    throw new Exception("Sản phẩm '" . $item['name'] . "' hiện không đủ số lượng trong kho.");
+                }
+
+                // 2. Thêm vào bảng order_items
 
                 $stmtItem->execute([
                     'order_id' => $order_id,
@@ -206,7 +227,6 @@ class CheckoutController
             } else if ($payment_method === 'paypal') {
                 $this->processPayPal($order_id, $order_code, $total_amount);
             }
-
         } catch (Exception $e) {
             $this->db->rollBack();
             header("Location: index.php?action=checkout_failed&error=" . urlencode($e->getMessage()));
@@ -275,7 +295,7 @@ class CheckoutController
         // Simple REST implementation to get Approval URL
         $clientId = PAYPAL_CLIENT_ID;
         $secret = PAYPAL_SECRET;
-        
+
         $environment = PAYPAL_MODE === 'sandbox' ? 'https://api-m.sandbox.paypal.com' : 'https://api-m.paypal.com';
 
         // 1. Get Access Token
@@ -284,11 +304,11 @@ class CheckoutController
         curl_setopt($ch, CURLOPT_HEADER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); 
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_USERPWD, $clientId . ":" . $secret);
         curl_setopt($ch, CURLOPT_POSTFIELDS, "grant_type=client_credentials");
         $result = curl_exec($ch);
-        
+
         if (empty($result)) {
             header("Location: index.php?action=checkout_failed&error=PayPal token error");
             exit;
@@ -299,13 +319,13 @@ class CheckoutController
         curl_close($ch);
 
         if (!$accessToken) {
-             header("Location: index.php?action=checkout_failed&error=Invalid PayPal Credentials");
-             exit;
+            header("Location: index.php?action=checkout_failed&error=Invalid PayPal Credentials");
+            exit;
         }
 
         // 2. Create Order
         $amount_usd = number_format($total_amount / 25000, 2, '.', ''); // Convert VND to USD mock rate 25000
-        
+
         $data = [
             "intent" => "CAPTURE",
             "purchase_units" => [
@@ -334,12 +354,12 @@ class CheckoutController
             "Content-Type: application/json"
         ]);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-        
+
         $result = curl_exec($ch);
         curl_close($ch);
-        
+
         $order = json_decode($result);
-        
+
         if (isset($order->links)) {
             foreach ($order->links as $link) {
                 if ($link->rel === 'approve') {
@@ -348,7 +368,7 @@ class CheckoutController
                 }
             }
         }
-        
+
         header("Location: index.php?action=checkout_failed&error=Cannot create PayPal order");
         exit;
     }

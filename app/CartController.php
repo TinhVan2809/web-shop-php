@@ -42,6 +42,8 @@ class CartController
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $product_id = $_POST['product_id'] ?? null;
             $variant_id = $_POST['variant_id'] ?? null;
+            // Chuyển chuỗi rỗng thành null để tránh lỗi khóa ngoại
+            if ($variant_id === '') $variant_id = null;
             $quantity = $_POST['quantity'] ?? 1;
 
             if (!$product_id) {
@@ -66,6 +68,8 @@ class CartController
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $product_id = $_POST['product_id'] ?? null;
             $variant_id = $_POST['variant_id'] ?? null;
+            // Chuyển chuỗi rỗng thành null để tránh lỗi khóa ngoại
+            if ($variant_id === '') $variant_id = null;
             $quantity = $_POST['quantity'] ?? 1;
 
             if ($quantity < 1) $quantity = 1;
@@ -108,6 +112,8 @@ class CartController
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $product_id = $_POST['product_id'] ?? null;
             $variant_id = $_POST['variant_id'] ?? null;
+            // Chuyển chuỗi rỗng thành null để tránh lỗi khóa ngoại
+            if ($variant_id === '') $variant_id = null;
 
             if (isset($_SESSION['user_id'])) {
                 $stmt = $this->db->prepare("DELETE FROM carts WHERE user_id = :user_id AND product_id = :product_id AND variant_id <=> :variant_id");
@@ -213,8 +219,8 @@ class CartController
                                pv.price as variant_price,
                                GROUP_CONCAT(CONCAT(va.attribute_name, ': ', va.attribute_value) SEPARATOR ', ') as variant_details
                         FROM products p 
-                        LEFT JOIN product_variants pv ON pv.variant_id = :vid
-                        LEFT JOIN variant_attributes va ON va.variant_id = :vid
+                        LEFT JOIN product_variants pv ON pv.variant_id <=> :vid
+                        LEFT JOIN variant_attributes va ON va.variant_id <=> :vid
                         WHERE p.product_id = :pid
                         GROUP BY p.product_id
                     ");

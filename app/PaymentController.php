@@ -149,11 +149,35 @@ class PaymentController
         exit;
     }
 
+    private function restockItems($order_id)
+    {
+        $stmt = $this->db->prepare("SELECT product_id, variant_id, quantity FROM order_items WHERE order_id = ?");
+        $stmt->execute([$order_id]);
+        $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $updateStock = $this->db->prepare("
+            UPDATE inventory 
+            SET quantity = quantity + :qty 
+            WHERE product_id = :pid AND variant_id <=> :vid
+        ");
+
+        foreach ($items as $item) {
+            $updateStock->execute([
+                'qty' => $item['quantity'],
+                'pid' => $item['product_id'],
+                'vid' => $item['variant_id']
+            ]);
+        }
+    }
+
     private function handleFailed($order_id)
     {
         $stmt = $this->db->prepare("UPDATE orders SET payment_status = 'failed' WHERE order_id = :id");
         $stmt->execute(['id' => $order_id]);
         
+        // Hoàn lại số lượng vào kho nếu thanh toán trực tuyến thất bại
+        $this->restockItems($order_id);
+
         header("Location: index.php?action=checkout_failed");
         exit;
     }

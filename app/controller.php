@@ -84,6 +84,10 @@ class Controller
         </main>
 
         <?php
+        // Include logo animation
+        include_once PROJECT_ROOT . '/components/logo_manu.php';
+
+
         // Footer
         include_once PROJECT_ROOT . '/components/footer.php';
     }
@@ -153,18 +157,18 @@ class Controller
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
                     <div>
                         <img id="main-image" src="/web-shop-php/asset/<?php echo $product['thumbnail']; ?>" alt="<?php echo $product['name']; ?>" class="w-full rounded-2xl transition-all duration-300">
-                        
+
                         <?php if (!empty($extra_images)): ?>
                             <div class="grid grid-cols-4 gap-4 mt-4">
                                 <!-- Hiển thị thumbnail chính như một phần của gallery -->
-                                <img src="/web-shop-php/asset/<?php echo $product['thumbnail']; ?>" 
-                                     class="w-full aspect-square object-cover rounded-lg cursor-pointer border-2 border-transparent hover:border-black transition-all"
-                                     onclick="document.getElementById('main-image').src=this.src">
-                                
+                                <img src="/web-shop-php/asset/<?php echo $product['thumbnail']; ?>"
+                                    class="w-full aspect-square object-cover rounded-lg cursor-pointer border-2 border-transparent hover:border-black transition-all"
+                                    onclick="document.getElementById('main-image').src=this.src">
+
                                 <?php foreach ($extra_images as $img): ?>
-                                    <img src="/web-shop-php/asset/<?php echo $img['image']; ?>" 
-                                         class="w-full aspect-square object-cover rounded-lg cursor-pointer border-2 border-transparent hover:border-black transition-all"
-                                         onclick="document.getElementById('main-image').src=this.src">
+                                    <img src="/web-shop-php/asset/<?php echo $img['image']; ?>"
+                                        class="w-full aspect-square object-cover rounded-lg cursor-pointer border-2 border-transparent hover:border-black transition-all"
+                                        onclick="document.getElementById('main-image').src=this.src">
                                 <?php endforeach; ?>
                             </div>
                         <?php endif; ?>
@@ -187,12 +191,12 @@ class Controller
                                 <h3 class="text-sm font-bold text-gray-900 uppercase mb-4">Tùy chọn sản phẩm:</h3>
                                 <div class="flex flex-wrap gap-3" id="variant-container">
                                     <?php foreach ($variants as $v): ?>
-                                        <div class="variant-option border rounded-xl p-3 cursor-pointer hover:border-black transition-all group relative" 
-                                             data-variant-id="<?php echo $v['variant_id']; ?>"
-                                             data-price="<?php echo $v['price'] ?: $product['discount_price'] ?? $product['price']; ?>"
-                                             data-image="<?php echo $v['image'] ? '/web-shop-php/asset/' . $v['image'] : ''; ?>"
-                                             data-stock="<?php echo $v['available_quantity'] ?? 0; ?>">
-                                            
+                                        <div class="variant-option border rounded-xl p-3 cursor-pointer hover:border-black transition-all group relative"
+                                            data-variant-id="<?php echo $v['variant_id']; ?>"
+                                            data-price="<?php echo $v['price'] ?: $product['discount_price'] ?? $product['price']; ?>"
+                                            data-image="<?php echo $v['image'] ? '/web-shop-php/asset/' . $v['image'] : ''; ?>"
+                                            data-stock="<?php echo $v['available_quantity'] ?? 0; ?>">
+
                                             <div class="text-xs font-bold text-gray-500 mb-1"><?php echo $v['sku']; ?></div>
                                             <div class="text-sm">
                                                 <?php foreach ($v['attrs'] as $name => $val): ?>
@@ -230,6 +234,8 @@ class Controller
                 </div>
             </main>
         <?php endif;
+
+        // Include footer
         include_once PROJECT_ROOT . '/components/footer.php';
     }
 
@@ -709,7 +715,7 @@ class Controller
     public function toggleFavorite()
     {
         header('Content-Type: application/json');
-        
+
         if (!isset($_SESSION['user_id'])) {
             echo json_encode(['success' => false, 'message' => 'Vui lòng đăng nhập để thực hiện!']);
             exit;
@@ -737,10 +743,10 @@ class Controller
             $deleteQuery = "DELETE FROM favority WHERE farority_id = :id";
             $deleteStmt = $db->prepare($deleteQuery);
             $deleteStmt->execute(['id' => $favorite['farority_id']]);
-            
+
             echo json_encode([
-                'success' => true, 
-                'isFavorited' => false, 
+                'success' => true,
+                'isFavorited' => false,
                 'message' => 'Đã xóa khỏi danh sách yêu thích!'
             ]);
         } else {
@@ -748,10 +754,10 @@ class Controller
             $insertQuery = "INSERT INTO favority (user_id, product_id) VALUES (:user_id, :product_id)";
             $insertStmt = $db->prepare($insertQuery);
             $insertStmt->execute(['user_id' => $user_id, 'product_id' => $product_id]);
-            
+
             echo json_encode([
-                'success' => true, 
-                'isFavorited' => true, 
+                'success' => true,
+                'isFavorited' => true,
                 'message' => 'Đã thêm vào danh sách yêu thích!'
             ]);
         }

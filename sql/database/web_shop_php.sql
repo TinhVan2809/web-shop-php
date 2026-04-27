@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th4 27, 2026 lúc 11:00 PM
+-- Thời gian đã tạo: Th4 28, 2026 lúc 12:12 AM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.2.12
 
@@ -31,6 +31,7 @@ CREATE TABLE `carts` (
   `cart_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `product_id` int(11) NOT NULL,
+  `variant_id` int(11) DEFAULT NULL,
   `add_at` timestamp NULL DEFAULT current_timestamp(),
   `quantity` int(11) DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -39,8 +40,8 @@ CREATE TABLE `carts` (
 -- Đang đổ dữ liệu cho bảng `carts`
 --
 
-INSERT INTO `carts` (`cart_id`, `user_id`, `product_id`, `add_at`, `quantity`) VALUES
-(1, 3, 2, '2026-04-22 18:00:41', 1);
+INSERT INTO `carts` (`cart_id`, `user_id`, `product_id`, `variant_id`, `add_at`, `quantity`) VALUES
+(39, 12, 1, 2, '2026-04-27 22:02:23', 1);
 
 -- --------------------------------------------------------
 
@@ -123,7 +124,8 @@ INSERT INTO `inventory` (`inventory_id`, `product_id`, `quantity`, `reserved_qua
 (4, 1, 20, 1, 10, 'low_stock', '2026-04-21 10:14:58', 4),
 (5, 2, 25, 3, 5, 'in_stock', '2026-04-21 10:14:58', 5),
 (6, 2, 15, 5, 5, 'low_stock', '2026-04-21 10:14:58', 6),
-(7, 2, 10, 2, 5, 'low_stock', '2026-04-21 10:14:58', 7);
+(7, 2, 10, 2, 5, 'low_stock', '2026-04-21 10:14:58', 7),
+(8, 12, 222, 55, 100, 'in_stock', '2026-04-27 21:22:44', NULL);
 
 -- --------------------------------------------------------
 
@@ -134,25 +136,26 @@ INSERT INTO `inventory` (`inventory_id`, `product_id`, `quantity`, `reserved_qua
 CREATE TABLE `manufacturers` (
   `manufacturer_id` int(11) NOT NULL,
   `manufacturer_name` varchar(255) NOT NULL,
-  `create_at` timestamp NULL DEFAULT current_timestamp()
+  `create_at` timestamp NULL DEFAULT current_timestamp(),
+  `logo_img` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Đang đổ dữ liệu cho bảng `manufacturers`
 --
 
-INSERT INTO `manufacturers` (`manufacturer_id`, `manufacturer_name`, `create_at`) VALUES
-(1, 'Nike', '2026-04-21 09:24:52'),
-(2, 'Adidas', '2026-04-21 09:35:55'),
-(3, 'Puma', '2026-04-21 09:35:55'),
-(4, 'Under Armour', '2026-04-21 09:35:55'),
-(5, 'New Balance', '2026-04-21 09:35:55'),
-(6, 'Lululemon', '2026-04-21 09:35:55'),
-(7, 'Chanel', '2026-04-25 12:54:35'),
-(8, 'Adidas', '2026-04-25 12:54:35'),
-(9, 'Puma', '2026-04-25 12:54:35'),
-(10, 'New Balance', '2026-04-25 12:54:35'),
-(11, 'Under Armour', '2026-04-25 12:54:35');
+INSERT INTO `manufacturers` (`manufacturer_id`, `manufacturer_name`, `create_at`, `logo_img`) VALUES
+(1, 'Nike', '2026-04-21 09:24:52', 'shopping.webp'),
+(2, 'Adidas', '2026-04-21 09:35:55', NULL),
+(3, 'Puma', '2026-04-21 09:35:55', NULL),
+(4, 'Under Armour', '2026-04-21 09:35:55', NULL),
+(5, 'New Balance', '2026-04-21 09:35:55', NULL),
+(6, 'Lululemon', '2026-04-21 09:35:55', NULL),
+(7, 'Chanel', '2026-04-25 12:54:35', NULL),
+(8, 'Adidas', '2026-04-25 12:54:35', NULL),
+(9, 'Puma', '2026-04-25 12:54:35', NULL),
+(10, 'New Balance', '2026-04-25 12:54:35', NULL),
+(11, 'Under Armour', '2026-04-25 12:54:35', NULL);
 
 -- --------------------------------------------------------
 
@@ -218,7 +221,8 @@ INSERT INTO `orders` (`order_id`, `user_id`, `order_code`, `status`, `payment_st
 (27, 12, 'ORD20260426154211443', 'pending', 'unpaid', 6700000.00, 0.00, 30000.00, 7400000.00, NULL, NULL, NULL, 'Tính Văn ', '0818177533', 'Cà Mau', 'Phú Tân', 'Tân Hải', 'Ấp Đầu Sấu', NULL, '2026-04-26 13:42:11', '2026-04-26 13:42:11'),
 (28, 12, 'ORD20260427220421182', 'pending', 'unpaid', 9900000.00, 0.00, 30000.00, 10920000.00, NULL, NULL, NULL, 'Tính Văn ', '0', '', '', '', '', NULL, '2026-04-27 20:04:21', '2026-04-27 20:04:21'),
 (29, 12, 'ORD20260427220521552', 'confirmed', 'unpaid', 2800000.00, 0.00, 30000.00, 3110000.00, NULL, NULL, NULL, 'Tính Văn ', '0818177533', 'TP Hồ Chí Minh', 'Quận Bình Thạnh', 'Phường 1', 'Ấp Đầu Sấu', NULL, '2026-04-27 20:05:21', '2026-04-27 20:55:22'),
-(30, 12, 'ORD20260427221101312', 'pending', 'unpaid', 3900000.00, 0.00, 30000.00, 4320000.00, NULL, NULL, NULL, 'Tính Văn ', '0818177533', 'TP Hồ Chí Minh', 'Phú Tân', 'Tân Hải', 'Ấp Đầu Sấu', NULL, '2026-04-27 20:11:01', '2026-04-27 20:11:01');
+(30, 12, 'ORD20260427221101312', 'pending', 'unpaid', 3900000.00, 0.00, 30000.00, 4320000.00, NULL, NULL, NULL, 'Tính Văn ', '0818177533', 'TP Hồ Chí Minh', 'Phú Tân', 'Tân Hải', 'Ấp Đầu Sấu', NULL, '2026-04-27 20:11:01', '2026-04-27 20:11:01'),
+(31, 12, 'ORD20260427235059358', 'pending', 'unpaid', 1500000.00, 0.00, 30000.00, 1680000.00, NULL, NULL, NULL, 'Tính Văn ', '0818177533', 'Cần Thơ', 'Quận Ninh Kiều', 'Phường An Hòa', 'Ấp Đầu Sấu', NULL, '2026-04-27 21:50:59', '2026-04-27 21:50:59');
 
 -- --------------------------------------------------------
 
@@ -288,7 +292,8 @@ INSERT INTO `order_items` (`order_item_id`, `order_id`, `product_id`, `variant_i
 (42, 28, 12, NULL, 'Nike Air Zoom Pegasus', 'nike_pegasus_40.jpg', NULL, 2800000.00, 3, 8400000.00),
 (43, 28, 1, NULL, ' Pickleball NikeCourt Air Zoom Vapor 11', 'nikecourt-air-zoom-vapor-11-mens-hard-court-tennis-shoes-03_720x720xcrop-preview.png', NULL, 1500000.00, 1, 1500000.00),
 (44, 29, 12, NULL, 'Nike Air Zoom Pegasus', 'nike_pegasus_40.jpg', NULL, 2800000.00, 1, 2800000.00),
-(45, 30, 13, NULL, 'Adidas Ultraboost 22', 'adidas_ultraboost_22.jpg', NULL, 3900000.00, 1, 3900000.00);
+(45, 30, 13, NULL, 'Adidas Ultraboost 22', 'adidas_ultraboost_22.jpg', NULL, 3900000.00, 1, 3900000.00),
+(46, 31, 1, NULL, ' Pickleball NikeCourt Air Zoom Vapor 11', 'nikecourt-air-zoom-vapor-11-mens-hard-court-tennis-shoes-03_720x720xcrop-preview.png', NULL, 1500000.00, 1, 1500000.00);
 
 -- --------------------------------------------------------
 
@@ -428,8 +433,16 @@ CREATE TABLE `reviews` (
   `review_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `product_id` int(11) NOT NULL,
-  `content` text DEFAULT NULL
+  `content` text DEFAULT NULL,
+  `rating` tinyint(4) NOT NULL CHECK (`rating` >= 1 and `rating` <= 5)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `reviews`
+--
+
+INSERT INTO `reviews` (`review_id`, `user_id`, `product_id`, `content`, `rating`) VALUES
+(1, 12, 12, 'lorem isum idalor lorem isum idalorlorem isum idalorlorem isum idalorlorem isum idalorlorem isum idalorlorem isum idalor', 5);
 
 -- --------------------------------------------------------
 
@@ -570,7 +583,8 @@ CREATE TABLE `voucher_products` (
 ALTER TABLE `carts`
   ADD PRIMARY KEY (`cart_id`),
   ADD KEY `user_id` (`user_id`),
-  ADD KEY `product_id` (`product_id`);
+  ADD KEY `product_id` (`product_id`),
+  ADD KEY `fk_carts_variants` (`variant_id`);
 
 --
 -- Chỉ mục cho bảng `categories`
@@ -705,7 +719,7 @@ ALTER TABLE `voucher_products`
 -- AUTO_INCREMENT cho bảng `carts`
 --
 ALTER TABLE `carts`
-  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=48;
 
 --
 -- AUTO_INCREMENT cho bảng `categories`
@@ -723,7 +737,7 @@ ALTER TABLE `favority`
 -- AUTO_INCREMENT cho bảng `inventory`
 --
 ALTER TABLE `inventory`
-  MODIFY `inventory_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `inventory_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT cho bảng `manufacturers`
@@ -735,13 +749,13 @@ ALTER TABLE `manufacturers`
 -- AUTO_INCREMENT cho bảng `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID ????n h??ng', AUTO_INCREMENT=31;
+  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID ????n h??ng', AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT cho bảng `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `order_item_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID chi ti???t ????n h??ng', AUTO_INCREMENT=46;
+  MODIFY `order_item_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID chi ti???t ????n h??ng', AUTO_INCREMENT=47;
 
 --
 -- AUTO_INCREMENT cho bảng `payments`
@@ -771,7 +785,7 @@ ALTER TABLE `product_variants`
 -- AUTO_INCREMENT cho bảng `reviews`
 --
 ALTER TABLE `reviews`
-  MODIFY `review_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `review_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT cho bảng `users`
@@ -818,7 +832,8 @@ ALTER TABLE `voucher_products`
 --
 ALTER TABLE `carts`
   ADD CONSTRAINT `carts_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`),
-  ADD CONSTRAINT `carts_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`);
+  ADD CONSTRAINT `carts_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `products` (`product_id`),
+  ADD CONSTRAINT `fk_carts_variants` FOREIGN KEY (`variant_id`) REFERENCES `product_variants` (`variant_id`) ON DELETE CASCADE;
 
 --
 -- Ràng buộc cho bảng `favority`
