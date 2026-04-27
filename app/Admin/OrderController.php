@@ -41,7 +41,13 @@ class OrderController extends AdminBaseController
         $stmt->execute([$id]);
         $order = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        $stmt = $this->db->prepare("SELECT * FROM order_items WHERE order_id = ?");
+        $stmt = $this->db->prepare("
+            SELECT oi.*, 
+                   GROUP_CONCAT(CONCAT(va.attribute_name, ': ', va.attribute_value) SEPARATOR ', ') AS variant_details
+            FROM order_items oi 
+            LEFT JOIN variant_attributes va ON oi.variant_id = va.variant_id
+            WHERE oi.order_id = ?
+            GROUP BY oi.order_item_id");
         $stmt->execute([$id]);
         $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

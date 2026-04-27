@@ -37,17 +37,22 @@ class CheckoutController
 
         // Calculate subtotal
         $stmtItems = $this->db->prepare("
-            SELECT c.quantity, p.price, p.discount_price 
+            SELECT c.quantity, c.variant_id, p.product_id, p.name, p.price, p.discount_price, p.thumbnail,
+                   pv.sku, pv.price as variant_price,
+                   GROUP_CONCAT(CONCAT(va.attribute_name, ': ', va.attribute_value) SEPARATOR ', ') as variant_details
             FROM carts c 
             JOIN products p ON c.product_id = p.product_id 
+            LEFT JOIN product_variants pv ON c.variant_id = pv.variant_id
+            LEFT JOIN variant_attributes va ON pv.variant_id = va.variant_id
             WHERE c.user_id = :user_id
+            GROUP BY c.cart_id
         ");
         $stmtItems->execute(['user_id' => $_SESSION['user_id']]);
         $items = $stmtItems->fetchAll(PDO::FETCH_ASSOC);
 
         $subtotal = 0;
         foreach ($items as $item) {
-            $price = $item['discount_price'] ?? $item['price'];
+            $price = $item['variant_price'] ?: ($item['discount_price'] ?? $item['price']);
             $subtotal += $price * $item['quantity'];
         }
 
@@ -83,10 +88,15 @@ class CheckoutController
 
         // Calculate totals
         $stmtItems = $this->db->prepare("
-            SELECT c.quantity, p.product_id, p.name, p.price, p.discount_price, p.thumbnail 
+            SELECT c.quantity, c.variant_id, p.product_id, p.name, p.price, p.discount_price, p.thumbnail,
+                   pv.sku, pv.price as variant_price,
+                   GROUP_CONCAT(CONCAT(va.attribute_name, ': ', va.attribute_value) SEPARATOR ', ') as variant_details
             FROM carts c 
             JOIN products p ON c.product_id = p.product_id 
+            LEFT JOIN product_variants pv ON c.variant_id = pv.variant_id
+            LEFT JOIN variant_attributes va ON pv.variant_id = va.variant_id
             WHERE c.user_id = :user_id
+            GROUP BY c.cart_id
         ");
         $stmtItems->execute(['user_id' => $_SESSION['user_id']]);
         $cartItems = $stmtItems->fetchAll(PDO::FETCH_ASSOC);
@@ -98,7 +108,7 @@ class CheckoutController
 
         $subtotal = 0;
         foreach ($cartItems as $item) {
-            $price = $item['discount_price'] ?? $item['price'];
+            $price = $item['variant_price'] ?: ($item['discount_price'] ?? $item['price']);
             $subtotal += $price * $item['quantity'];
         }
 
@@ -144,19 +154,27 @@ class CheckoutController
 
             // Insert Order Items
             $stmtItem = $this->db->prepare("
-                INSERT INTO order_items (order_id, product_id, product_name, product_image, price, quantity, total_price)
-                VALUES (:order_id, :product_id, :product_name, :product_image, :price, :quantity, :total_price)
+                INSERT INTO order_items (order_id, product_id, variant_id, product_name, product_image, sku, price, quantity, total_price)
+                VALUES (:order_id, :product_id, :variant_id, :product_name, :product_image, :sku, :price, :quantity, :total_price)
             ");
 
             foreach ($cartItems as $item) {
-                $price = $item['discount_price'] ?? $item['price'];
+                $price = $item['variant_price'] ?: ($item['discount_price'] ?? $item['price']);
                 $total_price = $price * $item['quantity'];
                 
+                // Lưu tên sản phẩm kèm thông tin biến thể để làm snapshot dữ liệu
+                $product_name = $item['name'];
+                if (!empty($item['variant_details'])) {
+                    $product_name .= ' (' . $item['variant_details'] . ')';
+                }
+
                 $stmtItem->execute([
                     'order_id' => $order_id,
                     'product_id' => $item['product_id'],
-                    'product_name' => $item['name'],
+                    'variant_id' => $item['variant_id'],
+                    'product_name' => $product_name,
                     'product_image' => $item['thumbnail'],
+                    'sku' => $item['sku'],
                     'price' => $price,
                     'quantity' => $item['quantity'],
                     'total_price' => $total_price

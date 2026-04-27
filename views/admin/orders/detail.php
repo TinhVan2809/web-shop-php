@@ -39,6 +39,9 @@
                                     <img src="/web-shop-php/asset/<?= $item['product_image'] ?>" class="w-12 h-12 rounded-lg object-cover">
                                     <div>
                                         <p class="font-semibold text-gray-900"><?= $item['product_name'] ?></p>
+                                        <?php if (!empty($item['variant_details'])): ?>
+                                            <p class="text-[10px] text-blue-600 font-medium italic">Biến thể: <?= $item['variant_details'] ?></p>
+                                        <?php endif; ?>
                                         <p class="text-xs text-gray-500">SKU: <?= $item['sku'] ?></p>
                                     </div>
                                 </div>

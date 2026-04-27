@@ -24,7 +24,7 @@ class CartController
         // Calculate totals
         $subtotal = 0;
         foreach ($cartItems as $item) {
-            $price = $item['discount_price'] ?? $item['price'];
+            $price = $item['variant_price'] ?: ($item['discount_price'] ?? $item['price']);
             $subtotal += $price * $item['quantity'];
         }
         
@@ -84,7 +84,7 @@ class CartController
             $cartItems = $this->getCartItems();
             $subtotal = 0;
             foreach ($cartItems as $item) {
-                $price = $item['discount_price'] ?? $item['price'];
+                $price = $item['variant_price'] ?: ($item['discount_price'] ?? $item['price']);
                 $subtotal += $price * $item['quantity'];
             }
             $tax = $subtotal * 0.10;
@@ -123,7 +123,7 @@ class CartController
             $cartItems = $this->getCartItems();
             $subtotal = 0;
             foreach ($cartItems as $item) {
-                $price = $item['discount_price'] ?? $item['price'];
+                $price = $item['variant_price'] ?: ($item['discount_price'] ?? $item['price']);
                 $subtotal += $price * $item['quantity'];
             }
             $tax = $subtotal * 0.10;
@@ -189,10 +189,15 @@ class CartController
         
         if (isset($_SESSION['user_id'])) {
             $stmt = $this->db->prepare("
-                SELECT c.quantity, c.variant_id, p.product_id, p.name, p.price, p.discount_price, p.thumbnail 
+                SELECT c.quantity, c.variant_id, p.product_id, p.name, p.price, p.discount_price, p.thumbnail,
+                       pv.price as variant_price,
+                       GROUP_CONCAT(CONCAT(va.attribute_name, ': ', va.attribute_value) SEPARATOR ', ') as variant_details
                 FROM carts c 
                 JOIN products p ON c.product_id = p.product_id 
+                LEFT JOIN product_variants pv ON c.variant_id = pv.variant_id
+                LEFT JOIN variant_attributes va ON pv.variant_id = va.variant_id
                 WHERE c.user_id = :user_id
+                GROUP BY c.cart_id
             ");
             $stmt->execute(['user_id' => $_SESSION['user_id']]);
             $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -203,8 +208,17 @@ class CartController
                     $pid = $parts[0];
                     $vid = $parts[1] ?? null;
 
-                    $stmt = $this->db->prepare("SELECT product_id, name, price, discount_price, thumbnail FROM products WHERE product_id = ?");
-                    $stmt->execute([$pid]);
+                    $stmt = $this->db->prepare("
+                        SELECT p.product_id, p.name, p.price, p.discount_price, p.thumbnail,
+                               pv.price as variant_price,
+                               GROUP_CONCAT(CONCAT(va.attribute_name, ': ', va.attribute_value) SEPARATOR ', ') as variant_details
+                        FROM products p 
+                        LEFT JOIN product_variants pv ON pv.variant_id = :vid
+                        LEFT JOIN variant_attributes va ON va.variant_id = :vid
+                        WHERE p.product_id = :pid
+                        GROUP BY p.product_id
+                    ");
+                    $stmt->execute(['pid' => $pid, 'vid' => $vid]);
                     $product = $stmt->fetch(PDO::FETCH_ASSOC);
 
                     if ($product) {

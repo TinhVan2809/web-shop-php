@@ -24,12 +24,19 @@
                         </thead>
                         <tbody>
                             <?php foreach ($cartItems as $item): ?>
-                                <?php $price = $item['discount_price'] ?? $item['price']; ?>
-                                <tr class="border-b border-gray-100 last:border-0 flex flex-col md:table-row relative" data-id="<?php echo $item['product_id']; ?>">
+                                <?php $price = $item['variant_price'] ?: ($item['discount_price'] ?? $item['price']); ?>
+                                <tr class="border-b border-gray-100 last:border-0 flex flex-col md:table-row relative" 
+                                    data-id="<?php echo $item['product_id']; ?>" 
+                                    data-variant-id="<?php echo $item['variant_id'] ?? ''; ?>">
                                     <td class="p-4">
                                         <div class="flex items-center gap-4">
                                             <img src="/web-shop-php/asset/<?php echo htmlspecialchars($item['thumbnail']); ?>" class="w-24 h-24 object-cover rounded-lg border border-gray-100">
-                                            <a href="index.php?action=detail&id=<?php echo $item['product_id']; ?>" class="font-medium hover:text-blue-600 text-lg line-clamp-2 pr-8 md:pr-0"><?php echo htmlspecialchars($item['name']); ?></a>
+                                            <div class="flex flex-col">
+                                                <a href="index.php?action=detail&id=<?php echo $item['product_id']; ?>" class="font-medium hover:text-blue-600 text-lg line-clamp-2 pr-8 md:pr-0"><?php echo htmlspecialchars($item['name']); ?></a>
+                                                <?php if (!empty($item['variant_details'])): ?>
+                                                    <p class="text-xs text-gray-500 mt-1 italic">Phân loại: <?php echo htmlspecialchars($item['variant_details']); ?></p>
+                                                <?php endif; ?>
+                                            </div>
                                         </div>
                                     </td>
                                     <td class="p-4 text-red-600 font-bold md:table-cell hidden">
@@ -37,16 +44,18 @@
                                     </td>
                                     <td class="p-4">
                                         <div class="flex items-center md:justify-center border border-gray-300 rounded-lg w-32 md:mx-auto">
-                                            <button class="px-3 py-1 hover:bg-gray-100 btn-decrease text-xl" data-id="<?php echo $item['product_id']; ?>">-</button>
-                                            <input type="number" class="w-12 text-center outline-none quantity-input font-medium" value="<?php echo $item['quantity']; ?>" data-id="<?php echo $item['product_id']; ?>" min="1">
-                                            <button class="px-3 py-1 hover:bg-gray-100 btn-increase text-xl" data-id="<?php echo $item['product_id']; ?>">+</button>
+                                            <button class="px-3 py-1 hover:bg-gray-100 btn-decrease text-xl" data-id="<?php echo $item['product_id']; ?>" data-variant-id="<?php echo $item['variant_id'] ?? ''; ?>">-</button>
+                                            <input type="number" class="w-12 text-center outline-none quantity-input font-medium" value="<?php echo $item['quantity']; ?>" 
+                                                   data-id="<?php echo $item['product_id']; ?>" data-variant-id="<?php echo $item['variant_id'] ?? ''; ?>" min="1">
+                                            <button class="px-3 py-1 hover:bg-gray-100 btn-increase text-xl" data-id="<?php echo $item['product_id']; ?>" data-variant-id="<?php echo $item['variant_id'] ?? ''; ?>">+</button>
                                         </div>
                                     </td>
                                     <td class="p-4 text-right font-bold text-gray-800 item-total md:table-cell hidden" data-price="<?php echo $price; ?>">
                                         <?php echo number_format($price * $item['quantity'], 0, ',', '.'); ?>₫
                                     </td>
                                     <td class="p-4 text-center absolute top-2 right-2 md:relative md:top-0 md:right-0">
-                                        <button class="text-gray-400 hover:text-red-500 transition-colors btn-remove p-2 bg-gray-50 md:bg-transparent rounded-full" data-id="<?php echo $item['product_id']; ?>">
+                                        <button class="text-gray-400 hover:text-red-500 transition-colors btn-remove p-2 bg-gray-50 md:bg-transparent rounded-full" 
+                                                data-id="<?php echo $item['product_id']; ?>" data-variant-id="<?php echo $item['variant_id'] ?? ''; ?>">
                                             <i class="ri-delete-bin-line text-xl"></i>
                                         </button>
                                     </td>
@@ -101,13 +110,13 @@ document.addEventListener('DOMContentLoaded', function() {
         return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + '₫';
     }
 
-    function updateCart(productId, quantity) {
+    function updateCart(productId, quantity, variantId) {
         fetch('index.php?action=update_cart', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: `product_id=${productId}&quantity=${quantity}`
+            body: `product_id=${productId}&quantity=${quantity}&variant_id=${variantId}`
         })
         .then(response => response.json())
         .then(data => {
@@ -128,13 +137,13 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    function removeCartItem(productId, rowElement) {
+    function removeCartItem(productId, variantId, rowElement) {
         fetch('index.php?action=remove_from_cart', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: `product_id=${productId}`
+            body: `product_id=${productId}&variant_id=${variantId}`
         })
         .then(response => response.json())
         .then(data => {
@@ -166,8 +175,9 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.btn-decrease').forEach(btn => {
         btn.addEventListener('click', function() {
             let id = this.getAttribute('data-id');
-            let input = document.querySelector(`input.quantity-input[data-id="${id}"]`);
-            let row = document.querySelector(`tr[data-id="${id}"]`);
+            let vid = this.getAttribute('data-variant-id');
+            let input = document.querySelector(`input.quantity-input[data-id="${id}"][data-variant-id="${vid}"]`);
+            let row = document.querySelector(`tr[data-id="${id}"][data-variant-id="${vid}"]`);
             let totalEl = row.querySelector('.item-total');
             let price = parseInt(totalEl.getAttribute('data-price'));
             
@@ -175,7 +185,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (val > 1) {
                 input.value = val - 1;
                 totalEl.textContent = formatCurrency(price * (val - 1));
-                updateCart(id, val - 1);
+                updateCart(id, val - 1, vid);
             }
         });
     });
@@ -183,22 +193,24 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.btn-increase').forEach(btn => {
         btn.addEventListener('click', function() {
             let id = this.getAttribute('data-id');
-            let input = document.querySelector(`input.quantity-input[data-id="${id}"]`);
-            let row = document.querySelector(`tr[data-id="${id}"]`);
+            let vid = this.getAttribute('data-variant-id');
+            let input = document.querySelector(`input.quantity-input[data-id="${id}"][data-variant-id="${vid}"]`);
+            let row = document.querySelector(`tr[data-id="${id}"][data-variant-id="${vid}"]`);
             let totalEl = row.querySelector('.item-total');
             let price = parseInt(totalEl.getAttribute('data-price'));
             
             let val = parseInt(input.value);
             input.value = val + 1;
             totalEl.textContent = formatCurrency(price * (val + 1));
-            updateCart(id, val + 1);
+            updateCart(id, val + 1, vid);
         });
     });
 
     document.querySelectorAll('.quantity-input').forEach(input => {
         input.addEventListener('change', function() {
             let id = this.getAttribute('data-id');
-            let row = document.querySelector(`tr[data-id="${id}"]`);
+            let vid = this.getAttribute('data-variant-id');
+            let row = document.querySelector(`tr[data-id="${id}"][data-variant-id="${vid}"]`);
             let totalEl = row.querySelector('.item-total');
             let price = parseInt(totalEl.getAttribute('data-price'));
             
@@ -208,15 +220,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.value = 1;
             }
             totalEl.textContent = formatCurrency(price * val);
-            updateCart(id, val);
+            updateCart(id, val, vid);
         });
     });
 
     document.querySelectorAll('.btn-remove').forEach(btn => {
         btn.addEventListener('click', function() {
             let id = this.getAttribute('data-id');
-            let row = document.querySelector(`tr[data-id="${id}"]`);
-            removeCartItem(id, row);
+            let vid = this.getAttribute('data-variant-id');
+            let row = document.querySelector(`tr[data-id="${id}"][data-variant-id="${vid}"]`);
+            removeCartItem(id, vid, row);
         });
     });
 });

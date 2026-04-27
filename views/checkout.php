@@ -113,11 +113,16 @@
                 
                 <div class="space-y-4 mb-6 max-h-[300px] overflow-y-auto pr-2">
                     <?php foreach ($items as $item): ?>
-                        <?php $price = $item['discount_price'] ?? $item['price']; ?>
+                        <?php $price = $item['variant_price'] ?: ($item['discount_price'] ?? $item['price']); ?>
                         <div class="flex justify-between items-center">
                             <div class="flex items-center gap-3">
                                 <span class="w-6 h-6 rounded-full bg-gray-200 text-xs flex items-center justify-center font-bold shrink-0"><?php echo $item['quantity']; ?></span>
-                                <span class="text-sm text-gray-600 line-clamp-1 flex-1"><?php echo htmlspecialchars($item['name'] ?? 'Sản phẩm'); ?></span>
+                                <div class="flex flex-col">
+                                    <span class="text-sm text-gray-600 line-clamp-1 font-medium"><?php echo htmlspecialchars($item['name'] ?? 'Sản phẩm'); ?></span>
+                                    <?php if (!empty($item['variant_details'])): ?>
+                                        <span class="text-[10px] text-gray-400 italic"><?php echo htmlspecialchars($item['variant_details']); ?></span>
+                                    <?php endif; ?>
+                                </div>
                             </div>
                             <span class="font-medium text-sm shrink-0"><?php echo number_format($price * $item['quantity'], 0, ',', '.'); ?>₫</span>
                         </div>
