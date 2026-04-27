@@ -45,9 +45,13 @@
                         <i class="ri-box-3-line"></i>
                         <span class="font-medium">Sản phẩm</span>
                     </a>
-                    <a href="index.php?action=admin_orders" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors <?= ($_GET['action'] == 'admin_orders') ? 'active' : '' ?>">
+                    <a href="index.php?action=admin_orders" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors <?= (isset($_GET['action']) && $_GET['action'] == 'admin_orders') ? 'active' : '' ?>">
                         <i class="ri-shopping-cart-2-line"></i>
                         <span class="font-medium">Đơn hàng</span>
+                    </a>
+                    <a href="index.php?action=admin_customers" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors <?= (isset($_GET['action']) && in_array($_GET['action'], ['admin_customers','admin_customer_detail'])) ? 'active' : '' ?>">
+                        <i class="ri-team-line"></i>
+                        <span class="font-medium">Khách hàng</span>
                     </a>
                 </nav>
             </div>
@@ -59,11 +63,13 @@
             <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8">
                 <h1 class="text-lg font-semibold text-gray-800">
                     <?php
-                    switch($_GET['action']) {
-                        case 'admin_dashboard': echo 'Dashboard'; break;
-                        case 'admin_users': echo 'Quản lý người dùng'; break;
-                        case 'admin_products': echo 'Quản lý sản phẩm'; break;
-                        case 'admin_orders': echo 'Quản lý đơn hàng'; break;
+                    switch($_GET['action'] ?? '') {
+                        case 'admin_dashboard':        echo 'Dashboard'; break;
+                        case 'admin_users':            echo 'Quản lý người dùng'; break;
+                        case 'admin_products':         echo 'Quản lý sản phẩm'; break;
+                        case 'admin_orders':           echo 'Quản lý đơn hàng'; break;
+                        case 'admin_customers':        echo 'Quản lý khách hàng'; break;
+                        case 'admin_customer_detail':  echo 'Chi tiết khách hàng'; break;
                         default: echo 'Quản trị';
                     }
                     ?>

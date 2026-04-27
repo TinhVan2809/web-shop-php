@@ -12,6 +12,7 @@ require_once PROJECT_ROOT . '/app/Admin/DashboardController.php';
 require_once PROJECT_ROOT . '/app/Admin/UserController.php';
 require_once PROJECT_ROOT . '/app/Admin/ProductController.php';
 require_once PROJECT_ROOT . '/app/Admin/OrderController.php';
+require_once PROJECT_ROOT . '/app/Admin/CustomerController.php';
 require_once PROJECT_ROOT . '/app/CartController.php';
 require_once PROJECT_ROOT . '/app/CheckoutController.php';
 require_once PROJECT_ROOT . '/app/PaymentController.php';
@@ -23,6 +24,7 @@ $dashboardCtrl = new DashboardController();
 $userCtrl = new UserController();
 $productCtrl = new ProductController();
 $orderCtrl = new OrderController();
+$customerCtrl = new CustomerController();
 $cartCtrl = new CartController();
 $checkoutCtrl = new CheckoutController();
 $paymentCtrl = new PaymentController();
@@ -175,6 +177,14 @@ switch ($action) {
         break;
     case 'update_order_status':
         $orderCtrl->updateStatus();
+        break;
+
+    // Customers
+    case 'admin_customers':
+        $customerCtrl->list();
+        break;
+    case 'admin_customer_detail':
+        $customerCtrl->detail();
         break;
 
     default:
