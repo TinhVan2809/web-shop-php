@@ -53,6 +53,10 @@
                         <i class="ri-team-line"></i>
                         <span class="font-medium">Khách hàng</span>
                     </a>
+                    <a href="index.php?action=admin_banners" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors <?= (isset($_GET['action']) && strpos($_GET['action'], 'banner') !== false) ? 'active' : '' ?>">
+                        <i class="ri-image-line"></i>
+                        <span class="font-medium">Quản lý Banner</span>
+                    </a>
                 </nav>
             </div>
         </aside>
@@ -70,6 +74,8 @@
                         case 'admin_orders':           echo 'Quản lý đơn hàng'; break;
                         case 'admin_customers':        echo 'Quản lý khách hàng'; break;
                         case 'admin_customer_detail':  echo 'Chi tiết khách hàng'; break;
+                        case 'admin_banners':          echo 'Quản lý Banner'; break;
+                        case 'banner_form':            echo 'Cập nhật Banner'; break;
                         default: echo 'Quản trị';
                     }
                     ?>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th4 28, 2026 lúc 12:53 AM
+-- Thời gian đã tạo: Th5 02, 2026 lúc 04:29 AM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.2.12
 
@@ -20,6 +20,29 @@ SET time_zone = "+00:00";
 --
 -- Cơ sở dữ liệu: `web_shop_php`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `banner`
+--
+
+CREATE TABLE `banner` (
+  `banenr_id` int(11) NOT NULL,
+  `img` varchar(500) NOT NULL,
+  `content` text DEFAULT NULL,
+  `url` varchar(500) DEFAULT NULL,
+  `create_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `banner`
+--
+
+INSERT INTO `banner` (`banenr_id`, `img`, `content`, `url`, `create_at`) VALUES
+(1, 'banner.png', 'lorem isum idalorlorem isum idalor lorem isum idalolorem isum idalor', NULL, '2026-05-02 02:03:22'),
+(2, 'banner-bag2.avif', 'banner.pngbanner.pngbanner.pngbanner.pngbanner.png banner.png', NULL, '2026-05-02 02:03:22'),
+(3, 'banner-pant2.jpg', 'lorem isum idalorlorem isum idalorlorem isum idalor', NULL, '2026-05-02 02:04:03');
 
 -- --------------------------------------------------------
 
@@ -41,7 +64,9 @@ CREATE TABLE `carts` (
 --
 
 INSERT INTO `carts` (`cart_id`, `user_id`, `product_id`, `variant_id`, `add_at`, `quantity`) VALUES
-(49, 12, 13, NULL, '2026-04-27 22:51:32', 1);
+(49, 12, 13, NULL, '2026-04-27 22:51:32', 1),
+(50, 12, 1, NULL, '2026-04-28 08:31:25', 1),
+(51, 12, 25, 10, '2026-04-30 22:37:20', 1);
 
 -- --------------------------------------------------------
 
@@ -125,7 +150,12 @@ INSERT INTO `inventory` (`inventory_id`, `product_id`, `quantity`, `reserved_qua
 (5, 2, 25, 3, 5, 'in_stock', '2026-04-21 10:14:58', 5),
 (6, 2, 15, 5, 5, 'low_stock', '2026-04-21 10:14:58', 6),
 (7, 2, 10, 2, 5, 'low_stock', '2026-04-21 10:14:58', 7),
-(8, 12, 222, 55, 100, 'in_stock', '2026-04-27 21:22:44', NULL);
+(8, 12, 222, 55, 100, 'in_stock', '2026-04-27 21:22:44', NULL),
+(9, 25, 23, 0, 10, 'in_stock', '2026-04-30 22:36:50', 9),
+(10, 25, 23, 0, 10, 'in_stock', '2026-04-30 22:36:50', 10),
+(11, 26, 20, 0, 10, 'in_stock', '2026-04-30 22:39:51', 11),
+(12, 26, 90, 0, 10, 'in_stock', '2026-04-30 22:39:51', 12),
+(13, 27, 12, 0, 10, 'in_stock', '2026-04-30 22:46:34', 13);
 
 -- --------------------------------------------------------
 
@@ -374,7 +404,11 @@ INSERT INTO `products` (`product_id`, `name`, `description`, `short_description`
 (17, 'Nike Dri-FIT Shorts', NULL, NULL, 850000.00, NULL, 'NIKE-DF-01', 1, 3, 'nike_drifit_pants.jpg', 0, 1, 'active', '2026-04-25 12:54:35', '2026-04-25 12:54:35'),
 (18, 'NB Classic 574', NULL, NULL, 2200000.00, 1800000.00, 'NB-574-01', 3, 7, 'nb_shorts.jpg', 0, 1, 'active', '2026-04-25 12:54:35', '2026-04-25 12:54:35'),
 (19, 'Áo tập gym', 'Áo tập gym co giãn', NULL, 750000.00, 600000.00, 'UA-HG-01', 2, 2, 'ua_heatgear.jpg', 0, 1, 'active', '2026-04-25 12:54:35', '2026-04-25 14:33:30'),
-(20, 'Nike Air Zoom Pegasus 2', '', NULL, 2000000.00, 1900000.00, 'NIKE-PEG-02', 1, 1, '1777320800_z7768801564389_8c3a978b0dba5675df9cdf334ee20e71.jpg', 0, 1, 'active', '2026-04-27 20:13:20', '2026-04-27 20:13:20');
+(20, 'Nike Air Zoom Pegasus 2', '', NULL, 2000000.00, 1900000.00, 'NIKE-PEG-02', 1, 1, '1777320800_z7768801564389_8c3a978b0dba5675df9cdf334ee20e71.jpg', 0, 1, 'active', '2026-04-27 20:13:20', '2026-04-27 20:13:20'),
+(24, 'Bag Gucci UK25', '', NULL, 1222222.00, 1000000.00, 'GUCCI-BAG-3', 3, 11, '1777587770_z7771082327678_e6849ccab14c70fb12ff4f0c282cb478.jpg', 0, 1, 'active', '2026-04-30 22:22:50', '2026-04-30 22:22:50'),
+(25, 'Bag Nike OVA25', '', NULL, 2000000.00, 1000000.00, 'NIKE-BAG-22', 4, 1, '1777588610_z7771082327580_6cbc171bac00e1ff092a5a8ede7bd9a7.jpg', 0, 1, 'active', '2026-04-30 22:36:50', '2026-04-30 22:36:50'),
+(26, 'Bag Nike OVA10', '', NULL, 1222222.00, 1111111.00, 'NIKE-BAG-10', 4, 1, '1777588791_z7771082327536_cc13cdb0e468e8d1659306bb0961d4bd.jpg', 0, 1, 'active', '2026-04-30 22:39:51', '2026-04-30 22:39:51'),
+(27, 'Nike Shirt IMP 22', '', NULL, 1000000.00, 900000.00, 'NIKE-SHIRT-22', 2, 1, '1777589194_fashion-portrait-young-elegant-woman_1328-2686.avif', 0, 1, 'active', '2026-04-30 22:46:34', '2026-04-30 22:46:34');
 
 -- --------------------------------------------------------
 
@@ -396,7 +430,11 @@ INSERT INTO `product_images` (`image_id`, `product_id`, `image`) VALUES
 (4, 12, 'product_12_gallery_69efce6a716a7.jpg'),
 (5, 12, 'product_12_gallery_69efce6a71e71.jpg'),
 (6, 12, 'product_12_gallery_69efce6a726f7.jpg'),
-(7, 12, 'product_12_gallery_69efce6a72ec1.jpg');
+(7, 12, 'product_12_gallery_69efce6a72ec1.jpg'),
+(8, 24, 'product_24_gallery_69f3d68f87805.jpg'),
+(9, 27, 'product_27_gallery_69f3dbca690c7.jpg'),
+(10, 27, 'product_27_gallery_69f3dbca69d3b.jpg'),
+(11, 27, 'product_27_gallery_69f3dbca6b087.jpg');
 
 -- --------------------------------------------------------
 
@@ -424,7 +462,12 @@ INSERT INTO `product_variants` (`variant_id`, `product_id`, `sku`, `price`, `ima
 (4, 1, 'NIKE-TS-L-BLACK', 450000.00, 'nike_tshirt_black.jpg', '2026-04-21 10:09:18'),
 (5, 2, 'ADI-SHOES-40', 1800000.00, 'adidas_40.jpg', '2026-04-21 10:09:47'),
 (6, 2, 'ADI-SHOES-41', 1800000.00, 'adidas_41.jpg', '2026-04-21 10:09:47'),
-(7, 2, 'ADI-SHOES-42', 1800000.00, 'adidas_42.jpg', '2026-04-21 10:09:47');
+(7, 2, 'ADI-SHOES-42', 1800000.00, 'adidas_42.jpg', '2026-04-21 10:09:47'),
+(9, 25, 'NIKE-BAG-34', 1230000.00, NULL, '2026-04-30 22:36:50'),
+(10, 25, 'NIKE-BAG-35', 122000.00, NULL, '2026-04-30 22:36:50'),
+(11, 26, 'NIKE-BAG-10', 1000000.00, NULL, '2026-04-30 22:39:51'),
+(12, 26, 'NIKE-BAG-39', 1222222.00, NULL, '2026-04-30 22:39:51'),
+(13, 27, 'NIKE-SHIRT-22-30-XANH', 1500000.00, '1777589194_variant_0_fashion-portrait-young-elegant-woman (2).jpg', '2026-04-30 22:46:34');
 
 -- --------------------------------------------------------
 
@@ -473,7 +516,7 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`user_id`, `name`, `username`, `password`, `role`, `status`, `gender`, `number_phone`, `gmail`, `avatar`, `create_at`) VALUES
 (3, 'tinhvan', '1', '1', 'admin', 'active', '1', 818177533, 'tinhlu703@gmail.com', 'default_avatar.png', '2026-04-19 20:06:15'),
-(4, 'T├¡nh V─ân', 'tinhlu703@gmail.com', '$2b$10$Q.o5HJ4sMfrW5Qt1rQnSVuBdyoc8OjQxbEhWm91qIVV2tGlN3fODu', 'customer', 'active', '1', 0, '', 'default_avatar.png', '2026-04-24 07:40:36'),
+(4, 'Tính Văn', 'tinhlu703@gmail.com', '$2b$10$Q.o5HJ4sMfrW5Qt1rQnSVuBdyoc8OjQxbEhWm91qIVV2tGlN3fODu', 'customer', 'active', '1', 0, '', 'default_avatar.png', '2026-04-24 07:40:36'),
 (12, 'Tính Văn ', 'username12345', '$2y$10$YNZIEDYKYFeWhAN2InDlnOZVASzo.3I2XnGeHz4u7ia6wfTs0kxta', 'customer', 'active', '1', 0, 'tinhlu703@gmail.com', 'default_avatar.png', '2026-04-26 07:19:52'),
 (13, 'Admin', 'admin', '$2y$10$uIlQiJFyJsCFbEanXxDeEeX7geY9vISXiyZ5xRpbF.uLBJadg9OEy', 'admin', 'active', '1', 0, '', 'default_avatar.png', '2026-04-26 07:20:32'),
 (14, 'tathainguyen', 'thainguyen24', '$2y$10$Ijy7rD4l00LE6UkiKG9c0ueRuVnl1vDLuiOZTP2FKSRXDit.oaDIa', 'customer', 'active', '1', 913775566, 'tathainguyen686@gmail.com', 'default_avatar.png', '2026-04-26 08:56:10'),
@@ -528,7 +571,17 @@ INSERT INTO `variant_attributes` (`id`, `variant_id`, `attribute_name`, `attribu
 (8, 4, 'color', 'black'),
 (9, 5, 'size', '40'),
 (10, 6, 'size', '41'),
-(11, 7, 'size', '42');
+(11, 7, 'size', '42'),
+(12, 9, 'size', '30'),
+(13, 9, 'color', 'Đỏ'),
+(14, 10, 'size', '34'),
+(15, 10, 'color', 'Xanh'),
+(16, 11, 'size', '30'),
+(17, 11, 'color', 'Đỏ'),
+(18, 12, 'size', '34'),
+(19, 12, 'color', 'Xanh'),
+(20, 13, 'size', '30'),
+(21, 13, 'color', 'Xanh');
 
 -- --------------------------------------------------------
 
@@ -579,6 +632,12 @@ CREATE TABLE `voucher_products` (
 --
 -- Chỉ mục cho các bảng đã đổ
 --
+
+--
+-- Chỉ mục cho bảng `banner`
+--
+ALTER TABLE `banner`
+  ADD PRIMARY KEY (`banenr_id`);
 
 --
 -- Chỉ mục cho bảng `carts`
@@ -719,10 +778,16 @@ ALTER TABLE `voucher_products`
 --
 
 --
+-- AUTO_INCREMENT cho bảng `banner`
+--
+ALTER TABLE `banner`
+  MODIFY `banenr_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT cho bảng `carts`
 --
 ALTER TABLE `carts`
-  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
+  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
 -- AUTO_INCREMENT cho bảng `categories`
@@ -740,7 +805,7 @@ ALTER TABLE `favority`
 -- AUTO_INCREMENT cho bảng `inventory`
 --
 ALTER TABLE `inventory`
-  MODIFY `inventory_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `inventory_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT cho bảng `manufacturers`
@@ -770,19 +835,19 @@ ALTER TABLE `payments`
 -- AUTO_INCREMENT cho bảng `products`
 --
 ALTER TABLE `products`
-  MODIFY `product_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `product_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT cho bảng `product_images`
 --
 ALTER TABLE `product_images`
-  MODIFY `image_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `image_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT cho bảng `product_variants`
 --
 ALTER TABLE `product_variants`
-  MODIFY `variant_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID bi???n th???', AUTO_INCREMENT=9;
+  MODIFY `variant_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID bi???n th???', AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT cho bảng `reviews`
@@ -806,7 +871,7 @@ ALTER TABLE `user_address`
 -- AUTO_INCREMENT cho bảng `variant_attributes`
 --
 ALTER TABLE `variant_attributes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT cho bảng `vouchers`

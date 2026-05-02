@@ -8,6 +8,10 @@
         href="https://cdn.jsdelivr.net/npm/remixicon@4.9.0/fonts/remixicon.css"
         rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Swiper Slider Assets -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
     <link rel="stylesheet" href="../src/styles/main.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

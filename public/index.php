@@ -13,6 +13,7 @@ require_once PROJECT_ROOT . '/app/Admin/UserController.php';
 require_once PROJECT_ROOT . '/app/Admin/ProductController.php';
 require_once PROJECT_ROOT . '/app/Admin/OrderController.php';
 require_once PROJECT_ROOT . '/app/Admin/CustomerController.php';
+require_once PROJECT_ROOT . '/app/Admin/BannerController.php';
 require_once PROJECT_ROOT . '/app/CartController.php';
 require_once PROJECT_ROOT . '/app/CheckoutController.php';
 require_once PROJECT_ROOT . '/app/PaymentController.php';
@@ -25,6 +26,7 @@ $userCtrl = new UserController();
 $productCtrl = new ProductController();
 $orderCtrl = new OrderController();
 $customerCtrl = new CustomerController();
+$bannerCtrl = new BannerController();
 $cartCtrl = new CartController();
 $checkoutCtrl = new CheckoutController();
 $paymentCtrl = new PaymentController();
@@ -188,6 +190,20 @@ switch ($action) {
         break;
     case 'admin_customer_detail':
         $customerCtrl->detail();
+        break;
+    
+    // Banners
+    case 'admin_banners':
+        $bannerCtrl->list();
+        break;
+    case 'banner_form':
+        $bannerCtrl->form();
+        break;
+    case 'save_banner':
+        $bannerCtrl->save();
+        break;
+    case 'delete_banner':
+        $bannerCtrl->delete();
         break;
 
     default:

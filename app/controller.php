@@ -24,6 +24,12 @@ class Controller
         $stmt->execute(['user_id' => $user_id]);
         $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+        // Truy vấn lấy tất cả banner từ database
+        $bannerQuery = "SELECT * FROM banner ORDER BY create_at DESC";
+        $bannerStmt = $db->prepare($bannerQuery);
+        $bannerStmt->execute();
+        $banners = $bannerStmt->fetchAll(PDO::FETCH_ASSOC);
+
         // Include header (đã có sẵn HTML, Head, Body mở)
         include_once PROJECT_ROOT . '/components/header.php';
 
@@ -45,7 +51,7 @@ class Controller
         (new most_favority())->mostFavority();
 ?>
 
-        <main class="container mx-auto px-7 py-10 mt-30">
+        <!-- <main class="container mx-auto px-7 py-10 mt-30">
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <?php foreach ($products as $product): ?>
@@ -81,7 +87,7 @@ class Controller
                     </div>
                 <?php endforeach; ?>
             </div>
-        </main>
+        </main> -->
 
         <?php
         // Include logo animation
