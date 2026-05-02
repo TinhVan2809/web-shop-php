@@ -30,7 +30,7 @@ class Most_sold
                  <hr class="border border-black w-125">
                 <div class="">
                     <h1 class="text-xl font-[550]">Best sellers</h1>
-                    <a href="#" class="text-sm">View all <i class="ri-arrow-right-line"></i></a>
+                    <a href="index.php?action=best_sellers" class="text-sm">View all <i class="ri-arrow-right-line"></i></a>
                 </div>
                 <hr class="border border-black w-125">
                </div>

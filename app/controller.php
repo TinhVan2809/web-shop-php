@@ -90,6 +90,10 @@ class Controller
         </main> -->
 
         <?php
+        // Include ads
+        include_once PROJECT_ROOT . '/components/ads.php';
+
+
         // Include logo animation
         include_once PROJECT_ROOT . '/components/logo_manu.php';
 
@@ -1038,5 +1042,74 @@ class Controller
         $rStmt = $db->prepare($reviewQuery);
         $rStmt->execute($reviewParams);
         echo json_encode($rStmt->fetchAll(PDO::FETCH_ASSOC));
+    }
+
+    public function bestSellers()
+    {
+        $database = new Database();
+        $db = $database->getConnection();
+
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $category_id = isset($_GET['category_id']) && $_GET['category_id'] !== 'all' ? (int)$_GET['category_id'] : null;
+        $price_range = $_GET['price_range'] ?? 'all';
+        $limit = 12;
+        $offset = ($page - 1) * $limit;
+        $user_id = $_SESSION['user_id'] ?? 0;
+
+        // Lấy danh sách danh mục để hiển thị bộ lọc
+        $categories = $db->query("SELECT * FROM categories")->fetchAll(PDO::FETCH_ASSOC);
+
+        // Xây dựng điều kiện WHERE
+        $where = " WHERE p.status = 'active'";
+        $params = [];
+        if ($category_id) {
+            $where .= " AND p.category_id = :category_id";
+            $params['category_id'] = $category_id;
+        }
+
+        if ($price_range !== 'all') {
+            if ($price_range === 'under-500') {
+                $where .= " AND COALESCE(p.discount_price, p.price) < 500000";
+            } elseif ($price_range === '500-2000') {
+                $where .= " AND COALESCE(p.discount_price, p.price) BETWEEN 500000 AND 2000000";
+            } elseif ($price_range === 'over-2000') {
+                $where .= " AND COALESCE(p.discount_price, p.price) > 2000000";
+            }
+        }
+
+        // Lấy tổng số sản phẩm duy nhất đã bán để tính số trang
+        $countQuery = "SELECT COUNT(DISTINCT oi.product_id) 
+                       FROM order_items oi 
+                       JOIN products p ON oi.product_id = p.product_id 
+                       $where";
+        $countStmt = $db->prepare($countQuery);
+        $countStmt->execute($params);
+        $totalItems = $countStmt->fetchColumn();
+        $totalPages = ceil($totalItems / $limit);
+
+        // Lấy danh sách sản phẩm bán chạy nhất kèm trạng thái yêu thích
+        $query = "SELECT p.*, c.category_name, SUM(oi.quantity) AS total_sold, f.farority_id AS is_favorited
+                  FROM order_items oi 
+                  JOIN products p ON oi.product_id = p.product_id 
+                  LEFT JOIN categories c ON p.category_id = c.category_id
+                  LEFT JOIN favority f ON p.product_id = f.product_id AND f.user_id = :user_id
+                  $where
+                  GROUP BY p.product_id
+                  ORDER BY total_sold DESC 
+                  LIMIT :limit OFFSET :offset";
+
+        $stmt = $db->prepare($query);
+        $stmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
+        if ($category_id) {
+            $stmt->bindValue(':category_id', $category_id, PDO::PARAM_INT);
+        }
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+        $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        include_once PROJECT_ROOT . '/components/header.php';
+        include_once PROJECT_ROOT . '/views/best_sellers.php';
+        include_once PROJECT_ROOT . '/components/footer.php';
     }
 }

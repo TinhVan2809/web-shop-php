@@ -112,6 +112,9 @@ switch ($action) {
     case 'get_reviews':
         $controller->getReviews();
         break;
+    case 'best_sellers':
+        $controller->bestSellers();
+        break;
     
     // --- ADMIN ROUTES ---
     
