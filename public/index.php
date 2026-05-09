@@ -14,6 +14,7 @@ require_once PROJECT_ROOT . '/app/Admin/ProductController.php';
 require_once PROJECT_ROOT . '/app/Admin/OrderController.php';
 require_once PROJECT_ROOT . '/app/Admin/CustomerController.php';
 require_once PROJECT_ROOT . '/app/Admin/BannerController.php';
+require_once PROJECT_ROOT . '/app/Admin/VoucherController.php';
 require_once PROJECT_ROOT . '/app/CartController.php';
 require_once PROJECT_ROOT . '/app/CheckoutController.php';
 require_once PROJECT_ROOT . '/app/PaymentController.php';
@@ -27,6 +28,7 @@ $productCtrl = new ProductController();
 $orderCtrl = new OrderController();
 $customerCtrl = new CustomerController();
 $bannerCtrl = new BannerController();
+$voucherCtrl = new VoucherController();
 $cartCtrl = new CartController();
 $checkoutCtrl = new CheckoutController();
 $paymentCtrl = new PaymentController();
@@ -216,6 +218,20 @@ switch ($action) {
         break;
     case 'delete_banner':
         $bannerCtrl->delete();
+        break;
+
+    // Vouchers
+    case 'admin_vouchers':
+        $voucherCtrl->list();
+        break;
+    case 'voucher_form':
+        $voucherCtrl->form();
+        break;
+    case 'save_voucher':
+        $voucherCtrl->save();
+        break;
+    case 'delete_voucher':
+        $voucherCtrl->delete();
         break;
 
     default:
