@@ -45,6 +45,10 @@
                         <i class="ri-box-3-line"></i>
                         <span class="font-medium">Sản phẩm</span>
                     </a>
+                    <a href="index.php?action=admin_vouchers" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors <?= (isset($_GET['action']) && strpos($_GET['action'], 'voucher') !== false) ? 'active' : '' ?>">
+                        <i class="ri-coupon-3-line"></i>
+                        <span class="font-medium">Voucher</span>
+                    </a>
                     <a href="index.php?action=admin_orders" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors <?= (isset($_GET['action']) && $_GET['action'] == 'admin_orders') ? 'active' : '' ?>">
                         <i class="ri-shopping-cart-2-line"></i>
                         <span class="font-medium">Đơn hàng</span>
@@ -57,6 +61,12 @@
                         <i class="ri-image-line"></i>
                         <span class="font-medium">Quản lý Banner</span>
                     </a>
+                    <div class="pt-6 mt-6 border-t border-gray-100">
+                        <a href="index.php?action=logout" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors" title="Đăng xuất về trang chủ">
+                            <i class="ri-logout-box-r-line"></i>
+                            <span class="font-medium">Đăng xuất</span>
+                        </a>
+                    </div>
                 </nav>
             </div>
         </aside>
@@ -76,6 +86,8 @@
                         case 'admin_customer_detail':  echo 'Chi tiết khách hàng'; break;
                         case 'admin_banners':          echo 'Quản lý Banner'; break;
                         case 'banner_form':            echo 'Cập nhật Banner'; break;
+                        case 'admin_vouchers':         echo 'Quản lý voucher'; break;
+                        case 'voucher_form':           echo 'Cập nhật voucher'; break;
                         default: echo 'Quản trị';
                     }
                     ?>

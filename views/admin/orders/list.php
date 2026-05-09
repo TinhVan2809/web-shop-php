@@ -14,8 +14,8 @@
     </div>
 </div>
 
-<div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-    <table class="w-full text-left border-collapse">
+<div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-visible">
+    <table class="w-full text-left border-collapse relative z-0">
         <thead>
             <tr class="bg-gray-50 border-b border-gray-100">
                 <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Mã đơn</th>
@@ -27,7 +27,7 @@
         </thead>
         <tbody class="divide-y divide-gray-100">
             <?php foreach ($orders as $order): ?>
-                <tr class="hover:bg-gray-50/50 transition-colors">
+                <tr class="hover:bg-gray-50/50 transition-colors relative">
                     <td class="px-6 py-4">
                         <span class="font-mono font-bold text-blue-600">#<?= $order['order_code'] ?></span>
                         <p class="text-[10px] text-gray-400 mt-0.5"><?= date('H:i d/m/Y', strtotime($order['created_at'])) ?></p>
@@ -55,7 +55,7 @@
                             <?= $st[1] ?>
                         </span>
                     </td>
-                    <td class="px-6 py-4 text-right">
+                    <td class="px-6 py-4 text-right relative overflow-visible">
                         <div class="flex justify-end gap-2 group relative">
                             <a href="index.php?action=order_detail&id=<?= $order['order_id'] ?>" class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-black hover:bg-gray-100 rounded-lg transition-all" title="Xem chi tiết">
                                 <i class="ri-eye-line"></i>
@@ -64,7 +64,7 @@
                                 <i class="ri-refresh-line"></i>
                             </button>
                             <!-- Dropdown đơn giản khi hover -->
-                            <div class="absolute right-0 bottom-full mb-2 hidden group-hover:flex flex-col bg-white border border-gray-100 shadow-xl rounded-xl p-2 z-50 w-40">
+                            <div class="absolute right-0 bottom-full mb-2 hidden group-hover:flex flex-col bg-white border border-gray-100 shadow-xl rounded-xl p-2 z-[60] w-40">
                                 <a href="index.php?action=update_order_status&id=<?= $order['order_id'] ?>&status=confirmed" class="px-3 py-2 hover:bg-blue-50 text-blue-600 text-xs font-bold rounded-lg transition-colors">XÁC NHẬN</a>
                                 <a href="index.php?action=update_order_status&id=<?= $order['order_id'] ?>&status=shipping" class="px-3 py-2 hover:bg-purple-50 text-purple-600 text-xs font-bold rounded-lg transition-colors">ĐANG GIAO</a>
                                 <a href="index.php?action=update_order_status&id=<?= $order['order_id'] ?>&status=completed" class="px-3 py-2 hover:bg-green-50 text-green-600 text-xs font-bold rounded-lg transition-colors">HOÀN THÀNH</a>
