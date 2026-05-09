@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th5 02, 2026 lúc 04:29 AM
+-- Thời gian đã tạo: Th5 09, 2026 lúc 03:31 AM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.2.12
 
@@ -156,20 +156,15 @@ INSERT INTO `inventory` (`inventory_id`, `product_id`, `quantity`, `reserved_qua
 (11, 26, 20, 0, 10, 'in_stock', '2026-04-30 22:39:51', 11),
 (12, 26, 90, 0, 10, 'in_stock', '2026-04-30 22:39:51', 12),
 (13, 27, 12, 0, 10, 'in_stock', '2026-04-30 22:46:34', 13),
-(14, 3, 50, 2, 10, 'in_stock', CURRENT_TIMESTAMP, 14),
-(15, 3, 45, 0, 10, 'in_stock', CURRENT_TIMESTAMP, 15),
-(16, 13, 30, 5, 5, 'in_stock', CURRENT_TIMESTAMP, 16);
-
--- --------------------------------------------------------
--- Thêm inventory cho các biến thể mới của product_id = 20 (Nike Air Zoom Pegasus 2)
--- --------------------------------------------------------
-INSERT INTO `inventory` (`inventory_id`, `product_id`, `quantity`, `reserved_quantity`, `min_stock_level`, `status`, `last_updated`, `variant_id`) VALUES
-(17, 20, 30, 0, 5, 'in_stock', CURRENT_TIMESTAMP, 17),
-(18, 20, 25, 0, 5, 'in_stock', CURRENT_TIMESTAMP, 18),
-(19, 20, 28, 0, 5, 'in_stock', CURRENT_TIMESTAMP, 19),
-(20, 20, 22, 0, 5, 'in_stock', CURRENT_TIMESTAMP, 20),
-(21, 20, 20, 0, 5, 'in_stock', CURRENT_TIMESTAMP, 21),
-(22, 20, 15, 0, 5, 'in_stock', CURRENT_TIMESTAMP, 22);
+(14, 3, 50, 2, 10, 'in_stock', '2026-05-02 03:25:38', 14),
+(15, 3, 45, 0, 10, 'in_stock', '2026-05-02 03:25:38', 15),
+(16, 13, 30, 5, 5, 'in_stock', '2026-05-02 03:25:38', 16),
+(17, 20, 30, 0, 5, 'in_stock', '2026-05-03 13:20:37', 17),
+(18, 20, 25, 0, 5, 'in_stock', '2026-05-03 13:20:37', 18),
+(19, 20, 28, 0, 5, 'in_stock', '2026-05-03 13:20:37', 19),
+(20, 20, 22, 0, 5, 'in_stock', '2026-05-03 13:20:37', 20),
+(21, 20, 20, 0, 5, 'in_stock', '2026-05-03 13:20:37', 21),
+(22, 20, 15, 0, 5, 'in_stock', '2026-05-03 13:20:37', 22);
 
 -- --------------------------------------------------------
 
@@ -482,20 +477,15 @@ INSERT INTO `product_variants` (`variant_id`, `product_id`, `sku`, `price`, `ima
 (11, 26, 'NIKE-BAG-10', 1000000.00, NULL, '2026-04-30 22:39:51'),
 (12, 26, 'NIKE-BAG-39', 1222222.00, NULL, '2026-04-30 22:39:51'),
 (13, 27, 'NIKE-SHIRT-22-30-XANH', 1500000.00, '1777589194_variant_0_fashion-portrait-young-elegant-woman (2).jpg', '2026-04-30 22:46:34'),
-(14, 3, 'ADI-UB22-40-WHT', 3100000.00, 'adidas_ultraboost_22.jpg', CURRENT_TIMESTAMP),
-(15, 3, 'ADI-UB22-41-WHT', 3100000.00, 'adidas_ultraboost_22.jpg', CURRENT_TIMESTAMP),
-(16, 13, 'ADI-UB-13-42', 3900000.00, 'adidas_ultraboost_22.jpg', CURRENT_TIMESTAMP);
-
--- --------------------------------------------------------
--- Thêm product_variants cho product_id = 20 (Nike Air Zoom Pegasus 2)
--- --------------------------------------------------------
-INSERT INTO `product_variants` (`variant_id`, `product_id`, `sku`, `price`, `image`, `created_at`) VALUES
-(17, 20, 'NIKE-PEG-02-40-WHT', 1900000.00, '1777320800_variant_40_white.jpg', CURRENT_TIMESTAMP),
-(18, 20, 'NIKE-PEG-02-40-BLK', 1900000.00, '1777320800_variant_40_black.jpg', CURRENT_TIMESTAMP),
-(19, 20, 'NIKE-PEG-02-41-WHT', 1900000.00, '1777320800_variant_41_white.jpg', CURRENT_TIMESTAMP),
-(20, 20, 'NIKE-PEG-02-41-BLK', 1900000.00, '1777320800_variant_41_black.jpg', CURRENT_TIMESTAMP),
-(21, 20, 'NIKE-PEG-02-42-WHT', 1900000.00, '1777320800_variant_42_white.jpg', CURRENT_TIMESTAMP),
-(22, 20, 'NIKE-PEG-02-42-BLK', 1900000.00, '1777320800_variant_42_black.jpg', CURRENT_TIMESTAMP);
+(14, 3, 'ADI-UB22-40-WHT', 3100000.00, 'adidas_ultraboost_22.jpg', '2026-05-02 03:25:38'),
+(15, 3, 'ADI-UB22-41-WHT', 3100000.00, 'adidas_ultraboost_22.jpg', '2026-05-02 03:25:38'),
+(16, 13, 'ADI-UB-13-42', 3900000.00, 'adidas_ultraboost_22.jpg', '2026-05-02 03:25:38'),
+(17, 20, 'NIKE-PEG-02-40-WHT', 1900000.00, '1777320800_variant_40_white.jpg', '2026-05-03 13:20:37'),
+(18, 20, 'NIKE-PEG-02-40-BLK', 1900000.00, '1777320800_variant_40_black.jpg', '2026-05-03 13:20:37'),
+(19, 20, 'NIKE-PEG-02-41-WHT', 1900000.00, '1777320800_variant_41_white.jpg', '2026-05-03 13:20:37'),
+(20, 20, 'NIKE-PEG-02-41-BLK', 1900000.00, '1777320800_variant_41_black.jpg', '2026-05-03 13:20:37'),
+(21, 20, 'NIKE-PEG-02-42-WHT', 1900000.00, '1777320800_variant_42_white.jpg', '2026-05-03 13:20:37'),
+(22, 20, 'NIKE-PEG-02-42-BLK', 1900000.00, '1777320800_variant_42_black.jpg', '2026-05-03 13:20:37');
 
 -- --------------------------------------------------------
 
@@ -618,12 +608,7 @@ INSERT INTO `variant_attributes` (`id`, `variant_id`, `attribute_name`, `attribu
 (23, 14, 'color', 'White'),
 (24, 15, 'size', '41'),
 (25, 15, 'color', 'White'),
-(26, 16, 'size', '42');
-
--- --------------------------------------------------------
--- Thêm variant_attributes cho các biến thể mới của product_id = 20
--- --------------------------------------------------------
-INSERT INTO `variant_attributes` (`id`, `variant_id`, `attribute_name`, `attribute_value`) VALUES
+(26, 16, 'size', '42'),
 (27, 17, 'size', '40'),
 (28, 17, 'color', 'White'),
 (29, 18, 'size', '40'),
@@ -859,7 +844,7 @@ ALTER TABLE `favority`
 -- AUTO_INCREMENT cho bảng `inventory`
 --
 ALTER TABLE `inventory`
-  MODIFY `inventory_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `inventory_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT cho bảng `manufacturers`
@@ -901,13 +886,13 @@ ALTER TABLE `product_images`
 -- AUTO_INCREMENT cho bảng `product_variants`
 --
 ALTER TABLE `product_variants`
-  MODIFY `variant_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID bi???n th???', AUTO_INCREMENT=14;
+  MODIFY `variant_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID bi???n th???', AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT cho bảng `reviews`
 --
 ALTER TABLE `reviews`
-  MODIFY `review_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `review_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT cho bảng `users`
@@ -925,7 +910,7 @@ ALTER TABLE `user_address`
 -- AUTO_INCREMENT cho bảng `variant_attributes`
 --
 ALTER TABLE `variant_attributes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT cho bảng `vouchers`
