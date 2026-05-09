@@ -30,7 +30,7 @@
             <nav class="hidden md:flex ml-10">
                 <ul class="flex justify-center items-center gap-5">
                     <li class="hover:underline cursor-pointer"><a href="index.php">Home</a></li>
-                    <li class="hover:underline cursor-pointer"><a href="index.php?action=admin_products">Products</a></li>
+                    <li class="hover:underline cursor-pointer"><a href="#">Products</a></li>
                     <li class="hover:underline cursor-pointer">Blogs</li>
                     <li class="hover:underline cursor-pointer">Contact</li>
                 </ul>
