@@ -161,6 +161,17 @@ INSERT INTO `inventory` (`inventory_id`, `product_id`, `quantity`, `reserved_qua
 (16, 13, 30, 5, 5, 'in_stock', CURRENT_TIMESTAMP, 16);
 
 -- --------------------------------------------------------
+-- Thêm inventory cho các biến thể mới của product_id = 20 (Nike Air Zoom Pegasus 2)
+-- --------------------------------------------------------
+INSERT INTO `inventory` (`inventory_id`, `product_id`, `quantity`, `reserved_quantity`, `min_stock_level`, `status`, `last_updated`, `variant_id`) VALUES
+(17, 20, 30, 0, 5, 'in_stock', CURRENT_TIMESTAMP, 17),
+(18, 20, 25, 0, 5, 'in_stock', CURRENT_TIMESTAMP, 18),
+(19, 20, 28, 0, 5, 'in_stock', CURRENT_TIMESTAMP, 19),
+(20, 20, 22, 0, 5, 'in_stock', CURRENT_TIMESTAMP, 20),
+(21, 20, 20, 0, 5, 'in_stock', CURRENT_TIMESTAMP, 21),
+(22, 20, 15, 0, 5, 'in_stock', CURRENT_TIMESTAMP, 22);
+
+-- --------------------------------------------------------
 
 --
 -- Cấu trúc bảng cho bảng `manufacturers`
@@ -476,6 +487,17 @@ INSERT INTO `product_variants` (`variant_id`, `product_id`, `sku`, `price`, `ima
 (16, 13, 'ADI-UB-13-42', 3900000.00, 'adidas_ultraboost_22.jpg', CURRENT_TIMESTAMP);
 
 -- --------------------------------------------------------
+-- Thêm product_variants cho product_id = 20 (Nike Air Zoom Pegasus 2)
+-- --------------------------------------------------------
+INSERT INTO `product_variants` (`variant_id`, `product_id`, `sku`, `price`, `image`, `created_at`) VALUES
+(17, 20, 'NIKE-PEG-02-40-WHT', 1900000.00, '1777320800_variant_40_white.jpg', CURRENT_TIMESTAMP),
+(18, 20, 'NIKE-PEG-02-40-BLK', 1900000.00, '1777320800_variant_40_black.jpg', CURRENT_TIMESTAMP),
+(19, 20, 'NIKE-PEG-02-41-WHT', 1900000.00, '1777320800_variant_41_white.jpg', CURRENT_TIMESTAMP),
+(20, 20, 'NIKE-PEG-02-41-BLK', 1900000.00, '1777320800_variant_41_black.jpg', CURRENT_TIMESTAMP),
+(21, 20, 'NIKE-PEG-02-42-WHT', 1900000.00, '1777320800_variant_42_white.jpg', CURRENT_TIMESTAMP),
+(22, 20, 'NIKE-PEG-02-42-BLK', 1900000.00, '1777320800_variant_42_black.jpg', CURRENT_TIMESTAMP);
+
+-- --------------------------------------------------------
 
 --
 -- Cấu trúc bảng cho bảng `reviews`
@@ -597,6 +619,23 @@ INSERT INTO `variant_attributes` (`id`, `variant_id`, `attribute_name`, `attribu
 (24, 15, 'size', '41'),
 (25, 15, 'color', 'White'),
 (26, 16, 'size', '42');
+
+-- --------------------------------------------------------
+-- Thêm variant_attributes cho các biến thể mới của product_id = 20
+-- --------------------------------------------------------
+INSERT INTO `variant_attributes` (`id`, `variant_id`, `attribute_name`, `attribute_value`) VALUES
+(27, 17, 'size', '40'),
+(28, 17, 'color', 'White'),
+(29, 18, 'size', '40'),
+(30, 18, 'color', 'Black'),
+(31, 19, 'size', '41'),
+(32, 19, 'color', 'White'),
+(33, 20, 'size', '41'),
+(34, 20, 'color', 'Black'),
+(35, 21, 'size', '42'),
+(36, 21, 'color', 'White'),
+(37, 22, 'size', '42'),
+(38, 22, 'color', 'Black');
 
 -- --------------------------------------------------------
 

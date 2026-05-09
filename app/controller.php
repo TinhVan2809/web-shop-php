@@ -155,6 +155,18 @@ class Controller
             }
         }
 
+        // Build attribute options map for UI (e.g. color => ["red" => [vids], ...])
+        $attrOptions = [];
+        foreach ($variants as $v) {
+            if (!empty($v['attrs'])) {
+                foreach ($v['attrs'] as $name => $value) {
+                    if (!isset($attrOptions[$name])) $attrOptions[$name] = [];
+                    if (!isset($attrOptions[$name][$value])) $attrOptions[$name][$value] = [];
+                    $attrOptions[$name][$value][] = $v['variant_id'];
+                }
+            }
+        }
+
         // Lấy danh sách đánh giá kèm thông tin người dùng
         $ratingFilter = $_GET['rating_filter'] ?? 'all';
         $reviewParams = ['id' => $id];
@@ -436,6 +448,73 @@ class Controller
             </main>
         <?php endif;
 
+        // Small script: attribute-based selection (color/size) -> pick variant, update image & stock
+        ?>
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const colorButtons = document.querySelectorAll('.color-option');
+            const sizeButtons = document.querySelectorAll('.size-option');
+            const btnAddToCart = document.querySelector('.btn-add-to-cart');
+            const mainImg = document.getElementById('main-image');
+            const stockCountDisplay = document.getElementById('stock-count');
+
+            function toNumbers(arr){ return arr.map(x => Number(x)); }
+            function intersect(a, b){ return a.filter(v => b.includes(v)); }
+
+            let selectedColorVariants = null;
+            let selectedSizeVariants = null;
+
+            colorButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    colorButtons.forEach(b => b.classList.remove('ring-2','ring-black','border-black'));
+                    this.classList.add('ring-2','ring-black','border-black');
+                    selectedColorVariants = toNumbers(this.getAttribute('data-variants').split(','));
+
+                    // Update size availability
+                    sizeButtons.forEach(s => {
+                        const sVariants = toNumbers(s.getAttribute('data-variants').split(','));
+                        const inter = intersect(selectedColorVariants, sVariants);
+                        if (inter.length > 0) { s.disabled = false; s.classList.remove('opacity-40','cursor-not-allowed'); }
+                        else { s.disabled = true; s.classList.add('opacity-40','cursor-not-allowed'); }
+                    });
+
+                    updateSelectedVariant();
+                });
+            });
+
+            sizeButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    sizeButtons.forEach(b => b.classList.remove('ring-2','ring-black','border-black','bg-black','text-white'));
+                    this.classList.add('ring-2','ring-black','border-black','bg-black','text-white');
+                    selectedSizeVariants = toNumbers(this.getAttribute('data-variants').split(','));
+                    updateSelectedVariant();
+                });
+            });
+
+            function updateSelectedVariant(){
+                let variantIds = null;
+                if (selectedColorVariants && selectedSizeVariants) variantIds = intersect(selectedColorVariants, selectedSizeVariants);
+                else if (selectedColorVariants) variantIds = selectedColorVariants;
+                else if (selectedSizeVariants) variantIds = selectedSizeVariants;
+
+                if (variantIds && variantIds.length > 0) {
+                    const vid = variantIds[0];
+                    if (btnAddToCart) btnAddToCart.setAttribute('data-variant-id', vid);
+                    const variantEl = document.querySelector('.variant-option[data-variant-id="' + vid + '"]');
+                    if (variantEl) {
+                        const stock = variantEl.getAttribute('data-stock') || 0;
+                        if (stockCountDisplay) stockCountDisplay.textContent = stock;
+                        const img = variantEl.getAttribute('data-image');
+                        if (img && mainImg) mainImg.src = img;
+                        document.querySelectorAll('.variant-option').forEach(el => el.classList.remove('border-black','ring-2','ring-black'));
+                        variantEl.classList.add('border-black','ring-2','ring-black');
+                    }
+                }
+            }
+        });
+        </script>
+
+        <?php
         // Include footer
         include_once PROJECT_ROOT . '/components/footer.php';
     }
