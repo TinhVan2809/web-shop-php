@@ -123,7 +123,7 @@ class VoucherController extends AdminBaseController
             $this->db->beginTransaction();
 
             if ($id) {
-                $stmt = $this->db->prepare("\n                    UPDATE vouchers\n                    SET code = ?, description = ?, discount_type = ?, discount_value = ?, max_discount = ?, min_order_value = ?, usage_limit = ?, start_date = ?, end_date = ?, status = ?\n                    WHERE voucher_id = ?\n                ");
+                $stmt = $this->db->prepare("UPDATE vouchers SET code = ?, description = ?, discount_type = ?, discount_value = ?, max_discount = ?, min_order_value = ?, usage_limit = ?, start_date = ?, end_date = ?, status = ? WHERE voucher_id = ?");
                 $stmt->execute([
                     $code,
                     $description !== '' ? $description : null,
@@ -138,7 +138,7 @@ class VoucherController extends AdminBaseController
                     $id,
                 ]);
             } else {
-                $stmt = $this->db->prepare("\n                    INSERT INTO vouchers (code, description, discount_type, discount_value, max_discount, min_order_value, usage_limit, start_date, end_date, status)\n                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)\n                ");
+                $stmt = $this->db->prepare("INSERT INTO vouchers (code, description, discount_type, discount_value, max_discount, min_order_value, usage_limit, start_date, end_date, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 $stmt->execute([
                     $code,
                     $description !== '' ? $description : null,
