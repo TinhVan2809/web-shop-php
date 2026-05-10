@@ -3,6 +3,8 @@
 http://localhost/web-shop-php/public/index.php
 ```
 
+![](/asset/Screenshot%202026-04-27%20103946.png)
+
 ###  Tài khoản Admin
 ```bash
     admin
@@ -16,8 +18,6 @@ http://localhost/web-shop-php/public/index.php
 ```
 ###
 
-![](/asset/Screenshot%202026-04-27%20103946.png)
-
 ### Các lỗi thường gặp
 **Page not found**
 => Kiểm tra lại URL (Mặc định: http://localhost/web-shop-php/public/index.php)
@@ -30,8 +30,6 @@ http://localhost/web-shop-php/public/index.php
 
 **Lỗi file CheckoutController.php dòng 16 hoặc dòng 5**
 => Kiểm tra cấu hình file [config](/config.example.php) (Liên hệ người giữ repo gốc)
-
-Đọc thêm [tại đây](./docs/doc.md)
 
 
 ### Tải khoản Test Thanh toán Sandbox

@@ -1,1 +1,0 @@
-- Toàn bộ ảnh sản phẩm lưu tại /asset -> Chỉ là ảnh demo, có thể sẽ khác với tên sản phẩm
