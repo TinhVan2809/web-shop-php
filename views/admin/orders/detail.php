@@ -60,7 +60,13 @@
                         <span class="font-medium"><?= number_format($order['subtotal'], 0, ',', '.') ?>₫</span>
                     </div>
                     <div class="flex justify-between w-64">
-                        <span class="text-gray-500">Giảm giá:</span>
+                        <span class="text-gray-500">
+                            <?php if (!empty($order['voucher_code']) && !empty($order['voucher_type'])): ?>
+                                Giảm giá (<?= htmlspecialchars($order['voucher_code']) ?> - <?= $order['voucher_type'] === 'percent' ? number_format($order['voucher_value'], 0, ',', '.') . '%' : number_format($order['voucher_value'], 0, ',', '.') . '₫' ?>):
+                            <?php else: ?>
+                                Giảm giá:
+                            <?php endif; ?>
+                        </span>
                         <span class="text-red-500">-<?= number_format($order['discount_amount'], 0, ',', '.') ?>₫</span>
                     </div>
                     <div class="flex justify-between w-64">

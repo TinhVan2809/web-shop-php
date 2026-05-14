@@ -37,7 +37,7 @@ class CheckoutController
 
         // Calculate subtotal
         $stmtItems = $this->db->prepare("
-            SELECT c.quantity, c.variant_id, p.product_id, p.name, p.price, p.discount_price, p.thumbnail,
+            SELECT c.quantity, c.variant_id, p.product_id, p.category_id, p.name, p.price, p.discount_price, p.thumbnail,
                    pv.sku, pv.price as variant_price,
                    GROUP_CONCAT(CONCAT(va.attribute_name, ': ', va.attribute_value) SEPARATOR ', ') as variant_details
             FROM carts c 
@@ -57,6 +57,8 @@ class CheckoutController
         }
 
         $tax = $subtotal * 0.10;
+        $voucher_code = strtoupper(trim($_GET['voucher'] ?? ''));
+        $discount_amount = 0;
 
         include_once PROJECT_ROOT . '/components/header.php';
         include_once PROJECT_ROOT . '/views/checkout.php';
@@ -75,20 +77,34 @@ class CheckoutController
             exit;
         }
 
-        $recipient_name = $_POST['recipient_name'] ?? '';
-        $recipient_phone = $_POST['recipient_phone'] ?? '';
-        $recipient_email = $_POST['recipient_email'] ?? '';
-        $province_name = $_POST['province_name'] ?? '';
-        $district_name = $_POST['district_name'] ?? '';
-        $ward_name = $_POST['ward_name'] ?? '';
-        $specific_address = $_POST['specific_address'] ?? '';
+        $recipient_name = trim($_POST['recipient_name'] ?? '');
+        $recipient_phone = trim($_POST['recipient_phone'] ?? '');
+        $recipient_email = trim($_POST['recipient_email'] ?? '');
+        $province_name = trim($_POST['province_name'] ?? '');
+        $district_name = trim($_POST['district_name'] ?? '');
+        $ward_name = trim($_POST['ward_name'] ?? '');
+        $specific_address = trim($_POST['specific_address'] ?? '');
+
+        if (
+            $recipient_name === '' ||
+            $recipient_phone === '' ||
+            $recipient_email === '' ||
+            $province_name === '' ||
+            $district_name === '' ||
+            $ward_name === '' ||
+            $specific_address === ''
+        ) {
+            header("Location: index.php?action=checkout&error=" . urlencode('Vui lòng nhập đầy đủ thông tin giao hàng.'));
+            exit;
+        }
 
         $shipping_method = $_POST['shipping_method'] ?? 'standard';
         $payment_method = $_POST['payment_method'] ?? 'cod';
+        $voucher_code = strtoupper(trim($_POST['voucher_code'] ?? ''));
 
         // Calculate totals
         $stmtItems = $this->db->prepare("
-            SELECT c.quantity, c.variant_id, p.product_id, p.name, p.price, p.discount_price, p.thumbnail,
+            SELECT c.quantity, c.variant_id, p.product_id, p.category_id, p.name, p.price, p.discount_price, p.thumbnail,
                    pv.sku, pv.price as variant_price,
                    GROUP_CONCAT(CONCAT(va.attribute_name, ': ', va.attribute_value) SEPARATOR ', ') as variant_details
             FROM carts c 
@@ -112,12 +128,31 @@ class CheckoutController
             $subtotal += $price * $item['quantity'];
         }
 
+        $discount_amount = 0;
+        $voucher_id = null;
+        $voucher_discount = null;
+
+        if ($voucher_code !== '') {
+            $voucherResult = $this->resolveVoucher($voucher_code, $cartItems, $subtotal);
+            if (isset($voucherResult['error'])) {
+                header("Location: index.php?action=checkout&error=" . urlencode($voucherResult['error']) . "&voucher=" . urlencode($voucher_code));
+                exit;
+            }
+
+            $discount_amount = $voucherResult['discount'];
+            $voucher_id = $voucherResult['voucher']['voucher_id'];
+            $voucher_discount = $discount_amount;
+        }
+
         $shipping_fee = 0;
         if ($shipping_method === 'standard') $shipping_fee = 30000;
         else if ($shipping_method === 'fast') $shipping_fee = 50000;
         else if ($shipping_method === 'pickup') $shipping_fee = 0;
 
-        $total_amount = $subtotal + ($subtotal * 0.10) + $shipping_fee;
+        $total_amount = $subtotal + ($subtotal * 0.10) + $shipping_fee - $discount_amount;
+        if ($total_amount < 0) {
+            $total_amount = 0;
+        }
 
         $order_code = 'ORD' . date('YmdHis') . rand(100, 999);
 
@@ -128,11 +163,13 @@ class CheckoutController
             // Create Order
             $stmt = $this->db->prepare("
                 INSERT INTO orders (
-                    user_id, order_code, status, payment_status, subtotal, shipping_fee, total_amount, 
-                    recipient_name, recipient_phone, province_name, district_name, ward_name, specific_address
+                    user_id, order_code, status, payment_status, subtotal, discount_amount, shipping_fee, total_amount,
+                    voucher_id, voucher_code, voucher_discount, recipient_name, recipient_phone, province_name,
+                    district_name, ward_name, specific_address
                 ) VALUES (
-                    :user_id, :order_code, 'pending', 'unpaid', :subtotal, :shipping_fee, :total_amount,
-                    :recipient_name, :recipient_phone, :province_name, :district_name, :ward_name, :specific_address
+                    :user_id, :order_code, 'pending', 'unpaid', :subtotal, :discount_amount, :shipping_fee, :total_amount,
+                    :voucher_id, :voucher_code, :voucher_discount, :recipient_name, :recipient_phone, :province_name,
+                    :district_name, :ward_name, :specific_address
                 )
             ");
 
@@ -140,8 +177,12 @@ class CheckoutController
                 'user_id' => $_SESSION['user_id'],
                 'order_code' => $order_code,
                 'subtotal' => $subtotal,
+                'discount_amount' => $discount_amount,
                 'shipping_fee' => $shipping_fee,
                 'total_amount' => $total_amount,
+                'voucher_id' => $voucher_id,
+                'voucher_code' => $voucher_code !== '' ? $voucher_code : null,
+                'voucher_discount' => $voucher_discount,
                 'recipient_name' => $recipient_name,
                 'recipient_phone' => $recipient_phone,
                 'province_name' => $province_name,
@@ -208,6 +249,11 @@ class CheckoutController
                 ]);
             }
 
+            if ($voucher_id) {
+                $stmtVoucher = $this->db->prepare("UPDATE vouchers SET used_count = used_count + 1 WHERE voucher_id = :id");
+                $stmtVoucher->execute(['id' => $voucher_id]);
+            }
+
             // Clear Cart
             $stmtClear = $this->db->prepare("DELETE FROM carts WHERE user_id = :user_id");
             $stmtClear->execute(['user_id' => $_SESSION['user_id']]);
@@ -226,7 +272,7 @@ class CheckoutController
                 $emailService = new EmailService();
                 $emailService->sendOrderConfirmation($order_id);
 
-                header("Location: index.php?action=checkout_success&order_code=" . $order_code);
+                header("Location: index.php?action=checkout_success&order_code=" . $order_code . "&order_id=" . $order_id);
                 exit;
             } else if ($payment_method === 'vnpay') {
                 $this->processVNPay($order_id, $order_code, $total_amount);
@@ -238,6 +284,137 @@ class CheckoutController
             header("Location: index.php?action=checkout_failed&error=" . urlencode($e->getMessage()));
             exit;
         }
+    }
+
+    public function applyVoucher()
+    {
+        header('Content-Type: application/json; charset=utf-8');
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['success' => false, 'message' => 'Phương thức không hợp lệ.']);
+            exit;
+        }
+
+        if (!isset($_SESSION['user_id'])) {
+            echo json_encode(['success' => false, 'message' => 'Vui lòng đăng nhập để áp dụng voucher.']);
+            exit;
+        }
+
+        $voucher_code = strtoupper(trim($_POST['voucher_code'] ?? ''));
+        if ($voucher_code === '') {
+            echo json_encode(['success' => false, 'message' => 'Vui lòng nhập mã voucher.']);
+            exit;
+        }
+
+        $stmtItems = $this->db->prepare("\n            SELECT c.quantity, c.variant_id, p.product_id, p.category_id, p.name, p.price, p.discount_price, p.thumbnail,\n                   pv.sku, pv.price as variant_price,\n                   GROUP_CONCAT(CONCAT(va.attribute_name, ': ', va.attribute_value) SEPARATOR ', ') as variant_details\n            FROM carts c \n            JOIN products p ON c.product_id = p.product_id \n            LEFT JOIN product_variants pv ON c.variant_id = pv.variant_id\n            LEFT JOIN variant_attributes va ON pv.variant_id = va.variant_id\n            WHERE c.user_id = :user_id\n            GROUP BY c.cart_id\n        ");
+        $stmtItems->execute(['user_id' => $_SESSION['user_id']]);
+        $cartItems = $stmtItems->fetchAll(PDO::FETCH_ASSOC);
+
+        if (empty($cartItems)) {
+            echo json_encode(['success' => false, 'message' => 'Giỏ hàng trống.']);
+            exit;
+        }
+
+        $subtotal = 0;
+        foreach ($cartItems as $item) {
+            $price = $item['variant_price'] ?: ($item['discount_price'] ?? $item['price']);
+            $subtotal += $price * $item['quantity'];
+        }
+
+        $voucherResult = $this->resolveVoucher($voucher_code, $cartItems, $subtotal);
+        if (isset($voucherResult['error'])) {
+            echo json_encode(['success' => false, 'message' => $voucherResult['error']]);
+            exit;
+        }
+
+        echo json_encode([
+            'success' => true,
+            'discount' => $voucherResult['discount'],
+            'voucher_code' => $voucher_code,
+            'discount_type' => $voucherResult['voucher']['discount_type'] ?? 'fixed',
+            'discount_value' => (float)($voucherResult['voucher']['discount_value'] ?? 0),
+        ]);
+        exit;
+    }
+
+    private function resolveVoucher(string $code, array $cartItems, float $subtotal): array
+    {
+        $stmt = $this->db->prepare("SELECT * FROM vouchers WHERE code = ? LIMIT 1");
+        $stmt->execute([$code]);
+        $voucher = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$voucher) {
+            return ['error' => 'Voucher không tồn tại.'];
+        }
+
+        if (($voucher['status'] ?? 'inactive') !== 'active') {
+            return ['error' => 'Voucher không còn hoạt động.'];
+        }
+
+        $now = new DateTime('now');
+        if (!empty($voucher['start_date']) && $now < new DateTime($voucher['start_date'])) {
+            return ['error' => 'Voucher chưa bắt đầu.'];
+        }
+        if (!empty($voucher['end_date']) && $now > new DateTime($voucher['end_date'])) {
+            return ['error' => 'Voucher đã hết hạn.'];
+        }
+
+        if ($voucher['usage_limit'] !== null && (int)$voucher['used_count'] >= (int)$voucher['usage_limit']) {
+            return ['error' => 'Voucher đã hết lượt sử dụng.'];
+        }
+
+        if ($subtotal < (float)$voucher['min_order_value']) {
+            return ['error' => 'Đơn hàng chưa đạt giá trị tối thiểu để dùng voucher.'];
+        }
+
+        $productStmt = $this->db->prepare("SELECT product_id FROM voucher_products WHERE voucher_id = ?");
+        $productStmt->execute([$voucher['voucher_id']]);
+        $productIds = array_map('intval', $productStmt->fetchAll(PDO::FETCH_COLUMN));
+
+        $categoryStmt = $this->db->prepare("SELECT category_id FROM voucher_categories WHERE voucher_id = ?");
+        $categoryStmt->execute([$voucher['voucher_id']]);
+        $categoryIds = array_map('intval', $categoryStmt->fetchAll(PDO::FETCH_COLUMN));
+
+        $eligibleSubtotal = 0.0;
+        foreach ($cartItems as $item) {
+            $price = $item['variant_price'] ?: ($item['discount_price'] ?? $item['price']);
+            $lineTotal = $price * $item['quantity'];
+
+            $isEligible = true;
+            if (!empty($productIds)) {
+                $isEligible = in_array((int)$item['product_id'], $productIds, true);
+            } else if (!empty($categoryIds)) {
+                $isEligible = in_array((int)$item['category_id'], $categoryIds, true);
+            }
+
+            if ($isEligible) {
+                $eligibleSubtotal += $lineTotal;
+            }
+        }
+
+        if ($eligibleSubtotal <= 0) {
+            return ['error' => 'Voucher không áp dụng cho sản phẩm trong giỏ hàng.'];
+        }
+
+        $discount = 0.0;
+        if (($voucher['discount_type'] ?? 'percent') === 'percent') {
+            $discount = $eligibleSubtotal * ((float)$voucher['discount_value'] / 100);
+        } else {
+            $discount = (float)$voucher['discount_value'];
+        }
+
+        if (!empty($voucher['max_discount']) && $discount > (float)$voucher['max_discount']) {
+            $discount = (float)$voucher['max_discount'];
+        }
+
+        if ($discount > $eligibleSubtotal) {
+            $discount = $eligibleSubtotal;
+        }
+
+        return [
+            'voucher' => $voucher,
+            'discount' => $discount,
+        ];
     }
 
     private function processVNPay($order_id, $order_code, $total_amount)

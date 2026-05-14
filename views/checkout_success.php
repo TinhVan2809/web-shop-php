@@ -11,6 +11,10 @@
     
     <div class="flex justify-center gap-4">
         <a href="index.php" class="px-8 py-3 bg-black text-white rounded-full font-medium hover:bg-gray-800 transition-colors">Tiếp tục mua sắm</a>
-        <a href="index.php?action=profile&id=<?php echo $_SESSION['user_id'] ?? ''; ?>" class="px-8 py-3 bg-white text-black border border-gray-300 rounded-full font-medium hover:bg-gray-50 transition-colors">Xem đơn hàng</a>
+        <?php if (isset($_GET['order_id'])): ?>
+            <a href="index.php?action=orderDetail&id=<?php echo (int)$_GET['order_id']; ?>" class="px-8 py-3 bg-white text-black border border-gray-300 rounded-full font-medium hover:bg-gray-50 transition-colors">Xem đơn hàng</a>
+        <?php else: ?>
+            <a href="index.php?action=profile&id=<?php echo $_SESSION['user_id'] ?? ''; ?>" class="px-8 py-3 bg-white text-black border border-gray-300 rounded-full font-medium hover:bg-gray-50 transition-colors">Xem đơn hàng</a>
+        <?php endif; ?>
     </div>
 </main>

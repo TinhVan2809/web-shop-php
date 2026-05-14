@@ -34,10 +34,12 @@ class OrderController extends AdminBaseController
             exit;
         }
 
-        $stmt = $this->db->prepare("SELECT o.*, u.name as customer_name, u.gmail as customer_email 
-                                    FROM orders o 
-                                    LEFT JOIN users u ON o.user_id = u.user_id 
-                                    WHERE o.order_id = ?");
+        $stmt = $this->db->prepare("SELECT o.*, u.name as customer_name, u.gmail as customer_email,
+                        v.discount_type as voucher_type, v.discount_value as voucher_value
+                        FROM orders o 
+                        LEFT JOIN users u ON o.user_id = u.user_id 
+                        LEFT JOIN vouchers v ON o.voucher_id = v.voucher_id
+                        WHERE o.order_id = ?");
         $stmt->execute([$id]);
         $order = $stmt->fetch(PDO::FETCH_ASSOC);
 
