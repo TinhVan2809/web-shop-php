@@ -1,3 +1,12 @@
+<?php
+/** @var array $user */
+/** @var array $items */
+/** @var float $subtotal */
+/** @var float $tax */
+/** @var string $voucher_code */
+/** @var float $discount_amount */
+?>
+
 <main class="container mx-auto px-7 py-10 mt-20">
     <div class="flex flex-col lg:flex-row gap-10">
         <!-- Checkout Form -->
@@ -93,9 +102,30 @@
                             <button type="button" id="apply-voucher" class="px-5 py-2 rounded-lg bg-amber-500 text-white font-semibold hover:bg-amber-600 transition-colors">
                                 Áp dụng
                             </button>
+                            <button type="button" id="browse-vouchers" class="px-5 py-2 rounded-lg bg-gray-100 text-gray-800 font-semibold hover:bg-gray-200 transition-colors">
+                                Xem voucher
+                            </button>
                         </div>
                         <p class="text-xs text-gray-500">Dán mã và bấm Áp dụng để thấy số tiền giảm.</p>
                         <p id="voucher-message" class="text-sm text-amber-700 hidden"></p>
+                    </div>
+                </div>
+
+                <div id="voucher-modal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+                    <div class="bg-white w-full max-w-2xl rounded-2xl shadow-xl p-6 mx-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-bold">Voucher có thể sử dụng</h3>
+                            <button type="button" id="close-voucher-modal" class="text-gray-400 hover:text-gray-700">
+                                <i class="ri-close-line text-2xl"></i>
+                            </button>
+                        </div>
+                        <div class="flex gap-3 mb-4">
+                            <button type="button" id="tab-available" class="px-4 py-2 rounded-lg bg-black text-white text-sm font-semibold">Có thể dùng</button>
+                            <button type="button" id="tab-saved" class="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 text-sm font-semibold">Đã lưu</button>
+                        </div>
+                        <div id="voucher-list" class="space-y-3 max-h-72 overflow-auto"></div>
+                        <div id="voucher-empty" class="text-sm text-gray-500 hidden">Không có voucher phù hợp.</div>
+                        <div id="voucher-saved" class="text-sm text-gray-500 hidden">Chưa có voucher đã lưu.</div>
                     </div>
                 </div>
 
@@ -218,6 +248,14 @@
     const voucherMessage = document.getElementById('voucher-message');
     const discountDisplay = document.getElementById('discount-amount');
     const discountLabel = document.getElementById('discount-label');
+    const browseVouchersBtn = document.getElementById('browse-vouchers');
+    const voucherModal = document.getElementById('voucher-modal');
+    const closeVoucherModalBtn = document.getElementById('close-voucher-modal');
+    const voucherList = document.getElementById('voucher-list');
+    const voucherEmpty = document.getElementById('voucher-empty');
+    const voucherSaved = document.getElementById('voucher-saved');
+    const tabAvailable = document.getElementById('tab-available');
+    const tabSaved = document.getElementById('tab-saved');
 
     function showVoucherMessage(message, isError) {
         if (!voucherMessage) return;
@@ -291,6 +329,150 @@
 
     if (applyVoucherBtn) {
         applyVoucherBtn.addEventListener('click', handleVoucherApply);
+    }
+
+    function openVoucherModal() {
+        if (!voucherModal) return;
+        voucherModal.classList.remove('hidden');
+        voucherModal.classList.add('flex');
+        showAvailableTab();
+        loadAvailableVouchers();
+    }
+
+    function closeVoucherModal() {
+        if (!voucherModal) return;
+        voucherModal.classList.add('hidden');
+        voucherModal.classList.remove('flex');
+    }
+
+    function showAvailableTab() {
+        if (voucherSaved) voucherSaved.classList.add('hidden');
+        if (voucherList) voucherList.classList.remove('hidden');
+        if (voucherEmpty) voucherEmpty.classList.add('hidden');
+        if (tabAvailable) {
+            tabAvailable.classList.add('bg-black', 'text-white');
+            tabAvailable.classList.remove('bg-gray-100', 'text-gray-700');
+        }
+        if (tabSaved) {
+            tabSaved.classList.add('bg-gray-100', 'text-gray-700');
+            tabSaved.classList.remove('bg-black', 'text-white');
+        }
+    }
+
+    function showSavedTab() {
+        if (voucherList) voucherList.classList.add('hidden');
+        if (voucherEmpty) voucherEmpty.classList.add('hidden');
+        if (voucherSaved) voucherSaved.classList.remove('hidden');
+        if (tabSaved) {
+            tabSaved.classList.add('bg-black', 'text-white');
+            tabSaved.classList.remove('bg-gray-100', 'text-gray-700');
+        }
+        if (tabAvailable) {
+            tabAvailable.classList.add('bg-gray-100', 'text-gray-700');
+            tabAvailable.classList.remove('bg-black', 'text-white');
+        }
+    }
+
+    function formatVoucherValue(type, value, maxDiscount) {
+        if (type === 'percent') {
+            let text = `${value}%`;
+            if (maxDiscount) {
+                text += ` (tối đa ${formatCurrency(maxDiscount)})`;
+            }
+            return text;
+        }
+
+        return formatCurrency(value);
+    }
+
+    function renderVoucherList(vouchers) {
+        if (!voucherList || !voucherEmpty) return;
+        voucherList.innerHTML = '';
+
+        if (!vouchers.length) {
+            voucherEmpty.classList.remove('hidden');
+            return;
+        }
+
+        voucherEmpty.classList.add('hidden');
+
+        vouchers.forEach((voucher) => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'border border-gray-200 rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3';
+
+            const info = document.createElement('div');
+            const discountText = formatVoucherValue(voucher.discount_type, voucher.discount_value, voucher.max_discount);
+            info.innerHTML = `
+                <div class="font-semibold text-gray-900">${voucher.code} - ${discountText}</div>
+                <div class="text-sm text-gray-500">${voucher.description || 'Không có mô tả.'}</div>
+                <div class="text-xs text-gray-400">Giảm dự kiến: ${formatCurrency(voucher.preview_discount)} | Đơn tối thiểu: ${formatCurrency(voucher.min_order_value)}</div>
+            `;
+
+            const action = document.createElement('button');
+            action.type = 'button';
+            action.className = 'px-4 py-2 rounded-lg bg-amber-500 text-white text-sm font-semibold hover:bg-amber-600 transition-colors';
+            action.textContent = 'Áp dụng';
+            action.addEventListener('click', () => {
+                if (voucherInput) {
+                    voucherInput.value = voucher.code;
+                }
+                closeVoucherModal();
+                handleVoucherApply();
+            });
+
+            wrapper.appendChild(info);
+            wrapper.appendChild(action);
+            voucherList.appendChild(wrapper);
+        });
+    }
+
+    function loadAvailableVouchers() {
+        if (!voucherList || !voucherEmpty) return;
+
+        voucherList.innerHTML = '<div class="text-sm text-gray-500">Đang tải voucher...</div>';
+        voucherEmpty.classList.add('hidden');
+
+        fetch('index.php?action=list_vouchers')
+            .then((response) => response.json())
+            .then((data) => {
+                if (!data.success) {
+                    voucherList.innerHTML = '';
+                    voucherEmpty.textContent = data.message || 'Không thể tải voucher.';
+                    voucherEmpty.classList.remove('hidden');
+                    return;
+                }
+
+                renderVoucherList(data.vouchers || []);
+            })
+            .catch(() => {
+                voucherList.innerHTML = '';
+                voucherEmpty.textContent = 'Không thể kết nối để lấy voucher.';
+                voucherEmpty.classList.remove('hidden');
+            });
+    }
+
+    if (browseVouchersBtn) {
+        browseVouchersBtn.addEventListener('click', openVoucherModal);
+    }
+
+    if (closeVoucherModalBtn) {
+        closeVoucherModalBtn.addEventListener('click', closeVoucherModal);
+    }
+
+    if (tabAvailable) {
+        tabAvailable.addEventListener('click', showAvailableTab);
+    }
+
+    if (tabSaved) {
+        tabSaved.addEventListener('click', showSavedTab);
+    }
+
+    if (voucherModal) {
+        voucherModal.addEventListener('click', (event) => {
+            if (event.target === voucherModal) {
+                closeVoucherModal();
+            }
+        });
     }
 
     // Dữ liệu gợi ý 5 Thành phố trực thuộc trung ương

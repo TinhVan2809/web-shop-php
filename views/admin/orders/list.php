@@ -49,22 +49,21 @@
                             'completed' => ['bg-green-50 text-green-600', 'HOÀN THÀNH'],
                             'cancelled' => ['bg-red-50 text-red-600', 'ĐÃ HỦY']
                         ];
-                        $st = $statusMap[$order['status']] ?? ['bg-gray-50 text-gray-600', 'KHOÔNG XÁC ĐỊNH'];
+                        $st = $statusMap[$order['status']] ?? ['bg-gray-50 text-gray-600', 'KHÔNG XÁC ĐỊNH'];
                         ?>
                         <span class="px-2.5 py-1 rounded-full text-[10px] font-bold <?= $st[0] ?>">
                             <?= $st[1] ?>
                         </span>
                     </td>
                     <td class="px-6 py-4 text-right relative overflow-visible">
-                        <div class="flex justify-end gap-2 group relative">
+                        <div class="flex justify-end gap-2 relative">
                             <a href="index.php?action=order_detail&id=<?= $order['order_id'] ?>" class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-black hover:bg-gray-100 rounded-lg transition-all" title="Xem chi tiết">
                                 <i class="ri-eye-line"></i>
                             </a>
-                            <button class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Cập nhật trạng thái nhanh">
+                            <button type="button" class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all status-toggle" data-menu="status-menu-<?= $order['order_id'] ?>" title="Cập nhật trạng thái">
                                 <i class="ri-refresh-line"></i>
                             </button>
-                            <!-- Dropdown đơn giản khi hover -->
-                            <div class="absolute right-0 bottom-full mb-2 hidden group-hover:flex flex-col bg-white border border-gray-100 shadow-xl rounded-xl p-2 z-[60] w-40">
+                            <div id="status-menu-<?= $order['order_id'] ?>" class="absolute right-0 bottom-full mb-2 hidden flex-col bg-white border border-gray-100 shadow-xl rounded-xl p-2 z-[60] w-40">
                                 <a href="index.php?action=update_order_status&id=<?= $order['order_id'] ?>&status=confirmed" class="px-3 py-2 hover:bg-blue-50 text-blue-600 text-xs font-bold rounded-lg transition-colors">XÁC NHẬN</a>
                                 <a href="index.php?action=update_order_status&id=<?= $order['order_id'] ?>&status=shipping" class="px-3 py-2 hover:bg-purple-50 text-purple-600 text-xs font-bold rounded-lg transition-colors">ĐANG GIAO</a>
                                 <a href="index.php?action=update_order_status&id=<?= $order['order_id'] ?>&status=completed" class="px-3 py-2 hover:bg-green-50 text-green-600 text-xs font-bold rounded-lg transition-colors">HOÀN THÀNH</a>
@@ -77,3 +76,37 @@
         </tbody>
     </table>
 </div>
+
+<script>
+    (function () {
+        const toggles = Array.from(document.querySelectorAll('.status-toggle'));
+
+        function closeAll() {
+            toggles.forEach((toggle) => {
+                const menuId = toggle.getAttribute('data-menu');
+                const menu = menuId ? document.getElementById(menuId) : null;
+                if (menu) {
+                    menu.classList.add('hidden');
+                }
+            });
+        }
+
+        toggles.forEach((toggle) => {
+            toggle.addEventListener('click', (event) => {
+                event.stopPropagation();
+                const menuId = toggle.getAttribute('data-menu');
+                const menu = menuId ? document.getElementById(menuId) : null;
+                if (!menu) return;
+
+                const isHidden = menu.classList.contains('hidden');
+                closeAll();
+                if (isHidden) {
+                    menu.classList.remove('hidden');
+                    menu.classList.add('flex');
+                }
+            });
+        });
+
+        document.addEventListener('click', closeAll);
+    })();
+</script>

@@ -713,7 +713,7 @@ class Controller
                 <p class="text-xl font-medium">Trang không tồn tại hoặc tài khoản đã bị khóa.</p>
             </div>
         <?php else: ?>
-            <main class="container mx-auto px-7 py-20 mt-10">
+            <main class="container mx-auto px-7 py-20 mt-24">
                 <div class="max-w-4xl mx-auto space-y-8">
                     <!-- Card Thông tin cá nhân -->
                     <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
@@ -723,8 +723,9 @@ class Controller
 
                         <div class="space-y-5">
                             <div class="flex flex-col items-center mb-6">
-                                <img src="/web-shop-php/asset/<?php echo $user['avatar'] ?: 'default_avatar.png'; ?>"
-                                    class="w-32 h-32 rounded-full object-cover border-4 border-gray-100 shadow-sm">
+                                <div class="w-32 h-32 rounded-full bg-gray-100 border-4 border-gray-100 shadow-sm flex items-center justify-center text-gray-500">
+                                    <i class="ri-user-3-line text-5xl"></i>
+                                </div>
                             </div>
                             <div class="flex border-b border-gray-50 pb-3">
                                 <span class="w-40 text-gray-500">Họ và tên:</span>
@@ -849,7 +850,7 @@ class Controller
 
         include_once PROJECT_ROOT . '/components/header.php';
         ?>
-        <main class="container mx-auto px-7 py-20 mt-10">
+        <main class="container mx-auto px-7 py-20 mt-24">
             <div class="max-w-4xl mx-auto">
                 <div class="mb-6 flex items-center justify-between">
                     <a href="index.php?action=profile&id=<?php echo $_SESSION['user_id']; ?>" class="text-gray-500 hover:text-black transition-colors flex items-center gap-2">
