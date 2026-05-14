@@ -89,7 +89,7 @@ function voucherChecked($haystack, $value) {
 				</div>
 				<div>
 					<label class="block text-sm font-bold text-gray-700 mb-2">Đơn hàng tối thiểu</label>
-					<input type="number" step="0.01" min="0" name="min_order_value" value="<?= htmlspecialchars(voucherValue($voucher, 'min_order_value', '0.00')) ?>"
+					<input type="number"min="1" name="min_order_value" value="<?= htmlspecialchars(voucherValue($voucher, 'min_order_value', '1')) ?>"
 						class="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl focus:outline-none focus:border-black transition-all"
 						placeholder="0">
 				</div>

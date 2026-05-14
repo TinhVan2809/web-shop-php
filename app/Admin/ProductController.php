@@ -94,8 +94,10 @@ class ProductController extends AdminBaseController
 
             // --- XỬ LÝ BIẾN THỂ (VARIANTS) ---
             if (isset($_POST['variants'])) {
-                // Để đơn giản, chúng ta xóa các biến thể cũ và insert mới 
+                // Để đơn giản, chúng ta xóa các biến thể cũ, inventory liên quan và insert mới
                 // (Lưu ý: Trong thực tế nên cập nhật theo ID để tránh ảnh hưởng đến khóa ngoại nếu có đơn hàng)
+                // Xóa bản ghi `inventory` trước để tránh lỗi ràng buộc foreign key (inventory.variant_id -> product_variants.variant_id)
+                $this->db->prepare("DELETE FROM inventory WHERE product_id = ?")->execute([$id]);
                 $this->db->prepare("DELETE FROM product_variants WHERE product_id = ?")->execute([$id]);
 
                 foreach ($_POST['variants'] as $idx => $v) {
