@@ -74,6 +74,9 @@ switch ($action) {
     case 'apply_voucher':
         $checkoutCtrl->applyVoucher();
         break;
+    case 'list_vouchers':
+        $checkoutCtrl->listVouchers();
+        break;
     case 'checkout_success':
         include_once PROJECT_ROOT . '/components/header.php';
         include_once PROJECT_ROOT . '/views/checkout_success.php';

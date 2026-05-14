@@ -337,6 +337,110 @@ class CheckoutController
         exit;
     }
 
+    public function listVouchers()
+    {
+        header('Content-Type: application/json; charset=utf-8');
+
+        if (!isset($_SESSION['user_id'])) {
+            echo json_encode(['success' => false, 'message' => 'Vui lòng đăng nhập để xem voucher.']);
+            exit;
+        }
+
+        $stmtItems = $this->db->prepare("\n            SELECT c.quantity, c.variant_id, p.product_id, p.category_id, p.name, p.price, p.discount_price, p.thumbnail,\n                   pv.sku, pv.price as variant_price,\n                   GROUP_CONCAT(CONCAT(va.attribute_name, ': ', va.attribute_value) SEPARATOR ', ') as variant_details\n            FROM carts c \n            JOIN products p ON c.product_id = p.product_id \n            LEFT JOIN product_variants pv ON c.variant_id = pv.variant_id\n            LEFT JOIN variant_attributes va ON pv.variant_id = va.variant_id\n            WHERE c.user_id = :user_id\n            GROUP BY c.cart_id\n        ");
+        $stmtItems->execute(['user_id' => $_SESSION['user_id']]);
+        $cartItems = $stmtItems->fetchAll(PDO::FETCH_ASSOC);
+
+        if (empty($cartItems)) {
+            echo json_encode(['success' => true, 'vouchers' => []]);
+            exit;
+        }
+
+        $subtotal = 0;
+        foreach ($cartItems as $item) {
+            $price = $item['variant_price'] ?: ($item['discount_price'] ?? $item['price']);
+            $subtotal += $price * $item['quantity'];
+        }
+
+        $now = (new DateTime('now'))->format('Y-m-d H:i:s');
+        $voucherStmt = $this->db->prepare("\n            SELECT * FROM vouchers\n            WHERE status = 'active'\n              AND (start_date IS NULL OR start_date <= :now)\n              AND (end_date IS NULL OR end_date >= :now)\n              AND (usage_limit IS NULL OR used_count < usage_limit)\n              AND min_order_value <= :subtotal\n            ORDER BY created_at DESC\n        ");
+        $voucherStmt->execute(['now' => $now, 'subtotal' => $subtotal]);
+        $vouchers = $voucherStmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $productStmt = $this->db->prepare("SELECT product_id FROM voucher_products WHERE voucher_id = ?");
+        $categoryStmt = $this->db->prepare("SELECT category_id FROM voucher_categories WHERE voucher_id = ?");
+
+        $available = [];
+        foreach ($vouchers as $voucher) {
+            $productStmt->execute([$voucher['voucher_id']]);
+            $productIds = array_map('intval', $productStmt->fetchAll(PDO::FETCH_COLUMN));
+
+            $categoryStmt->execute([$voucher['voucher_id']]);
+            $categoryIds = array_map('intval', $categoryStmt->fetchAll(PDO::FETCH_COLUMN));
+
+            $eligibleSubtotal = $this->calculateEligibleSubtotal($cartItems, $productIds, $categoryIds);
+            if ($eligibleSubtotal <= 0) {
+                continue;
+            }
+
+            $previewDiscount = 0.0;
+            if (($voucher['discount_type'] ?? 'percent') === 'percent') {
+                $previewDiscount = $eligibleSubtotal * ((float)$voucher['discount_value'] / 100);
+            } else {
+                $previewDiscount = (float)$voucher['discount_value'];
+            }
+
+            if (!empty($voucher['max_discount']) && $previewDiscount > (float)$voucher['max_discount']) {
+                $previewDiscount = (float)$voucher['max_discount'];
+            }
+
+            if ($previewDiscount > $eligibleSubtotal) {
+                $previewDiscount = $eligibleSubtotal;
+            }
+
+            $remaining = null;
+            if ($voucher['usage_limit'] !== null) {
+                $remaining = max(0, (int)$voucher['usage_limit'] - (int)$voucher['used_count']);
+            }
+
+            $available[] = [
+                'code' => $voucher['code'],
+                'description' => $voucher['description'],
+                'discount_type' => $voucher['discount_type'],
+                'discount_value' => (float)$voucher['discount_value'],
+                'max_discount' => $voucher['max_discount'] !== null ? (float)$voucher['max_discount'] : null,
+                'min_order_value' => (float)$voucher['min_order_value'],
+                'preview_discount' => $previewDiscount,
+                'remaining' => $remaining,
+            ];
+        }
+
+        echo json_encode(['success' => true, 'vouchers' => $available]);
+        exit;
+    }
+
+    private function calculateEligibleSubtotal(array $cartItems, array $productIds, array $categoryIds): float
+    {
+        $eligibleSubtotal = 0.0;
+
+        foreach ($cartItems as $item) {
+            $price = $item['variant_price'] ?: ($item['discount_price'] ?? $item['price']);
+            $lineTotal = $price * $item['quantity'];
+
+            $isEligible = true;
+            if (!empty($productIds)) {
+                $isEligible = in_array((int)$item['product_id'], $productIds, true);
+            } else if (!empty($categoryIds)) {
+                $isEligible = in_array((int)$item['category_id'], $categoryIds, true);
+            }
+
+            if ($isEligible) {
+                $eligibleSubtotal += $lineTotal;
+            }
+        }
+
+        return $eligibleSubtotal;
+    }
+
     private function resolveVoucher(string $code, array $cartItems, float $subtotal): array
     {
         $stmt = $this->db->prepare("SELECT * FROM vouchers WHERE code = ? LIMIT 1");
@@ -375,22 +479,7 @@ class CheckoutController
         $categoryStmt->execute([$voucher['voucher_id']]);
         $categoryIds = array_map('intval', $categoryStmt->fetchAll(PDO::FETCH_COLUMN));
 
-        $eligibleSubtotal = 0.0;
-        foreach ($cartItems as $item) {
-            $price = $item['variant_price'] ?: ($item['discount_price'] ?? $item['price']);
-            $lineTotal = $price * $item['quantity'];
-
-            $isEligible = true;
-            if (!empty($productIds)) {
-                $isEligible = in_array((int)$item['product_id'], $productIds, true);
-            } else if (!empty($categoryIds)) {
-                $isEligible = in_array((int)$item['category_id'], $categoryIds, true);
-            }
-
-            if ($isEligible) {
-                $eligibleSubtotal += $lineTotal;
-            }
-        }
+        $eligibleSubtotal = $this->calculateEligibleSubtotal($cartItems, $productIds, $categoryIds);
 
         if ($eligibleSubtotal <= 0) {
             return ['error' => 'Voucher không áp dụng cho sản phẩm trong giỏ hàng.'];

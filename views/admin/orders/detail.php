@@ -1,3 +1,8 @@
+<?php
+/** @var array $order */
+/** @var array $items */
+?>
+
 <div class="flex justify-between items-center mb-8">
     <div>
         <h2 class="text-2xl font-bold flex items-center gap-3">
@@ -113,7 +118,7 @@
 
         <div class="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
             <h3 class="font-bold mb-6 flex items-center gap-2">
-                <i class="ri-truck-line text-purple-500"></i> Trạng thái vận chuyển
+                <i class="ri-truck-line text-purple-500"></i> Trạng thái đơn hàng
             </h3>
             <form action="index.php?action=update_order_status" method="GET" class="space-y-4">
                 <input type="hidden" name="action" value="update_order_status">
