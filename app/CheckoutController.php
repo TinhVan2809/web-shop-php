@@ -345,8 +345,8 @@ class CheckoutController
                 ]
             ],
             "application_context" => [
-                "return_url" => "http://localhost/webshopphp/public/index.php?action=paypal_return&order_id=" . $order_id,
-                "cancel_url" => "http://localhost/webshopphp/public/index.php?action=checkout_failed"
+                "return_url" => "http://localhost/web-shop-php/public/index.php?action=paypal_return&order_id=" . $order_id,
+                "cancel_url" => "http://localhost/web-shop-php/public/index.php?action=checkout_failed"
             ]
         ];
 
