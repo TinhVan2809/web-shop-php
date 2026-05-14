@@ -1,3 +1,12 @@
+<?php
+// Initialize variables for static analysis
+$categories = $categories ?? [];
+$products = $products ?? [];
+$page = $page ?? 1;
+$totalPages = $totalPages ?? 1;
+$price_range = $price_range ?? 'all';
+$category_id = $category_id ?? null;
+?>
 <main class="container mx-auto px-7 py-20 mt-20">
     <div class="mb-12 border-b border-gray-100 pb-8 flex flex-col md:flex-row justify-between items-end gap-4">
         

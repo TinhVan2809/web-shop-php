@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 
 <head>
     <meta charset="UTF-8">
@@ -30,8 +30,8 @@
             <nav class="hidden md:flex ml-10">
                 <ul class="flex justify-center items-center gap-5">
                     <li class="hover:underline cursor-pointer"><a href="index.php">Home</a></li>
-                    <li class="hover:underline cursor-pointer"><a href="#">Products</a></li>
-                    <li class="hover:underline cursor-pointer">Blogs</li>
+                    <li class="hover:underline cursor-pointer"><a href="index.php?action=products">Products</a></li>
+                    <li class="hover:underline cursor-pointer"><a href="index.php?action=blogs">Blogs</a></li>
                     <li class="hover:underline cursor-pointer">Contact</li>
                 </ul>
             </nav>
@@ -88,7 +88,7 @@
         <nav>
             <ul class="flex flex-col gap-6 text-xl font-medium">
                 <li><a href="index.php" class="hover:text-green-700">Home</a></li>
-                <li><a href="#" class="hover:text-green-700">Products</a></li>
+                <li><a href="index.php?action=products" class="hover:text-green-700">Products</a></li>
                 <li><a href="#" class="hover:text-green-700">Blogs</a></li>
                 <li><a href="#" class="hover:text-green-700">Contact</a></li>
             </ul>

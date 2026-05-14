@@ -1,5 +1,6 @@
 <?php
 
+header('Content-Type: text/html; charset=utf-8');
 session_start();
 
 define('PROJECT_ROOT', dirname(__DIR__));
@@ -15,9 +16,13 @@ require_once PROJECT_ROOT . '/app/Admin/OrderController.php';
 require_once PROJECT_ROOT . '/app/Admin/CustomerController.php';
 require_once PROJECT_ROOT . '/app/Admin/BannerController.php';
 require_once PROJECT_ROOT . '/app/Admin/VoucherController.php';
+require_once PROJECT_ROOT . '/app/Admin/ReportController.php';
+require_once PROJECT_ROOT . '/app/Admin/BlogAdminController.php';
 require_once PROJECT_ROOT . '/app/CartController.php';
 require_once PROJECT_ROOT . '/app/CheckoutController.php';
 require_once PROJECT_ROOT . '/app/PaymentController.php';
+require_once PROJECT_ROOT . '/app/BlogController.php';
+require_once PROJECT_ROOT . '/app/PageController.php';
 $action = $_GET['action'] ?? 'index';
 $controller = new Controller();
 
@@ -32,6 +37,10 @@ $voucherCtrl = new VoucherController();
 $cartCtrl = new CartController();
 $checkoutCtrl = new CheckoutController();
 $paymentCtrl = new PaymentController();
+$blogCtrl = new BlogController();
+$pageCtrl = new PageController();
+$blogAdminCtrl = new BlogAdminController();
+$reportCtrl = new ReportController();
 switch ($action) {
     case 'index':
         $controller->index();
@@ -117,9 +126,30 @@ switch ($action) {
     case 'best_sellers':
         $controller->bestSellers();
         break;
-    
+    case 'products':
+        $controller->products();
+        break;
+    case 'orderDetail':
+        $controller->orderDetail();
+        break;
+
+
+    // --- BLOG ROUTES ---
+    case 'blogs':
+        $blogCtrl->index();
+        break;
+    case 'blog_detail':
+        $blogCtrl->detail();
+        break;
+    case 'blog_category':
+        $blogCtrl->filterByCategory();
+        break;
+    case 'blog_search':
+        $blogCtrl->search();
+        break;
+
     // --- ADMIN ROUTES ---
-    
+
     // Dashboard
     case 'admin_dashboard':
         $dashboardCtrl->index();
@@ -141,7 +171,7 @@ switch ($action) {
     case 'toggle_user_status':
         $userCtrl->toggleStatus();
         break;
-    
+
     // Categories
     case 'admin_categories':
         $productCtrl->categories();
@@ -205,7 +235,7 @@ switch ($action) {
     case 'admin_customer_detail':
         $customerCtrl->detail();
         break;
-    
+
     // Banners
     case 'admin_banners':
         $bannerCtrl->list();
@@ -232,6 +262,54 @@ switch ($action) {
         break;
     case 'delete_voucher':
         $voucherCtrl->delete();
+        break;
+
+    // Reports
+    case 'revenue_report':
+        $reportCtrl->revenueReport();
+        break;
+    case 'product_report':
+        $reportCtrl->productReport();
+        break;
+    case 'order_report':
+        $reportCtrl->orderReport();
+        break;
+    case 'customer_report':
+        $reportCtrl->customerReport();
+        break;
+
+    // Blog Admin
+    case 'admin_blogs':
+        $blogAdminCtrl->list();
+        break;
+    case 'blog_admin_form':
+        $blogAdminCtrl->form();
+        break;
+    case 'blog_save':
+        $blogAdminCtrl->save();
+        break;
+    case 'blog_delete':
+        $blogAdminCtrl->delete();
+        break;
+    case 'blog_change_status':
+        $blogAdminCtrl->changeStatus();
+        break;
+
+    // Pages Admin
+    case 'admin_pages':
+        $pageCtrl->list();
+        break;
+    case 'page_admin_form':
+        $pageCtrl->form();
+        break;
+    case 'page_save':
+        $pageCtrl->save();
+        break;
+    case 'page_delete':
+        $pageCtrl->delete();
+        break;
+    case 'page_view':
+        $pageCtrl->view();
         break;
 
     default:

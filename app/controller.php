@@ -51,44 +51,6 @@ class Controller
         (new most_favority())->mostFavority();
 ?>
 
-        <!-- <main class="container mx-auto px-7 py-10 mt-30">
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <?php foreach ($products as $product): ?>
-                    <div class="rounded-lg overflow-hidden hover:shadow-md transition-shadow">
-                        <a href="index.php?action=detail&id=<?php echo $product['product_id']; ?>" class="block relative h-64 bg-gray-100">
-                            <img src="/web-shop-php/asset/<?php echo $product['thumbnail']; ?>"
-                                alt="<?php echo $product['name']; ?>"
-                                class="w-full h-full object-cover">
-                            <?php if ($product['is_new']): ?>
-                                <span class="absolute top-2 left-2 text-black font-[550] text-xs px-2 py-1 rounded">New</span>
-                            <?php endif; ?>
-                            <button class="absolute top-0 right-0 p-3 btn-toggle-favorite" data-id="<?php echo $product['product_id']; ?>">
-                                <i class="<?php echo !empty($product['is_favorited']) ? 'ri-heart-3-fill text-red-500' : 'ri-heart-3-line'; ?> text-2xl hover:text-red-500 transition-colors"></i>
-                            </button>
-                        </a>
-
-                        <div class="p-4">
-                            <p class="text-xs text-gray-500 uppercase"><?php echo $product['category_name']; ?></p>
-                            <a href="index.php?action=detail&id=<?php echo $product['product_id']; ?>">
-                                <h2 class="font-bold text-lg mb-2 truncate hover:text-blue-600 transition-colors"><?php echo $product['name']; ?></h2>
-                            </a>
-
-
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <p class="font-bold"><?php echo number_format($product['discount_price'] ?? $product['price'], 0, ',', '.'); ?>₫</p>
-                                    <?php if ($product['discount_price']): ?>
-                                        <p class="text-gray-400 text-xs line-through"><?php echo number_format($product['price'], 0, ',', '.'); ?>₫</p>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-        </main> -->
-
         <?php
         // Include ads
         include_once PROJECT_ROOT . '/components/ads.php';
@@ -101,6 +63,7 @@ class Controller
         // Footer
         include_once PROJECT_ROOT . '/components/footer.php';
     }
+
 
     public function detail()
     {
@@ -224,7 +187,7 @@ class Controller
                     <div>
                         <h1 class="text-4xl font-bold mb-2"><?php echo $product['name']; ?></h1>
                         <p class="text-gray-500 mb-4 uppercase tracking-wider text-sm"><?php echo $product['category_name']; ?> | <?php echo $product['manufacturer_name'] ?? 'Haseki Store'; ?></p>
-                        
+
                         <!-- Hiển thị đánh giá trung bình -->
                         <div class="flex items-center gap-2 mb-6">
                             <div class="flex text-yellow-400">
@@ -296,48 +259,48 @@ class Controller
                 <!-- Phần Đánh giá sản phẩm -->
                 <div class="mt-20 border-t pt-10">
                     <h2 class="text-2xl font-bold mb-8">Đánh giá sản phẩm (<?php echo count($reviews); ?>)</h2>
-                    
+
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
                         <!-- Danh sách đánh giá -->
                         <div class="lg:col-span-2 space-y-8">
                             <!-- Bộ lọc đánh giá -->
                             <div class="flex flex-wrap gap-2 mb-8 items-center border-b pb-6">
                                 <span class="text-sm font-bold text-gray-500 mr-2 uppercase tracking-wider">Lọc xem:</span>
-                                <a href="index.php?action=detail&id=<?= $id ?>&rating_filter=all" 
-                                   data-rating="all"
-                                   class="filter-review-btn px-4 py-1.5 rounded-full text-sm font-medium border <?= $ratingFilter === 'all' ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-200 hover:border-black' ?> transition-all">
+                                <a href="index.php?action=detail&id=<?= $id ?>&rating_filter=all"
+                                    data-rating="all"
+                                    class="filter-review-btn px-4 py-1.5 rounded-full text-sm font-medium border <?= $ratingFilter === 'all' ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-200 hover:border-black' ?> transition-all">
                                     Tất cả
                                 </a>
-                                <?php for($i=5; $i>=1; $i--): ?>
-                                    <a href="index.php?action=detail&id=<?= $id ?>&rating_filter=<?= $i ?>" 
-                                       data-rating="<?= $i ?>"
-                                       class="filter-review-btn px-4 py-1.5 rounded-full text-sm font-medium border <?= (string)$ratingFilter === (string)$i ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-200 hover:border-black' ?> flex items-center gap-1 transition-all">
+                                <?php for ($i = 5; $i >= 1; $i--): ?>
+                                    <a href="index.php?action=detail&id=<?= $id ?>&rating_filter=<?= $i ?>"
+                                        data-rating="<?= $i ?>"
+                                        class="filter-review-btn px-4 py-1.5 rounded-full text-sm font-medium border <?= (string)$ratingFilter === (string)$i ? 'bg-black text-white border-black' : 'bg-white text-gray-600 border-gray-200 hover:border-black' ?> flex items-center gap-1 transition-all">
                                         <?= $i ?> <i class="ri-star-fill text-yellow-400"></i>
                                     </a>
                                 <?php endfor; ?>
                             </div>
 
                             <div id="reviews-list-container" class="space-y-8">
-                            <?php if (empty($reviews)): ?>
-                                <p class="text-gray-500 italic">Sản phẩm này chưa có đánh giá nào.</p>
-                            <?php else: ?>
-                                <?php foreach ($reviews as $review): ?>
-                                    <div class="flex gap-4 pb-6 border-b border-gray-100 last:border-0">
-                                        <img src="/web-shop-php/asset/<?php echo $review['avatar'] ?: 'default_avatar.png'; ?>" class="w-12 h-12 rounded-full object-cover">
-                                        <div class="flex-1">
-                                            <div class="flex justify-between items-center mb-1">
-                                                <h4 class="font-bold"><?php echo htmlspecialchars($review['user_name']); ?></h4>
-                                                <div class="flex text-yellow-400 text-sm">
-                                                    <?php for ($i = 1; $i <= 5; $i++): ?>
-                                                        <i class="ri-star-<?php echo $i <= $review['rating'] ? 'fill' : 'line'; ?>"></i>
-                                                    <?php endfor; ?>
+                                <?php if (empty($reviews)): ?>
+                                    <p class="text-gray-500 italic">Sản phẩm này chưa có đánh giá nào.</p>
+                                <?php else: ?>
+                                    <?php foreach ($reviews as $review): ?>
+                                        <div class="flex gap-4 pb-6 border-b border-gray-100 last:border-0">
+                                            <img src="/web-shop-php/asset/<?php echo $review['avatar'] ?: 'default_avatar.png'; ?>" class="w-12 h-12 rounded-full object-cover">
+                                            <div class="flex-1">
+                                                <div class="flex justify-between items-center mb-1">
+                                                    <h4 class="font-bold"><?php echo htmlspecialchars($review['user_name']); ?></h4>
+                                                    <div class="flex text-yellow-400 text-sm">
+                                                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                                                            <i class="ri-star-<?php echo $i <= $review['rating'] ? 'fill' : 'line'; ?>"></i>
+                                                        <?php endfor; ?>
+                                                    </div>
                                                 </div>
+                                                <p class="text-gray-600 text-sm leading-relaxed"><?php echo nl2br(htmlspecialchars($review['content'])); ?></p>
                                             </div>
-                                            <p class="text-gray-600 text-sm leading-relaxed"><?php echo nl2br(htmlspecialchars($review['content'])); ?></p>
                                         </div>
-                                    </div>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </div>
                         </div>
 
@@ -347,7 +310,7 @@ class Controller
                             <?php if (isset($_SESSION['user_id'])): ?>
                                 <form action="index.php?action=add_review" method="POST" class="space-y-4">
                                     <input type="hidden" name="product_id" value="<?php echo $product['product_id']; ?>">
-                                    
+
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-2">Chọn số sao:</label>
                                         <div class="flex gap-2 text-2xl text-gray-300" id="star-rating">
@@ -384,7 +347,7 @@ class Controller
                             star.addEventListener('click', function() {
                                 const val = this.getAttribute('data-value');
                                 ratingInput.value = val;
-                                
+
                                 // Reset & Highlight
                                 stars.forEach((s, index) => {
                                     if (index < val) {
@@ -451,70 +414,80 @@ class Controller
         // Small script: attribute-based selection (color/size) -> pick variant, update image & stock
         ?>
         <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const colorButtons = document.querySelectorAll('.color-option');
-            const sizeButtons = document.querySelectorAll('.size-option');
-            const btnAddToCart = document.querySelector('.btn-add-to-cart');
-            const mainImg = document.getElementById('main-image');
-            const stockCountDisplay = document.getElementById('stock-count');
+            document.addEventListener('DOMContentLoaded', function() {
+                const colorButtons = document.querySelectorAll('.color-option');
+                const sizeButtons = document.querySelectorAll('.size-option');
+                const btnAddToCart = document.querySelector('.btn-add-to-cart');
+                const mainImg = document.getElementById('main-image');
+                const stockCountDisplay = document.getElementById('stock-count');
 
-            function toNumbers(arr){ return arr.map(x => Number(x)); }
-            function intersect(a, b){ return a.filter(v => b.includes(v)); }
+                function toNumbers(arr) {
+                    return arr.map(x => Number(x));
+                }
 
-            let selectedColorVariants = null;
-            let selectedSizeVariants = null;
+                function intersect(a, b) {
+                    return a.filter(v => b.includes(v));
+                }
 
-            colorButtons.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    colorButtons.forEach(b => b.classList.remove('ring-2','ring-black','border-black'));
-                    this.classList.add('ring-2','ring-black','border-black');
-                    selectedColorVariants = toNumbers(this.getAttribute('data-variants').split(','));
+                let selectedColorVariants = null;
+                let selectedSizeVariants = null;
 
-                    // Update size availability
-                    sizeButtons.forEach(s => {
-                        const sVariants = toNumbers(s.getAttribute('data-variants').split(','));
-                        const inter = intersect(selectedColorVariants, sVariants);
-                        if (inter.length > 0) { s.disabled = false; s.classList.remove('opacity-40','cursor-not-allowed'); }
-                        else { s.disabled = true; s.classList.add('opacity-40','cursor-not-allowed'); }
+                colorButtons.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        colorButtons.forEach(b => b.classList.remove('ring-2', 'ring-black', 'border-black'));
+                        this.classList.add('ring-2', 'ring-black', 'border-black');
+                        selectedColorVariants = toNumbers(this.getAttribute('data-variants').split(','));
+
+                        // Update size availability
+                        sizeButtons.forEach(s => {
+                            const sVariants = toNumbers(s.getAttribute('data-variants').split(','));
+                            const inter = intersect(selectedColorVariants, sVariants);
+                            if (inter.length > 0) {
+                                s.disabled = false;
+                                s.classList.remove('opacity-40', 'cursor-not-allowed');
+                            } else {
+                                s.disabled = true;
+                                s.classList.add('opacity-40', 'cursor-not-allowed');
+                            }
+                        });
+
+                        updateSelectedVariant();
                     });
-
-                    updateSelectedVariant();
                 });
-            });
 
-            sizeButtons.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    sizeButtons.forEach(b => b.classList.remove('ring-2','ring-black','border-black','bg-black','text-white'));
-                    this.classList.add('ring-2','ring-black','border-black','bg-black','text-white');
-                    selectedSizeVariants = toNumbers(this.getAttribute('data-variants').split(','));
-                    updateSelectedVariant();
+                sizeButtons.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        sizeButtons.forEach(b => b.classList.remove('ring-2', 'ring-black', 'border-black', 'bg-black', 'text-white'));
+                        this.classList.add('ring-2', 'ring-black', 'border-black', 'bg-black', 'text-white');
+                        selectedSizeVariants = toNumbers(this.getAttribute('data-variants').split(','));
+                        updateSelectedVariant();
+                    });
                 });
-            });
 
-            function updateSelectedVariant(){
-                let variantIds = null;
-                if (selectedColorVariants && selectedSizeVariants) variantIds = intersect(selectedColorVariants, selectedSizeVariants);
-                else if (selectedColorVariants) variantIds = selectedColorVariants;
-                else if (selectedSizeVariants) variantIds = selectedSizeVariants;
+                function updateSelectedVariant() {
+                    let variantIds = null;
+                    if (selectedColorVariants && selectedSizeVariants) variantIds = intersect(selectedColorVariants, selectedSizeVariants);
+                    else if (selectedColorVariants) variantIds = selectedColorVariants;
+                    else if (selectedSizeVariants) variantIds = selectedSizeVariants;
 
-                if (variantIds && variantIds.length > 0) {
-                    const vid = variantIds[0];
-                    if (btnAddToCart) btnAddToCart.setAttribute('data-variant-id', vid);
-                    const variantEl = document.querySelector('.variant-option[data-variant-id="' + vid + '"]');
-                    if (variantEl) {
-                        const stock = variantEl.getAttribute('data-stock') || 0;
-                        if (stockCountDisplay) stockCountDisplay.textContent = stock;
-                        const img = variantEl.getAttribute('data-image');
-                        if (img && mainImg) mainImg.src = img;
-                        document.querySelectorAll('.variant-option').forEach(el => el.classList.remove('border-black','ring-2','ring-black'));
-                        variantEl.classList.add('border-black','ring-2','ring-black');
+                    if (variantIds && variantIds.length > 0) {
+                        const vid = variantIds[0];
+                        if (btnAddToCart) btnAddToCart.setAttribute('data-variant-id', vid);
+                        const variantEl = document.querySelector('.variant-option[data-variant-id="' + vid + '"]');
+                        if (variantEl) {
+                            const stock = variantEl.getAttribute('data-stock') || 0;
+                            if (stockCountDisplay) stockCountDisplay.textContent = stock;
+                            const img = variantEl.getAttribute('data-image');
+                            if (img && mainImg) mainImg.src = img;
+                            document.querySelectorAll('.variant-option').forEach(el => el.classList.remove('border-black', 'ring-2', 'ring-black'));
+                            variantEl.classList.add('border-black', 'ring-2', 'ring-black');
+                        }
                     }
                 }
-            }
-        });
+            });
         </script>
 
-        <?php
+    <?php
         // Include footer
         include_once PROJECT_ROOT . '/components/footer.php';
     }
@@ -593,7 +566,7 @@ class Controller
 
         // 3. Hiển thị View danh sách sản phẩm
         include_once PROJECT_ROOT . '/components/header.php';
-        ?>
+    ?>
         <?php
         if ($id == 1):
         ?>
@@ -744,37 +717,37 @@ class Controller
                 <div class="max-w-4xl mx-auto space-y-8">
                     <!-- Card Thông tin cá nhân -->
                     <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
-                    <h1 class="text-3xl font-bold mb-8 flex items-center gap-3">
-                        <i class="ri-user-settings-line"></i> Thông tin cá nhân
-                    </h1>
+                        <h1 class="text-3xl font-bold mb-8 flex items-center gap-3">
+                            <i class="ri-user-settings-line"></i> Thông tin cá nhân
+                        </h1>
 
-                    <div class="space-y-5">
-                        <div class="flex flex-col items-center mb-6">
-                            <img src="/web-shop-php/asset/<?php echo $user['avatar'] ?: 'default_avatar.png'; ?>"
-                                class="w-32 h-32 rounded-full object-cover border-4 border-gray-100 shadow-sm">
+                        <div class="space-y-5">
+                            <div class="flex flex-col items-center mb-6">
+                                <img src="/web-shop-php/asset/<?php echo $user['avatar'] ?: 'default_avatar.png'; ?>"
+                                    class="w-32 h-32 rounded-full object-cover border-4 border-gray-100 shadow-sm">
+                            </div>
+                            <div class="flex border-b border-gray-50 pb-3">
+                                <span class="w-40 text-gray-500">Họ và tên:</span>
+                                <span class="font-semibold"><?php echo htmlspecialchars($user['name']); ?></span>
+                            </div>
+                            <div class="flex border-b border-gray-50 pb-3">
+                                <span class="w-40 text-gray-500">Tên đăng nhập:</span>
+                                <span><?php echo htmlspecialchars($user['username']); ?></span>
+                            </div>
+                            <div class="flex border-b border-gray-50 pb-3">
+                                <span class="w-40 text-gray-500">Email:</span>
+                                <span><?php echo htmlspecialchars($user['gmail'] ?? 'Chưa cập nhật'); ?></span>
+                            </div>
+                            <div class="flex">
+                                <span class="w-40 text-gray-500">Số điện thoại:</span>
+                                <span><?php echo htmlspecialchars($user['number_phone'] ?? 'Chưa cập nhật'); ?></span>
+                            </div>
                         </div>
-                        <div class="flex border-b border-gray-50 pb-3">
-                            <span class="w-40 text-gray-500">Họ và tên:</span>
-                            <span class="font-semibold"><?php echo htmlspecialchars($user['name']); ?></span>
-                        </div>
-                        <div class="flex border-b border-gray-50 pb-3">
-                            <span class="w-40 text-gray-500">Tên đăng nhập:</span>
-                            <span><?php echo htmlspecialchars($user['username']); ?></span>
-                        </div>
-                        <div class="flex border-b border-gray-50 pb-3">
-                            <span class="w-40 text-gray-500">Email:</span>
-                            <span><?php echo htmlspecialchars($user['gmail'] ?? 'Chưa cập nhật'); ?></span>
-                        </div>
-                        <div class="flex">
-                            <span class="w-40 text-gray-500">Số điện thoại:</span>
-                            <span><?php echo htmlspecialchars($user['number_phone'] ?? 'Chưa cập nhật'); ?></span>
-                        </div>
-                    </div>
 
-                    <div class="mt-12 flex gap-4">
-                        <a href="index.php?action=edit_profile&id=<?php echo $user['user_id']; ?>" class="bg-black text-white px-8 py-2.5 rounded-lg font-bold hover:bg-gray-800 transition-all text-center">Chỉnh sửa</a>
-                        <a href="index.php?action=logout" class="border border-red-500 text-red-500 px-8 py-2.5 rounded-lg font-bold hover:bg-red-50 transition-all text-center">Đăng xuất</a>
-                    </div>
+                        <div class="mt-12 flex gap-4">
+                            <a href="index.php?action=edit_profile&id=<?php echo $user['user_id']; ?>" class="bg-black text-white px-8 py-2.5 rounded-lg font-bold hover:bg-gray-800 transition-all text-center">Chỉnh sửa</a>
+                            <a href="index.php?action=logout" class="border border-red-500 text-red-500 px-8 py-2.5 rounded-lg font-bold hover:bg-red-50 transition-all text-center">Đăng xuất</a>
+                        </div>
                     </div>
 
                     <!-- Card Lịch sử đơn hàng -->
@@ -805,21 +778,21 @@ class Controller
                                                 <td class="py-4 text-gray-600"><?php echo date('d/m/Y', strtotime($order['created_at'])); ?></td>
                                                 <td class="py-4 font-bold"><?php echo number_format($order['total_amount'], 0, ',', '.'); ?>₫</td>
                                                 <td class="py-4 text-center">
-                                                    <span class="px-2 py-1 rounded-full text-[10px] font-bold uppercase <?php 
-                                                        echo $order['status'] === 'completed' ? 'bg-green-100 text-green-700' : ($order['status'] === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700');
-                                                    ?>">
+                                                    <span class="px-2 py-1 rounded-full text-[10px] font-bold uppercase <?php
+                                                                                                                        echo $order['status'] === 'completed' ? 'bg-green-100 text-green-700' : ($order['status'] === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700');
+                                                                                                                        ?>">
                                                         <?php echo $order['status']; ?>
                                                     </span>
                                                 </td>
                                                 <td class="py-4">
-                                                    <span class="px-2 py-1 rounded-md text-[10px] font-bold uppercase <?php 
-                                                        echo $order['payment_status'] === 'paid' ? 'bg-blue-50 text-blue-600' : 'bg-gray-100 text-gray-400';
-                                                    ?>">
+                                                    <span class="px-2 py-1 rounded-md text-[10px] font-bold uppercase <?php
+                                                                                                                        echo $order['payment_status'] === 'paid' ? 'bg-blue-50 text-blue-600' : 'bg-gray-100 text-gray-400';
+                                                                                                                        ?>">
                                                         <?php echo $order['payment_status']; ?>
                                                     </span>
                                                 </td>
                                                 <td class="py-4 text-right">
-                                                    <a href="index.php?action=order_detail&id=<?php echo $order['order_id']; ?>" class="text-blue-600 hover:underline font-medium">Chi tiết</a>
+                                                    <a href="index.php?action=orderDetail&id=<?php echo $order['order_id']; ?>" class="text-blue-600 hover:underline font-medium">Chi tiết</a>
                                                     <?php if ($order['status'] === 'pending'): ?>
                                                         <a href="index.php?action=cancel_order&id=<?php echo $order['order_id']; ?>" onclick="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này?')" class="text-red-500 hover:underline font-medium ml-3">Hủy đơn</a>
                                                     <?php endif; ?>
@@ -919,10 +892,10 @@ class Controller
                             <div class="text-sm space-y-2">
                                 <p><span class="text-gray-500">Người nhận:</span> <br> <strong><?php echo htmlspecialchars($order['recipient_name']); ?></strong></p>
                                 <p><span class="text-gray-500">Điện thoại:</span> <br> <?php echo htmlspecialchars($order['recipient_phone']); ?></p>
-                                <p><span class="text-gray-500">Địa chỉ:</span> <br> 
-                                    <?php echo htmlspecialchars($order['specific_address']); ?>, 
-                                    <?php echo htmlspecialchars($order['ward_name']); ?>, 
-                                    <?php echo htmlspecialchars($order['district_name']); ?>, 
+                                <p><span class="text-gray-500">Địa chỉ:</span> <br>
+                                    <?php echo htmlspecialchars($order['specific_address']); ?>,
+                                    <?php echo htmlspecialchars($order['ward_name']); ?>,
+                                    <?php echo htmlspecialchars($order['district_name']); ?>,
                                     <?php echo htmlspecialchars($order['province_name']); ?>
                                 </p>
                             </div>
@@ -963,7 +936,7 @@ class Controller
                 </div>
             </div>
         </main>
-        <?php
+    <?php
         include_once PROJECT_ROOT . '/components/footer.php';
     }
 
@@ -1036,7 +1009,7 @@ class Controller
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         include_once PROJECT_ROOT . '/components/header.php';
-        ?>
+    ?>
         <main class="container mx-auto px-7 py-20 mt-10">
             <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-sm border border-gray-100">
                 <h1 class="text-3xl font-bold mb-8 italic">Chỉnh sửa thông tin</h1>
@@ -1289,7 +1262,7 @@ class Controller
     {
         header('Content-Type: application/json');
         $keyword = $_GET['keyword'] ?? '';
-        
+
         if (strlen($keyword) < 2) {
             echo json_encode([]);
             return;
@@ -1329,7 +1302,7 @@ class Controller
                 exit;
             }
         }
-        
+
         header("Location: index.php");
         exit;
     }
@@ -1339,7 +1312,7 @@ class Controller
         header('Content-Type: application/json');
         $id = $_GET['id'] ?? null;
         $ratingFilter = $_GET['rating_filter'] ?? 'all';
-        
+
         if (!$id) {
             echo json_encode([]);
             return;
@@ -1431,6 +1404,76 @@ class Controller
 
         include_once PROJECT_ROOT . '/components/header.php';
         include_once PROJECT_ROOT . '/views/best_sellers.php';
+        include_once PROJECT_ROOT . '/components/footer.php';
+    }
+
+    public function products()
+    {
+        $database = new Database();
+        $db = $database->getConnection();
+
+        $user_id = $_SESSION['user_id'] ?? 0;
+        $limit = 8;
+        $categoryKeys = [
+            'shoes' => 'Giày',
+            'bags' => 'Túi',
+            'shirt' => 'Áo',
+            'pants' => 'Quần'
+        ];
+
+        // Fetch category ids for our keys
+        $names = array_keys($categoryKeys);
+        $placeholders = implode(',', array_fill(0, count($names), '?'));
+        $stmt = $db->prepare("SELECT * FROM categories WHERE category_name IN ($placeholders)");
+        $stmt->execute($names);
+        $cats = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $catMap = [];
+        foreach ($cats as $c) { $catMap[$c['category_name']] = $c['category_id']; }
+
+        $categories = [];
+        foreach ($categoryKeys as $catName => $title) {
+            $cid = $catMap[$catName] ?? null;
+            $pageParam = 'page_' . $catName;
+            $currentPage = isset($_GET[$pageParam]) ? max(1, (int)$_GET[$pageParam]) : 1;
+            $offset = ($currentPage - 1) * $limit;
+
+            if (!$cid) {
+                $categories[$catName] = ['title' => $title, 'products' => [], 'current_page' => 1, 'total_pages' => 1, 'category_id' => null];
+                continue;
+            }
+
+            $countStmt = $db->prepare("SELECT COUNT(*) FROM products WHERE category_id = :cid AND status = 'active'");
+            $countStmt->execute(['cid' => $cid]);
+            $total = (int)$countStmt->fetchColumn();
+            $totalPages = max(1, ceil($total / $limit));
+
+            $q = "SELECT p.*, c.category_name, f.farority_id AS is_favorited, i.available_quantity
+                  FROM products p
+                  LEFT JOIN categories c ON p.category_id = c.category_id
+                  LEFT JOIN favority f ON p.product_id = f.product_id AND f.user_id = :user_id
+                  LEFT JOIN inventory i ON p.product_id = i.product_id
+                  WHERE p.category_id = :cid AND p.status = 'active'
+                  ORDER BY p.created_at DESC
+                  LIMIT :limit OFFSET :offset";
+            $pstmt = $db->prepare($q);
+            $pstmt->bindValue(':user_id', $user_id, PDO::PARAM_INT);
+            $pstmt->bindValue(':cid', $cid, PDO::PARAM_INT);
+            $pstmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $pstmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+            $pstmt->execute();
+            $products = $pstmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $categories[$catName] = [
+                'title' => $title,
+                'products' => $products,
+                'current_page' => $currentPage,
+                'total_pages' => $totalPages,
+                'category_id' => $cid
+            ];
+        }
+
+        include_once PROJECT_ROOT . '/components/header.php';
+        include_once PROJECT_ROOT . '/views/products.php';
         include_once PROJECT_ROOT . '/components/footer.php';
     }
 }

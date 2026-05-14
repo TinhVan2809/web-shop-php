@@ -1,3 +1,12 @@
+<?php
+
+/**
+ * @var array $stats Dashboard statistics (total_users, total_products, total_orders, total_revenue)
+ * @var array $chartLabels Revenue chart labels for last 7 days
+ * @var array $chartValues Revenue chart values for last 7 days
+ * @var array $lowStockProducts Low stock products
+ */
+?>
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
     <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
         <div class="flex items-center justify-between mb-4">
@@ -63,15 +72,26 @@
     </div>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
     <!-- Biểu đồ doanh thu -->
-    <div class="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm lg:col-span-2">
+    <div class="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
         <h3 class="text-lg font-bold mb-6">Xu hướng doanh thu (7 ngày qua)</h3>
         <div class="h-[350px] w-full">
             <canvas id="revenueChart"></canvas>
         </div>
     </div>
 
+    <!-- Biểu đồ sản phẩm bán chạy -->
+    <div class="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
+        <h3 class="text-lg font-bold mb-6">Top 10 sản phẩm bán chạy (7 ngày qua)</h3>
+        <div class="h-[350px] w-full">
+            <canvas id="topProductsChart"></canvas>
+        </div>
+    </div>
+</div>
+
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
     <!-- Biểu đồ phân bổ tồn kho -->
     <div class="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
         <h3 class="text-lg font-bold mb-6">Tình trạng kho hàng</h3>
@@ -79,21 +99,62 @@
             <canvas id="stockStatusChart"></canvas>
         </div>
     </div>
-</div>
-
-<div class="grid grid-cols-1 gap-8 mb-8">
-    <!-- Biểu đồ sản phẩm bán chạy -->
-    <h3 class="text-lg font-bold mb-6">Top 10 sản phẩm bán chạy (7 ngày qua)</h3>
-    <div class="h-[350px] w-full">
-        <canvas id="topProductsChart"></canvas>
+    <!-- Biểu đồ tỷ lệ danh mục bán ra -->
+<div class="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
+    <h3 class="text-lg font-bold mb-6">Tỷ lệ sản phẩm bán ra theo danh mục</h3>
+    <div class="h-[350px] w-full flex items-center justify-center">
+        <canvas id="categorySalesChart"></canvas>
     </div>
 </div>
+
 </div>
+
+
+
 
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
     <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 border-l-4 border-l-red-500">
         <p class="text-sm font-medium text-gray-500 uppercase">Sản phẩm sắp hết hàng</p>
         <h3 class="text-2xl font-bold mt-1 text-red-600"><?= count($lowStockProducts ?? []) ?> sản phẩm</h3>
+    </div>
+</div>
+
+<!-- Bảng 5 đơn hàng mới nhất -->
+<div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-8">
+    <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+        <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+            <i class="ri-shopping-cart-2-line text-blue-500"></i> Đơn hàng mới nhất
+        </h2>
+        <a href="index.php?action=admin_orders" class="text-sm text-blue-600 hover:underline">Xem tất cả -></a>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full text-left">
+            <thead>
+                <tr class="bg-gray-50 text-xs font-bold text-gray-500 uppercase">
+                    <th class="px-6 py-4">Mã đơn</th>
+                    <th class="px-6 py-4">Khách hàng</th>
+                    <th class="px-6 py-4">Ngày đặt</th>
+                    <th class="px-6 py-4">Tổng tiền</th>
+                    <th class="px-6 py-4">Trạng thái</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                <?php foreach ($latestOrders as $order): ?>
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4 text-sm font-bold text-blue-600">#<?= $order['order_code'] ?></td>
+                        <td class="px-6 py-4 text-sm font-medium text-gray-800"><?= htmlspecialchars($order['customer_name']) ?></td>
+                        <td class="px-6 py-4 text-sm text-gray-600"><?= date('d/m/Y H:i', strtotime($order['created_at'])) ?></td>
+                        <td class="px-6 py-4 text-sm font-bold"><?= number_format($order['total_amount'], 0, ',', '.') ?>₫</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 text-[10px] font-bold rounded-full uppercase 
+                                <?= $order['status'] === 'completed' ? 'bg-green-100 text-green-700' : ($order['status'] === 'pending' ? 'bg-yellow-100 text-yellow-700' : ($order['status'] === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700')) ?>">
+                                <?= $order['status'] ?>
+                            </span>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
     </div>
 </div>
 
@@ -155,6 +216,70 @@
     </div>
 </div>
 
+<!-- Báo Cáo & Thống Kê Section -->
+<div class="mt-12 border-t border-gray-200 pt-8">
+    <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+        <i class="ri-bar-chart-box-line text-blue-600"></i> Báo Cáo & Thống Kê
+    </h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <!-- Revenue Report -->
+        <a href="index.php?action=revenue_report" class="group bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl shadow-sm border border-blue-200 p-6 hover:shadow-lg transition-all hover:-translate-y-1">
+            <div class="flex items-center justify-between mb-4">
+                <i class="ri-money-dollar-circle-line text-3xl text-blue-600"></i>
+                <i class="ri-arrow-right-line text-xl text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+            </div>
+            <h4 class="font-bold text-gray-900">Báo Cáo Doanh Thu</h4>
+            <p class="text-sm text-gray-600 mt-1">Theo ngày, tháng, năm</p>
+        </a>
+
+        <!-- Product Report -->
+        <a href="index.php?action=product_report" class="group bg-gradient-to-br from-green-50 to-green-100 rounded-xl shadow-sm border border-green-200 p-6 hover:shadow-lg transition-all hover:-translate-y-1">
+            <div class="flex items-center justify-between mb-4">
+                <i class="ri-shopping-bag-line text-3xl text-green-600"></i>
+                <i class="ri-arrow-right-line text-xl text-green-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+            </div>
+            <h4 class="font-bold text-gray-900">Báo Cáo Sản Phẩm</h4>
+            <p class="text-sm text-gray-600 mt-1">Bán chạy, tồn kho, doanh thu</p>
+        </a>
+
+        <!-- Order Report -->
+        <a href="index.php?action=order_report" class="group bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl shadow-sm border border-orange-200 p-6 hover:shadow-lg transition-all hover:-translate-y-1">
+            <div class="flex items-center justify-between mb-4">
+                <i class="ri-shopping-cart-2-line text-3xl text-orange-600"></i>
+                <i class="ri-arrow-right-line text-xl text-orange-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+            </div>
+            <h4 class="font-bold text-gray-900">Báo Cáo Đơn Hàng</h4>
+            <p class="text-sm text-gray-600 mt-1">Theo trạng thái & thanh toán</p>
+        </a>
+
+        <!-- Customer Report -->
+        <a href="index.php?action=customer_report" class="group bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl shadow-sm border border-purple-200 p-6 hover:shadow-lg transition-all hover:-translate-y-1">
+            <div class="flex items-center justify-between mb-4">
+                <i class="ri-user-star-line text-3xl text-purple-600"></i>
+                <i class="ri-arrow-right-line text-xl text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+            </div>
+            <h4 class="font-bold text-gray-900">Báo Cáo Khách Hàng</h4>
+            <p class="text-sm text-gray-600 mt-1">Top buyers, loyal, at-risk</p>
+        </a>
+    </div>
+
+    <!-- Blogs Management Link -->
+    <div class="bg-gradient-to-r from-indigo-50 to-pink-50 rounded-xl shadow-sm border border-indigo-200 p-6 mb-8">
+        <div class="flex items-center justify-between">
+            <div>
+                <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                    <i class="ri-article-line text-indigo-600"></i> Quản Lý Blogs
+                </h3>
+                <p class="text-sm text-gray-600 mt-2">Xem, chỉnh sửa và quản lý các bài viết blog trên website</p>
+            </div>
+            <a href="index.php?action=blogs" target="_blank" class="flex items-center gap-2 bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors font-medium whitespace-nowrap">
+                <i class="ri-external-link-line"></i> Xem Blogs
+            </a>
+        </div>
+    </div>
+</div>
+
 <!-- Chart.js Library -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
@@ -166,6 +291,8 @@
         const dataValues = <?= json_encode($chartValues) ?>;
         const topProductLabels = <?= json_encode($topProductLabels) ?>;
         const topProductValues = <?= json_encode($topProductValues) ?>;
+        const categoryChartLabels = <?= json_encode($categoryChartLabels) ?>;
+        const categoryChartValues = <?= json_encode($categoryChartValues) ?>;
         const stockStatus = <?= json_encode($stockStatus) ?>;
 
         new Chart(ctx, {
@@ -255,6 +382,42 @@
                 datasets: [{
                     data: [stockStatus.in_stock, stockStatus.low_stock, stockStatus.out_of_stock],
                     backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                    borderWidth: 0,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20,
+                            font: {
+                                size: 12,
+                                weight: '600'
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Biểu đồ Doughnut tỷ lệ danh mục bán ra
+        const ctxCategory = document.getElementById('categorySalesChart').getContext('2d');
+        new Chart(ctxCategory, {
+            type: 'doughnut',
+            data: {
+                labels: categoryChartLabels,
+                datasets: [{
+                    data: categoryChartValues,
+                    backgroundColor: [
+                        '#4CAF50', '#2196F3', '#FFC107', '#FF5722', '#9C27B0',
+                        '#00BCD4', '#8BC34A', '#FFEB3B', '#607D8B', '#E91E63'
+                    ],
                     borderWidth: 0,
                     hoverOffset: 10
                 }]

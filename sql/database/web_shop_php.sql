@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th5 09, 2026 lúc 03:31 AM
+-- Thời gian đã tạo: Th5 14, 2026 lúc 09:51 AM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.2.12
 
@@ -47,6 +47,36 @@ INSERT INTO `banner` (`banenr_id`, `img`, `content`, `url`, `create_at`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Cấu trúc bảng cho bảng `blogs`
+--
+
+CREATE TABLE `blogs` (
+  `blog_id` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL COMMENT 'Tiêu đề bài viết',
+  `slug` varchar(255) NOT NULL COMMENT 'Đường dẫn SEO thân thiện',
+  `content` longtext NOT NULL COMMENT 'Nội dung bài viết',
+  `excerpt` text DEFAULT NULL COMMENT 'Mô tả ngắn',
+  `thumbnail` varchar(500) DEFAULT NULL COMMENT 'Ảnh đại diện',
+  `author` varchar(255) DEFAULT NULL COMMENT 'Tác giả',
+  `category` varchar(100) DEFAULT 'General' COMMENT 'Danh mục',
+  `views` int(11) DEFAULT 0 COMMENT 'Số lượt xem',
+  `status` enum('draft','published','archived') DEFAULT 'draft' COMMENT 'Trạng thái',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `blogs`
+--
+
+INSERT INTO `blogs` (`blog_id`, `title`, `slug`, `content`, `excerpt`, `thumbnail`, `author`, `category`, `views`, `status`, `created_at`, `updated_at`) VALUES
+(1, 'Những xu hướng thời trang mùa hè 2026', 'xu-huong-thoi-trang-mua-he-2026', '<p>Mùa hè 2026 mang lại nhiều xu hướng thời trang mới lạ và tươi mới. Các màu sắc rực rỡ, chất liệu thoáng mát sẽ là những lựa chọn hàng đầu của các fashionista.</p><p>Đừng bỏ lỡ cơ hội cập nhật tủ áo của bạn với những items trendy nhất!</p>', 'Khám phá những xu hướng thời trang sizzling của mùa hè 2026', 'banner-shirt-main.png', 'Admin', 'Thời trang', 245, 'published', '2026-05-14 06:48:55', '2026-05-14 06:48:55'),
+(2, 'Cách chọn túi xách phù hợp với từng khuôn mặt', 'cach-chon-tui-xach-phu-hop', '<p>Một chiếc túi xách không chỉ là phụ kiện để bảo vệ đồ vật, mà còn là statement piece của bộ trang phục.</p><p>Hãy tìm hiểu cách lựa chọn túi xách sao cho phù hợp nhất với khuôn mặt và vóc dáng của bạn.</p>', 'Hướng dẫn chọn túi xách hoàn hảo cho từng loại khuôn mặt', 'banner-bag2.avif', 'Admin', 'Mỹ phẩm & Phụ kiện', 189, 'published', '2026-05-14 06:48:55', '2026-05-14 06:48:55'),
+(3, '5 bí quyết bảo quản quần áo kéo dài tuổi thọ', 'bi-quyet-bao-quan-quan-ao', '<p>Mỗi chiếc quần áo yêu thích đều cần được chăm sóc cẩn thận để kéo dài tuổi thọ.</p><p>Theo dõi bài viết này để biết 5 bí quyết quản lý quần áo giúp giữ chúng như mới.</p>', '5 cách đơn giản giúp quần áo của bạn luôn như mới', 'adidas_track_pants.jpg', 'Admin', 'Mẹo & Kinh nghiệm', 312, 'published', '2026-05-14 06:48:55', '2026-05-14 06:48:55');
+
+-- --------------------------------------------------------
+
+--
 -- Cấu trúc bảng cho bảng `carts`
 --
 
@@ -58,15 +88,6 @@ CREATE TABLE `carts` (
   `add_at` timestamp NULL DEFAULT current_timestamp(),
   `quantity` int(11) DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Đang đổ dữ liệu cho bảng `carts`
---
-
-INSERT INTO `carts` (`cart_id`, `user_id`, `product_id`, `variant_id`, `add_at`, `quantity`) VALUES
-(49, 12, 13, NULL, '2026-04-27 22:51:32', 1),
-(50, 12, 1, NULL, '2026-04-28 08:31:25', 1),
-(51, 12, 25, 10, '2026-04-30 22:37:20', 1);
 
 -- --------------------------------------------------------
 
@@ -109,7 +130,6 @@ CREATE TABLE `favority` (
 --
 
 INSERT INTO `favority` (`farority_id`, `product_id`, `user_id`, `create_at`) VALUES
-(1, 13, 12, '2026-04-27 07:07:31'),
 (2, 12, 12, '2026-04-27 07:07:39'),
 (3, 17, 12, '2026-04-27 07:07:44'),
 (7, 17, 15, '2026-04-27 07:08:29'),
@@ -118,7 +138,8 @@ INSERT INTO `favority` (`farority_id`, `product_id`, `user_id`, `create_at`) VAL
 (10, 15, 15, '2026-04-27 07:28:43'),
 (11, 12, 15, '2026-04-27 07:28:51'),
 (12, 10, 15, '2026-04-27 07:40:56'),
-(13, 11, 12, '2026-04-27 19:57:45');
+(13, 11, 12, '2026-04-27 19:57:45'),
+(14, 13, 12, '2026-05-13 13:09:03');
 
 -- --------------------------------------------------------
 
@@ -150,13 +171,13 @@ INSERT INTO `inventory` (`inventory_id`, `product_id`, `quantity`, `reserved_qua
 (5, 2, 25, 3, 5, 'in_stock', '2026-04-21 10:14:58', 5),
 (6, 2, 15, 5, 5, 'low_stock', '2026-04-21 10:14:58', 6),
 (7, 2, 10, 2, 5, 'low_stock', '2026-04-21 10:14:58', 7),
-(8, 12, 222, 55, 100, 'in_stock', '2026-04-27 21:22:44', NULL),
+(8, 12, 220, 55, 100, 'in_stock', '2026-05-14 06:58:05', NULL),
 (9, 25, 23, 0, 10, 'in_stock', '2026-04-30 22:36:50', 9),
 (10, 25, 23, 0, 10, 'in_stock', '2026-04-30 22:36:50', 10),
 (11, 26, 20, 0, 10, 'in_stock', '2026-04-30 22:39:51', 11),
 (12, 26, 90, 0, 10, 'in_stock', '2026-04-30 22:39:51', 12),
 (13, 27, 12, 0, 10, 'in_stock', '2026-04-30 22:46:34', 13),
-(14, 3, 50, 2, 10, 'in_stock', '2026-05-02 03:25:38', 14),
+(14, 3, 49, 2, 10, 'in_stock', '2026-05-13 12:44:37', 14),
 (15, 3, 45, 0, 10, 'in_stock', '2026-05-02 03:25:38', 15),
 (16, 13, 30, 5, 5, 'in_stock', '2026-05-02 03:25:38', 16),
 (17, 20, 30, 0, 5, 'in_stock', '2026-05-03 13:20:37', 17),
@@ -262,7 +283,10 @@ INSERT INTO `orders` (`order_id`, `user_id`, `order_code`, `status`, `payment_st
 (29, 12, 'ORD20260427220521552', 'confirmed', 'unpaid', 2800000.00, 0.00, 30000.00, 3110000.00, NULL, NULL, NULL, 'Tính Văn ', '0818177533', 'TP Hồ Chí Minh', 'Quận Bình Thạnh', 'Phường 1', 'Ấp Đầu Sấu', NULL, '2026-04-27 20:05:21', '2026-04-27 20:55:22'),
 (30, 12, 'ORD20260427221101312', 'pending', 'unpaid', 3900000.00, 0.00, 30000.00, 4320000.00, NULL, NULL, NULL, 'Tính Văn ', '0818177533', 'TP Hồ Chí Minh', 'Phú Tân', 'Tân Hải', 'Ấp Đầu Sấu', NULL, '2026-04-27 20:11:01', '2026-04-27 20:11:01'),
 (31, 12, 'ORD20260427235059358', 'pending', 'unpaid', 1500000.00, 0.00, 30000.00, 1680000.00, NULL, NULL, NULL, 'Tính Văn ', '0818177533', 'Cần Thơ', 'Quận Ninh Kiều', 'Phường An Hòa', 'Ấp Đầu Sấu', NULL, '2026-04-27 21:50:59', '2026-04-27 21:50:59'),
-(32, 12, 'ORD20260428001434755', 'pending', 'unpaid', 900000.00, 0.00, 30000.00, 1020000.00, NULL, NULL, NULL, 'Tính Văn ', '0818177533', 'Cần Thơ', 'Quận Ninh Kiều', 'Phường Cái Khế', 'Ấp Đầu Sấu', NULL, '2026-04-27 22:14:34', '2026-04-27 22:14:34');
+(32, 12, 'ORD20260428001434755', 'pending', 'unpaid', 900000.00, 0.00, 30000.00, 1020000.00, NULL, NULL, NULL, 'Tính Văn ', '0818177533', 'Cần Thơ', 'Quận Ninh Kiều', 'Phường Cái Khế', 'Ấp Đầu Sấu', NULL, '2026-04-27 22:14:34', '2026-04-27 22:14:34'),
+(37, 12, 'ORD20260513144437130', 'pending', 'unpaid', 3100000.00, 0.00, 0.00, 3410000.00, NULL, NULL, NULL, 'Tính Văn ', '0234567', 'Hà Nội', 'Quận Ba Đình', 'Phường Vĩnh Phúc', '123456', NULL, '2026-05-13 12:44:37', '2026-05-13 12:44:37'),
+(38, 12, 'ORD20260513144518880', 'completed', 'unpaid', 2800000.00, 0.00, 30000.00, 3110000.00, NULL, NULL, NULL, 'Tính Văn ', '0', '', '', '', '', NULL, '2026-05-13 12:45:18', '2026-05-13 12:52:10'),
+(39, 12, 'ORD20260514085805666', 'pending', 'unpaid', 2800000.00, 0.00, 30000.00, 3110000.00, NULL, NULL, NULL, 'Tính Văn ', '017899498', 'TP Hồ Chí Minh', 'Quận 3', 'Phường 2', '2', NULL, '2026-05-14 06:58:05', '2026-05-14 06:58:05');
 
 -- --------------------------------------------------------
 
@@ -335,7 +359,38 @@ INSERT INTO `order_items` (`order_item_id`, `order_id`, `product_id`, `variant_i
 (45, 30, 13, NULL, 'Adidas Ultraboost 22', 'adidas_ultraboost_22.jpg', NULL, 3900000.00, 1, 3900000.00),
 (46, 31, 1, NULL, ' Pickleball NikeCourt Air Zoom Vapor 11', 'nikecourt-air-zoom-vapor-11-mens-hard-court-tennis-shoes-03_720x720xcrop-preview.png', NULL, 1500000.00, 1, 1500000.00),
 (47, 32, 1, 2, ' Pickleball NikeCourt Air Zoom Vapor 11 (size: M, color: black)', 'nikecourt-air-zoom-vapor-11-mens-hard-court-tennis-shoes-03_720x720xcrop-preview.png', 'NIKE-TS-M-BLACK', 450000.00, 1, 450000.00),
-(48, 32, 1, 1, ' Pickleball NikeCourt Air Zoom Vapor 11 (size: M, color: red)', 'nikecourt-air-zoom-vapor-11-mens-hard-court-tennis-shoes-03_720x720xcrop-preview.png', 'NIKE-TS-M-RED', 450000.00, 1, 450000.00);
+(48, 32, 1, 1, ' Pickleball NikeCourt Air Zoom Vapor 11 (size: M, color: red)', 'nikecourt-air-zoom-vapor-11-mens-hard-court-tennis-shoes-03_720x720xcrop-preview.png', 'NIKE-TS-M-RED', 450000.00, 1, 450000.00),
+(49, 37, 3, 14, 'Adidas Ultraboost 22 (size: 40, color: White)', 'adidas_ultraboost_22.jpg', 'ADI-UB22-40-WHT', 3100000.00, 1, 3100000.00),
+(50, 38, 12, NULL, 'Nike Air Zoom Pegasus', 'nike_pegasus_40.jpg', NULL, 2800000.00, 1, 2800000.00),
+(51, 39, 12, NULL, 'Nike Air Zoom Pegasus', 'nike_pegasus_40.jpg', NULL, 2800000.00, 1, 2800000.00);
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `pages`
+--
+
+CREATE TABLE `pages` (
+  `page_id` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL COMMENT 'Tiêu đề trang',
+  `slug` varchar(255) NOT NULL COMMENT 'Đường dẫn SEO',
+  `content` longtext NOT NULL COMMENT 'Nội dung trang',
+  `meta_description` text DEFAULT NULL COMMENT 'Meta description cho SEO',
+  `position` int(11) DEFAULT 0 COMMENT 'Vị trí sắp xếp',
+  `is_published` tinyint(1) DEFAULT 1 COMMENT 'Trạng thái công khai',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Đang đổ dữ liệu cho bảng `pages`
+--
+
+INSERT INTO `pages` (`page_id`, `title`, `slug`, `content`, `meta_description`, `position`, `is_published`, `created_at`, `updated_at`) VALUES
+(1, 'Về Chúng Tôi', 've-chung-toi', '<h2>Chào mừng đến với Haseki Store</h2><p>Haseki Store là cửa hàng thời trang hàng đầu, cung cấp các sản phẩm quần áo, giày dép, và phụ kiện chất lượng cao với giá cả phải chăng.</p><h2>Sứ Mệnh Của Chúng Tôi</h2><p>Chúng tôi cam kết mang đến cho khách hàng những sản phẩm thời trang tốt nhất với dịch vụ tuyệt vời.</p>', 'Tìm hiểu về Haseki Store - cửa hàng thời trang hàng đầu', 1, 1, '2026-05-14 06:53:49', '2026-05-14 06:53:49'),
+(2, 'Chính Sách Bảo Mật', 'chinh-sach-bao-mat', '<h2>Chính Sách Bảo Mật Của Haseki Store</h2><p>Chúng tôi cam kết bảo vệ thông tin cá nhân của bạn. Mọi dữ liệu sẽ được mã hóa và bảo mật.</p><h2>Cách Chúng Tôi Sử Dụng Dữ Liệu</h2><p>Dữ liệu của bạn chỉ được sử dụng để cải thiện dịch vụ và không chia sẻ với bên thứ ba.</p>', 'Chính sách bảo mật thông tin khách hàng', 2, 1, '2026-05-14 06:53:49', '2026-05-14 06:53:49'),
+(3, 'Điều Khoản Sử Dụng', 'dieu-khoan-su-dung', '<h2>Điều Khoản Sử Dụng</h2><p>Bằng cách sử dụng website này, bạn đồng ý với các điều khoản sau:</p><ul><li>Sử dụng website chỉ cho mục đích hợp pháp</li><li>Không vi phạm quyền sở hữu trí tuệ</li><li>Tuân thủ các luật pháp hiện hành</li></ul>', 'Điều khoản sử dụng website Haseki Store', 3, 1, '2026-05-14 06:53:49', '2026-05-14 06:53:49'),
+(4, 'Chính Sách Hoàn Trả', 'chinh-sach-hoan-tra', '<h2>Chính Sách Hoàn Trả 30 Ngày</h2><p>Nếu bạn không hài lòng với sản phẩm, chúng tôi sẽ hoàn trả tiền trong vòng 30 ngày.</p><h2>Điều Kiện Hoàn Trả</h2><ul><li>Sản phẩm phải còn nguyên bao bì</li><li>Chưa qua sử dụng</li><li>Có hoá đơn mua hàng</li></ul>', 'Chính sách hoàn trả 30 ngày', 4, 1, '2026-05-14 06:53:49', '2026-05-14 06:53:49');
 
 -- --------------------------------------------------------
 
@@ -394,7 +449,7 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`product_id`, `name`, `description`, `short_description`, `price`, `discount_price`, `sku`, `category_id`, `manufacturer_id`, `thumbnail`, `sold_count`, `is_new`, `status`, `created_at`, `updated_at`) VALUES
-(1, ' Pickleball NikeCourt Air Zoom Vapor 11', NULL, 'Gi???y th??? thao cho nam', 2950000.00, 1500000.00, '123425', 1, NULL, 'nikecourt-air-zoom-vapor-11-mens-hard-court-tennis-shoes-03_720x720xcrop-preview.png', 0, 1, 'active', '2026-04-21 03:31:35', '2026-04-23 01:25:12'),
+(1, ' Pickleball NikeCourt Air Zoom Vapor 11', '', 'Gi???y th??? thao cho nam', 2950000.00, 1500000.00, '123425', 1, 1, 'nikecourt-air-zoom-vapor-11-mens-hard-court-tennis-shoes-03_720x720xcrop-preview.png', 0, 1, 'active', '2026-04-21 03:31:35', '2026-05-09 01:54:15'),
 (2, 'Nike Air Zoom Pegasus 40', 'Gi??y ch???y b??? cao c???p v???i c??ng ngh??? Zoom Air, ph?? h???p cho luy???n t???p v?? thi ?????u.', 'Gi??y ch???y b??? Nike', 3200000.00, 2900000.00, 'NIKE-PEG40', 1, 1, 'nike_pegasus_40.jpg', 120, 1, 'active', '2026-04-21 09:42:14', '2026-04-21 09:42:14'),
 (3, 'Adidas Ultraboost 22', 'Gi??y ch???y b??? v???i ????? Boost ??m ??i, ho??n tr??? n??ng l?????ng t???t.', 'Gi??y ch???y Adidas', 3500000.00, 3100000.00, 'ADI-UB22', 1, 2, 'adidas_ultraboost_22.jpg', 95, 1, 'active', '2026-04-21 09:42:14', '2026-04-21 09:42:14'),
 (4, 'Puma Training T-Shirt', '??o thun th??? thao tho??ng kh??, ph?? h???p t???p gym.', '??o t???p Puma', 450000.00, 390000.00, 'PUMA-TS01', 2, 3, 'puma_tshirt.jpg', 200, 1, 'active', '2026-04-21 09:42:14', '2026-04-21 09:42:14'),
@@ -644,6 +699,13 @@ CREATE TABLE `vouchers` (
   `created_at` timestamp NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+--
+-- Đang đổ dữ liệu cho bảng `vouchers`
+--
+
+INSERT INTO `vouchers` (`voucher_id`, `code`, `description`, `discount_type`, `discount_value`, `max_discount`, `min_order_value`, `usage_limit`, `used_count`, `start_date`, `end_date`, `status`, `created_at`) VALUES
+(1, 'ASSDF1234', '2ert', 'fixed', 50000.00, 20000.00, 0.00, 42, 0, '2026-05-07 19:59:00', '2026-05-31 19:59:00', 'active', '2026-05-13 13:01:33');
+
 -- --------------------------------------------------------
 
 --
@@ -677,6 +739,13 @@ CREATE TABLE `voucher_products` (
 --
 ALTER TABLE `banner`
   ADD PRIMARY KEY (`banenr_id`);
+
+--
+-- Chỉ mục cho bảng `blogs`
+--
+ALTER TABLE `blogs`
+  ADD PRIMARY KEY (`blog_id`),
+  ADD UNIQUE KEY `slug` (`slug`);
 
 --
 -- Chỉ mục cho bảng `carts`
@@ -729,6 +798,13 @@ ALTER TABLE `order_items`
   ADD PRIMARY KEY (`order_item_id`),
   ADD KEY `order_id` (`order_id`),
   ADD KEY `product_id` (`product_id`);
+
+--
+-- Chỉ mục cho bảng `pages`
+--
+ALTER TABLE `pages`
+  ADD PRIMARY KEY (`page_id`),
+  ADD UNIQUE KEY `slug` (`slug`);
 
 --
 -- Chỉ mục cho bảng `payments`
@@ -823,10 +899,16 @@ ALTER TABLE `banner`
   MODIFY `banenr_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
+-- AUTO_INCREMENT cho bảng `blogs`
+--
+ALTER TABLE `blogs`
+  MODIFY `blog_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT cho bảng `carts`
 --
 ALTER TABLE `carts`
-  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
 
 --
 -- AUTO_INCREMENT cho bảng `categories`
@@ -838,7 +920,7 @@ ALTER TABLE `categories`
 -- AUTO_INCREMENT cho bảng `favority`
 --
 ALTER TABLE `favority`
-  MODIFY `farority_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `farority_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT cho bảng `inventory`
@@ -856,13 +938,19 @@ ALTER TABLE `manufacturers`
 -- AUTO_INCREMENT cho bảng `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID ????n h??ng', AUTO_INCREMENT=33;
+  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID ????n h??ng', AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT cho bảng `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `order_item_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID chi ti???t ????n h??ng', AUTO_INCREMENT=49;
+  MODIFY `order_item_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID chi ti???t ????n h??ng', AUTO_INCREMENT=52;
+
+--
+-- AUTO_INCREMENT cho bảng `pages`
+--
+ALTER TABLE `pages`
+  MODIFY `page_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT cho bảng `payments`
@@ -916,7 +1004,7 @@ ALTER TABLE `variant_attributes`
 -- AUTO_INCREMENT cho bảng `vouchers`
 --
 ALTER TABLE `vouchers`
-  MODIFY `voucher_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `voucher_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT cho bảng `voucher_categories`

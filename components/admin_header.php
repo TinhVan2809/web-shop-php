@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -61,6 +61,40 @@
                         <i class="ri-image-line"></i>
                         <span class="font-medium">Quản lý Banner</span>
                     </a>
+
+                    <!-- CMS Section -->
+                    <div class="pt-6 mt-6 border-t border-gray-100">
+                        <p class="px-4 py-2 text-xs font-bold text-gray-400 uppercase">Quản lý Nội dung</p>
+                        <a href="index.php?action=admin_blogs" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors <?= (isset($_GET['action']) && strpos($_GET['action'], 'blog') !== false) ? 'active' : '' ?>">
+                            <i class="ri-article-line"></i>
+                            <span class="font-medium">Bài Viết Blog</span>
+                        </a>
+                        <a href="index.php?action=admin_pages" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors <?= (isset($_GET['action']) && strpos($_GET['action'], 'page') !== false) ? 'active' : '' ?>">
+                            <i class="ri-pages-line"></i>
+                            <span class="font-medium">Trang Tĩnh</span>
+                        </a>
+                    </div>
+
+                    <!-- Reports Section -->
+                    <div class="pt-6 mt-6 border-t border-gray-100">
+                        <p class="px-4 py-2 text-xs font-bold text-gray-400 uppercase">Báo Cáo</p>
+                        <a href="index.php?action=revenue_report" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors <?= (isset($_GET['action']) && $_GET['action'] == 'revenue_report') ? 'active' : '' ?>">
+                            <i class="ri-money-dollar-circle-line"></i>
+                            <span class="font-medium">Doanh Thu</span>
+                        </a>
+                        <a href="index.php?action=product_report" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors <?= (isset($_GET['action']) && $_GET['action'] == 'product_report') ? 'active' : '' ?>">
+                            <i class="ri-bar-chart-box-line"></i>
+                            <span class="font-medium">Sản Phẩm</span>
+                        </a>
+                        <a href="index.php?action=order_report" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors <?= (isset($_GET['action']) && $_GET['action'] == 'order_report') ? 'active' : '' ?>">
+                            <i class="ri-inbox-line"></i>
+                            <span class="font-medium">Đơn Hàng</span>
+                        </a>
+                        <a href="index.php?action=customer_report" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors <?= (isset($_GET['action']) && $_GET['action'] == 'customer_report') ? 'active' : '' ?>">
+                            <i class="ri-user-stats-line"></i>
+                            <span class="font-medium">Khách Hàng</span>
+                        </a>
+                    </div>
                     <div class="pt-6 mt-6 border-t border-gray-100">
                         <a href="index.php?action=logout" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors" title="Đăng xuất về trang chủ">
                             <i class="ri-logout-box-r-line"></i>
@@ -88,6 +122,14 @@
                         case 'banner_form':            echo 'Cập nhật Banner'; break;
                         case 'admin_vouchers':         echo 'Quản lý voucher'; break;
                         case 'voucher_form':           echo 'Cập nhật voucher'; break;
+                        case 'admin_blogs':            echo 'Quản lý Bài Viết Blog'; break;
+                        case 'blog_admin_form':        echo 'Tạo/Chỉnh sửa Bài Viết'; break;
+                        case 'admin_pages':            echo 'Quản lý Trang Tĩnh'; break;
+                        case 'page_admin_form':        echo 'Tạo/Chỉnh sửa Trang'; break;
+                        case 'revenue_report':         echo 'Báo Cáo Doanh Thu'; break;
+                        case 'product_report':         echo 'Báo Cáo Sản Phẩm'; break;
+                        case 'order_report':           echo 'Báo Cáo Đơn Hàng'; break;
+                        case 'customer_report':        echo 'Báo Cáo Khách Hàng'; break;
                         default: echo 'Quản trị';
                     }
                     ?>

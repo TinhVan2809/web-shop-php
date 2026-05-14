@@ -71,6 +71,34 @@ class DashboardController extends AdminBaseController
             FROM inventory";
         $stockStatus = $this->db->query($stockStatusQuery)->fetch(PDO::FETCH_ASSOC);
 
+        // 3.8. Thống kê tỷ lệ phần trăm các danh mục sản phẩm được bán ra
+        $categorySalesQuery = "SELECT
+            c.category_name,
+            SUM(oi.quantity) as total_sold_quantity
+        FROM order_items oi
+        JOIN products p ON oi.product_id = p.product_id
+        JOIN categories c ON p.category_id = c.category_id
+        JOIN orders o ON oi.order_id = o.order_id
+        WHERE o.status = 'completed'
+        GROUP BY c.category_id, c.category_name
+        ORDER BY total_sold_quantity DESC";
+
+        $categorySalesData = $this->db->query($categorySalesQuery)->fetchAll(PDO::FETCH_ASSOC);
+        $totalOverallSold = array_sum(array_column($categorySalesData, 'total_sold_quantity'));
+        $categoryChartData = [];
+        foreach ($categorySalesData as $data) {
+            $percentage = ($totalOverallSold > 0) ? round(($data['total_sold_quantity'] / $totalOverallSold) * 100, 2) : 0;
+            $categoryChartData[] = ['label' => $data['category_name'], 'value' => $percentage];
+        }
+
+        // 3.7. Lấy 5 đơn hàng mới nhất
+        $latestOrdersQuery = "SELECT o.*, u.name as customer_name 
+                             FROM orders o 
+                             JOIN users u ON o.user_id = u.user_id 
+                             ORDER BY o.created_at DESC 
+                             LIMIT 5";
+        $latestOrders = $this->db->query($latestOrdersQuery)->fetchAll(PDO::FETCH_ASSOC);
+
         // 4. Render view dashboard với đầy đủ dữ liệu
         $this->render('dashboard', [
             'stats' => $stats,
@@ -79,7 +107,10 @@ class DashboardController extends AdminBaseController
             'chartValues' => array_column($chartData, 'value'),
             'topProductLabels' => array_column($topProductsData, 'name'),
             'topProductValues' => array_column($topProductsData, 'total_sold'),
-            'stockStatus' => $stockStatus
+            'stockStatus' => $stockStatus, // Existing stock status data
+            'categoryChartLabels' => array_column($categoryChartData, 'label'), // New category chart labels
+            'categoryChartValues' => array_column($categoryChartData, 'value'), // New category chart values
+            'latestOrders' => $latestOrders // Existing latest orders data
         ]);
     }
 }

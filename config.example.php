@@ -1,13 +1,11 @@
 <?php
-// config.example.php
-// ĐÂY LÀ FILE MẪU. HÃY COPY FILE NÀY THÀNH config.php VÀ ĐIỀN THÔNG TIN CỦA BẠN VÀO config.php
-
+// config.php
 // Cấu hình thông tin để gửi email
 define('MAIL_HOST', 'smtp.gmail.com');
-define('MAIL_USERNAME', 'email.cua.ban@gmail.com'); 
-define('MAIL_PASSWORD', 'mat_khau_ung_dung_cua_ban'); 
-define('MAIL_PORT', 587); 
-define('MAIL_FROM_ADDRESS', 'email.cua.ban@gmail.com');
+define('MAIL_USERNAME', 'tathainguyen24@gmail.com'); // ĐIỀN EMAIL CỦA BẠN VÀO ĐÂY
+define('MAIL_PASSWORD', 'kbthtyfwacyfodgx'); // ĐIỀN MẬT KHẨU ỨNG DỤNG (16 KÝ TỰ) VÀO ĐÂY
+define('MAIL_PORT', 587); // Hoặc 465
+define('MAIL_FROM_ADDRESS', 'tathainguyen24@gmail.com'); // ĐIỀN EMAIL CỦA BẠN VÀO ĐÂY
 define('MAIL_FROM_NAME', 'Haseki Store');
 
 // VNPay Configuration
