@@ -5,17 +5,6 @@ http://localhost/web-shop-php/public/index.php
 
 ![](/asset/Screenshot%202026-04-27%20103946.png)
 
-###  Tài khoản Admin
-```bash
-    admin
-    1
-```
-
-### Tài khoản khách hàng
-```bash
-    username12345
-    12345678
-```
 ###
 
 ### Các lỗi thường gặp
@@ -49,3 +38,15 @@ http://localhost/web-shop-php/public/index.php
 **3. Email Test (Nhận hóa đơn):**
 - **Email:** tathainguyen24@gmail.com 
 - *(Hoặc bạn có thể nhập email thật của bạn ở bước thanh toán để kiểm tra hộp thư đến).*
+
+###  Tài khoản Admin
+```bash
+    admin
+    1
+```
+
+### Tài khoản khách hàng
+```bash
+    username12345
+    12345678
+```

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Máy chủ: 127.0.0.1
--- Thời gian đã tạo: Th5 14, 2026 lúc 09:51 AM
+-- Thời gian đã tạo: Th5 14, 2026 lúc 06:03 PM
 -- Phiên bản máy phục vụ: 10.4.32-MariaDB
 -- Phiên bản PHP: 8.2.12
 
@@ -70,7 +70,7 @@ CREATE TABLE `blogs` (
 --
 
 INSERT INTO `blogs` (`blog_id`, `title`, `slug`, `content`, `excerpt`, `thumbnail`, `author`, `category`, `views`, `status`, `created_at`, `updated_at`) VALUES
-(1, 'Những xu hướng thời trang mùa hè 2026', 'xu-huong-thoi-trang-mua-he-2026', '<p>Mùa hè 2026 mang lại nhiều xu hướng thời trang mới lạ và tươi mới. Các màu sắc rực rỡ, chất liệu thoáng mát sẽ là những lựa chọn hàng đầu của các fashionista.</p><p>Đừng bỏ lỡ cơ hội cập nhật tủ áo của bạn với những items trendy nhất!</p>', 'Khám phá những xu hướng thời trang sizzling của mùa hè 2026', 'banner-shirt-main.png', 'Admin', 'Thời trang', 245, 'published', '2026-05-14 06:48:55', '2026-05-14 06:48:55'),
+(1, 'Những xu hướng thời trang mùa hè 2026', 'xu-huong-thoi-trang-mua-he-2026', '<p>Mùa hè 2026 mang lại nhiều xu hướng thời trang mới lạ và tươi mới. Các màu sắc rực rỡ, chất liệu thoáng mát sẽ là những lựa chọn hàng đầu của các fashionista.</p><p>Đừng bỏ lỡ cơ hội cập nhật tủ áo của bạn với những items trendy nhất!</p>', 'Khám phá những xu hướng thời trang sizzling của mùa hè 2026', 'banner-shirt-main.png', 'Admin', 'Thời trang', 246, 'published', '2026-05-14 06:48:55', '2026-05-14 15:54:51'),
 (2, 'Cách chọn túi xách phù hợp với từng khuôn mặt', 'cach-chon-tui-xach-phu-hop', '<p>Một chiếc túi xách không chỉ là phụ kiện để bảo vệ đồ vật, mà còn là statement piece của bộ trang phục.</p><p>Hãy tìm hiểu cách lựa chọn túi xách sao cho phù hợp nhất với khuôn mặt và vóc dáng của bạn.</p>', 'Hướng dẫn chọn túi xách hoàn hảo cho từng loại khuôn mặt', 'banner-bag2.avif', 'Admin', 'Mỹ phẩm & Phụ kiện', 189, 'published', '2026-05-14 06:48:55', '2026-05-14 06:48:55'),
 (3, '5 bí quyết bảo quản quần áo kéo dài tuổi thọ', 'bi-quyet-bao-quan-quan-ao', '<p>Mỗi chiếc quần áo yêu thích đều cần được chăm sóc cẩn thận để kéo dài tuổi thọ.</p><p>Theo dõi bài viết này để biết 5 bí quyết quản lý quần áo giúp giữ chúng như mới.</p>', '5 cách đơn giản giúp quần áo của bạn luôn như mới', 'adidas_track_pants.jpg', 'Admin', 'Mẹo & Kinh nghiệm', 312, 'published', '2026-05-14 06:48:55', '2026-05-14 06:48:55');
 
@@ -171,7 +171,7 @@ INSERT INTO `inventory` (`inventory_id`, `product_id`, `quantity`, `reserved_qua
 (5, 2, 25, 3, 5, 'in_stock', '2026-04-21 10:14:58', 5),
 (6, 2, 15, 5, 5, 'low_stock', '2026-04-21 10:14:58', 6),
 (7, 2, 10, 2, 5, 'low_stock', '2026-04-21 10:14:58', 7),
-(8, 12, 220, 55, 100, 'in_stock', '2026-05-14 06:58:05', NULL),
+(8, 12, 218, 55, 100, 'in_stock', '2026-05-14 16:01:10', NULL),
 (9, 25, 23, 0, 10, 'in_stock', '2026-04-30 22:36:50', 9),
 (10, 25, 23, 0, 10, 'in_stock', '2026-04-30 22:36:50', 10),
 (11, 26, 20, 0, 10, 'in_stock', '2026-04-30 22:39:51', 11),
@@ -179,7 +179,7 @@ INSERT INTO `inventory` (`inventory_id`, `product_id`, `quantity`, `reserved_qua
 (13, 27, 12, 0, 10, 'in_stock', '2026-04-30 22:46:34', 13),
 (14, 3, 49, 2, 10, 'in_stock', '2026-05-13 12:44:37', 14),
 (15, 3, 45, 0, 10, 'in_stock', '2026-05-02 03:25:38', 15),
-(16, 13, 30, 5, 5, 'in_stock', '2026-05-02 03:25:38', 16),
+(16, 13, 29, 5, 5, 'in_stock', '2026-05-14 15:51:26', 16),
 (17, 20, 30, 0, 5, 'in_stock', '2026-05-03 13:20:37', 17),
 (18, 20, 25, 0, 5, 'in_stock', '2026-05-03 13:20:37', 18),
 (19, 20, 28, 0, 5, 'in_stock', '2026-05-03 13:20:37', 19),
@@ -286,7 +286,9 @@ INSERT INTO `orders` (`order_id`, `user_id`, `order_code`, `status`, `payment_st
 (32, 12, 'ORD20260428001434755', 'pending', 'unpaid', 900000.00, 0.00, 30000.00, 1020000.00, NULL, NULL, NULL, 'Tính Văn ', '0818177533', 'Cần Thơ', 'Quận Ninh Kiều', 'Phường Cái Khế', 'Ấp Đầu Sấu', NULL, '2026-04-27 22:14:34', '2026-04-27 22:14:34'),
 (37, 12, 'ORD20260513144437130', 'pending', 'unpaid', 3100000.00, 0.00, 0.00, 3410000.00, NULL, NULL, NULL, 'Tính Văn ', '0234567', 'Hà Nội', 'Quận Ba Đình', 'Phường Vĩnh Phúc', '123456', NULL, '2026-05-13 12:44:37', '2026-05-13 12:44:37'),
 (38, 12, 'ORD20260513144518880', 'completed', 'unpaid', 2800000.00, 0.00, 30000.00, 3110000.00, NULL, NULL, NULL, 'Tính Văn ', '0', '', '', '', '', NULL, '2026-05-13 12:45:18', '2026-05-13 12:52:10'),
-(39, 12, 'ORD20260514085805666', 'pending', 'unpaid', 2800000.00, 0.00, 30000.00, 3110000.00, NULL, NULL, NULL, 'Tính Văn ', '017899498', 'TP Hồ Chí Minh', 'Quận 3', 'Phường 2', '2', NULL, '2026-05-14 06:58:05', '2026-05-14 06:58:05');
+(39, 12, 'ORD20260514085805666', 'pending', 'unpaid', 2800000.00, 0.00, 30000.00, 3110000.00, NULL, NULL, NULL, 'Tính Văn ', '017899498', 'TP Hồ Chí Minh', 'Quận 3', 'Phường 2', '2', NULL, '2026-05-14 06:58:05', '2026-05-14 06:58:05'),
+(40, 12, 'ORD20260514175126897', 'pending', 'unpaid', 6700000.00, 0.00, 30000.00, 7400000.00, NULL, NULL, NULL, 'Tính Văn ', '0', '', '', '', '', NULL, '2026-05-14 15:51:26', '2026-05-14 15:51:26'),
+(41, 12, 'ORD20260514180110320', 'pending', 'unpaid', 2800000.00, 20000.00, 30000.00, 3090000.00, 1, 'ASSDF1234', 20000.00, 'Tính Văn', '0818177533', 'TP Hồ Chí Minh', 'Quận 3', 'Phường 3', 'duong so 6', NULL, '2026-05-14 16:01:10', '2026-05-14 16:01:10');
 
 -- --------------------------------------------------------
 
@@ -362,7 +364,10 @@ INSERT INTO `order_items` (`order_item_id`, `order_id`, `product_id`, `variant_i
 (48, 32, 1, 1, ' Pickleball NikeCourt Air Zoom Vapor 11 (size: M, color: red)', 'nikecourt-air-zoom-vapor-11-mens-hard-court-tennis-shoes-03_720x720xcrop-preview.png', 'NIKE-TS-M-RED', 450000.00, 1, 450000.00),
 (49, 37, 3, 14, 'Adidas Ultraboost 22 (size: 40, color: White)', 'adidas_ultraboost_22.jpg', 'ADI-UB22-40-WHT', 3100000.00, 1, 3100000.00),
 (50, 38, 12, NULL, 'Nike Air Zoom Pegasus', 'nike_pegasus_40.jpg', NULL, 2800000.00, 1, 2800000.00),
-(51, 39, 12, NULL, 'Nike Air Zoom Pegasus', 'nike_pegasus_40.jpg', NULL, 2800000.00, 1, 2800000.00);
+(51, 39, 12, NULL, 'Nike Air Zoom Pegasus', 'nike_pegasus_40.jpg', NULL, 2800000.00, 1, 2800000.00),
+(52, 40, 12, NULL, 'Nike Air Zoom Pegasus', 'nike_pegasus_40.jpg', NULL, 2800000.00, 1, 2800000.00),
+(53, 40, 13, 16, 'Adidas Ultraboost 22 (size: 42)', 'adidas_ultraboost_22.jpg', 'ADI-UB-13-42', 3900000.00, 1, 3900000.00),
+(54, 41, 12, NULL, 'Nike Air Zoom Pegasus', 'nike_pegasus_40.jpg', NULL, 2800000.00, 1, 2800000.00);
 
 -- --------------------------------------------------------
 
@@ -704,7 +709,7 @@ CREATE TABLE `vouchers` (
 --
 
 INSERT INTO `vouchers` (`voucher_id`, `code`, `description`, `discount_type`, `discount_value`, `max_discount`, `min_order_value`, `usage_limit`, `used_count`, `start_date`, `end_date`, `status`, `created_at`) VALUES
-(1, 'ASSDF1234', '2ert', 'fixed', 50000.00, 20000.00, 0.00, 42, 0, '2026-05-07 19:59:00', '2026-05-31 19:59:00', 'active', '2026-05-13 13:01:33');
+(1, 'ASSDF1234', '2ert', 'fixed', 50000.00, 20000.00, 0.00, 42, 1, '2026-05-07 19:59:00', '2026-05-31 19:59:00', 'active', '2026-05-13 13:01:33');
 
 -- --------------------------------------------------------
 
@@ -908,7 +913,7 @@ ALTER TABLE `blogs`
 -- AUTO_INCREMENT cho bảng `carts`
 --
 ALTER TABLE `carts`
-  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
+  MODIFY `cart_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
 
 --
 -- AUTO_INCREMENT cho bảng `categories`
@@ -938,13 +943,13 @@ ALTER TABLE `manufacturers`
 -- AUTO_INCREMENT cho bảng `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID ????n h??ng', AUTO_INCREMENT=40;
+  MODIFY `order_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID ????n h??ng', AUTO_INCREMENT=42;
 
 --
 -- AUTO_INCREMENT cho bảng `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `order_item_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID chi ti???t ????n h??ng', AUTO_INCREMENT=52;
+  MODIFY `order_item_id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'ID chi ti???t ????n h??ng', AUTO_INCREMENT=55;
 
 --
 -- AUTO_INCREMENT cho bảng `pages`
