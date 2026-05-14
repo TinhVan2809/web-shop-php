@@ -43,9 +43,9 @@ http://localhost/web-shop-php/public/index.php
 - **Mật khẩu OTP:** 123456
 
 **2. PayPal Sandbox:**
-- **Email:** sb-x3m3g30000000@personal.example.com (Vui lòng thay thế bằng email Buyer Sandbox của bạn nếu có)
-- **Password:** :!RO]ww1
+- **Email:** sb-wsflc50870689@personal.example.com (Vui lòng thay thế bằng email Buyer Sandbox của bạn nếu có)
+- **Password:**  :!RO]ww1
 
 **3. Email Test (Nhận hóa đơn):**
-- **Email:** tathainguyen24@gmail.com
+- **Email:** tathainguyen24@gmail.com 
 - *(Hoặc bạn có thể nhập email thật của bạn ở bước thanh toán để kiểm tra hộp thư đến).*
