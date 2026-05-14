@@ -138,6 +138,9 @@ switch ($action) {
     case 'orderDetail':
         $controller->orderDetail();
         break;
+    case 'cancel_order':
+        $controller->cancelOrder();
+        break;
 
 
     // --- BLOG ROUTES ---
