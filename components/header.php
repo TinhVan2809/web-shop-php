@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 
 <head>
     <meta charset="UTF-8">
@@ -31,7 +31,7 @@
                 <ul class="flex justify-center items-center gap-5">
                     <li class="hover:underline cursor-pointer"><a href="index.php">Home</a></li>
                     <li class="hover:underline cursor-pointer"><a href="#">Products</a></li>
-                    <li class="hover:underline cursor-pointer">Blogs</li>
+                    <li class="hover:underline cursor-pointer"><a href="index.php?action=blogs">Blogs</a></li>
                     <li class="hover:underline cursor-pointer">Contact</li>
                 </ul>
             </nav>

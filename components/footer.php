@@ -8,17 +8,16 @@
             </div>
         </div>
         <nav>
-            <ul class="grid grid-cols-4 gap-5 md:gap-0">
+            <ul class="grid grid-cols-5 gap-5 md:gap-0">
                 <li class="flex flex-col gap-2">
                     <p class="font-[500]">Homespace</p>
                     <a class="text-sm md:text-md hover:underline underline-ofset-1">Products</a>
-                    <a class="text-sm md:text-md hover:underline underline-ofset-1">Blogs</a>
+                    <a href="index.php?action=blogs" class="text-sm md:text-md hover:underline underline-ofset-1">Blogs</a>
                     <a class="text-sm md:text-md hover:underline underline-ofset-1">Contact</a>
                 </li>
                 <li class="flex flex-col gap-2">
                     <p class="font-[500]">Studio</p>
-                    <a class="text-sm md:text-md hover:underline underline-ofset-1">Signature works</a>
-                    <a class="text-sm md:text-md hover:underline underline-ofset-1">About</a>
+                    <a href="index.php?action=page_view&slug=ve-chung-toi" class="text-sm md:text-md hover:underline underline-ofset-1">About</a>
                 </li>
                 <li class="flex flex-col gap-2">
                     <p class="font-[500]">Products</p>
@@ -32,6 +31,12 @@
                     <a class="text-sm md:text-md hover:underline underline-ofset-1">Instagram</a>
                     <a class="text-sm md:text-md hover:underline underline-ofset-1">X</a>
                     <a class="text-sm md:text-md hover:underline underline-ofset-1">Facebook</a>
+                </li>
+                <li class="flex flex-col gap-2">
+                    <p class="font-[500]">Policies</p>
+                    <a href="index.php?action=page_view&slug=chinh-sach-bao-mat" class="text-sm md:text-md hover:underline underline-ofset-1">Privacy</a>
+                    <a href="index.php?action=page_view&slug=dieu-khoan-su-dung" class="text-sm md:text-md hover:underline underline-ofset-1">Terms</a>
+                    <a href="index.php?action=page_view&slug=chinh-sach-hoan-tra" class="text-sm md:text-md hover:underline underline-ofset-1">Returns</a>
                 </li>
             </ul>
         </nav>
