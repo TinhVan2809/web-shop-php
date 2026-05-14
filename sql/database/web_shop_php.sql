@@ -8,6 +8,8 @@
 -- Phiên bản PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
@@ -879,6 +881,60 @@ ALTER TABLE `products`
 --
 -- AUTO_INCREMENT cho bảng `product_images`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `blogs`
+--
+
+CREATE TABLE IF NOT EXISTS `blogs` (
+  `blog_id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `title` varchar(255) NOT NULL COMMENT 'Tiêu đề bài viết',
+  `slug` varchar(255) NOT NULL UNIQUE COMMENT 'Đường dẫn SEO thân thiện',
+  `content` longtext NOT NULL COMMENT 'Nội dung bài viết',
+  `excerpt` text DEFAULT NULL COMMENT 'Mô tả ngắn',
+  `thumbnail` varchar(500) DEFAULT NULL COMMENT 'Ảnh đại diện',
+  `author` varchar(255) DEFAULT NULL COMMENT 'Tác giả',
+  `category` varchar(100) DEFAULT 'General' COMMENT 'Danh mục',
+  `views` int(11) DEFAULT 0 COMMENT 'Số lượt xem',
+  `status` enum('draft', 'published', 'archived') DEFAULT 'draft' COMMENT 'Trạng thái',
+  `created_at` timestamp DEFAULT current_timestamp(),
+  `updated_at` timestamp DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+-- Dữ liệu mẫu cho bảng `blogs`
+INSERT INTO `blogs` (`title`, `slug`, `content`, `excerpt`, `thumbnail`, `author`, `category`, `views`, `status`, `created_at`) VALUES
+('Những xu hướng thời trang mùa hè 2026', 'xu-huong-thoi-trang-mua-he-2026', '<p>Mùa hè 2026 mang lại nhiều xu hướng thời trang mới lạ và tươi mới. Các màu sắc rực rỡ, chất liệu thoáng mát sẽ là những lựa chọn hàng đầu của các fashionista.</p><p>Đừng bỏ lỡ cơ hội cập nhật tủ áo của bạn với những items trendy nhất!</p>', 'Khám phá những xu hướng thời trang sizzling của mùa hè 2026', 'banner-shirt-main.png', 'Admin', 'Thời trang', 245, 'published', NOW()),
+('Cách chọn túi xách phù hợp với từng khuôn mặt', 'cach-chon-tui-xach-phu-hop', '<p>Một chiếc túi xách không chỉ là phụ kiện để bảo vệ đồ vật, mà còn là statement piece của bộ trang phục.</p><p>Hãy tìm hiểu cách lựa chọn túi xách sao cho phù hợp nhất với khuôn mặt và vóc dáng của bạn.</p>', 'Hướng dẫn chọn túi xách hoàn hảo cho từng loại khuôn mặt', 'banner-bag2.avif', 'Admin', 'Mỹ phẩm & Phụ kiện', 189, 'published', NOW()),
+('5 bí quyết bảo quản quần áo kéo dài tuổi thọ', 'bi-quyet-bao-quan-quan-ao', '<p>Mỗi chiếc quần áo yêu thích đều cần được chăm sóc cẩn thận để kéo dài tuổi thọ.</p><p>Theo dõi bài viết này để biết 5 bí quyết quản lý quần áo giúp giữ chúng như mới.</p>', '5 cách đơn giản giúp quần áo của bạn luôn như mới', 'adidas_track_pants.jpg', 'Admin', 'Mẹo & Kinh nghiệm', 312, 'published', NOW());
+
+-- --------------------------------------------------------
+
+--
+-- Cấu trúc bảng cho bảng `pages`
+--
+
+CREATE TABLE IF NOT EXISTS `pages` (
+  `page_id` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `title` varchar(255) NOT NULL COMMENT 'Tiêu đề trang',
+  `slug` varchar(255) NOT NULL UNIQUE COMMENT 'Đường dẫn SEO',
+  `content` longtext NOT NULL COMMENT 'Nội dung trang',
+  `meta_description` text COMMENT 'Meta description cho SEO',
+  `position` int(11) DEFAULT 0 COMMENT 'Vị trí sắp xếp',
+  `is_published` tinyint(1) DEFAULT 1 COMMENT 'Trạng thái công khai',
+  `created_at` timestamp DEFAULT current_timestamp(),
+  `updated_at` timestamp DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Dữ liệu mẫu cho bảng `pages`
+INSERT INTO `pages` (`title`, `slug`, `content`, `meta_description`, `position`, `is_published`, `created_at`) VALUES
+('Về Chúng Tôi', 've-chung-toi', '<h2>Chào mừng đến với Haseki Store</h2><p>Haseki Store là cửa hàng thời trang hàng đầu, cung cấp các sản phẩm quần áo, giày dép, và phụ kiện chất lượng cao với giá cả phải chăng.</p><h2>Sứ Mệnh Của Chúng Tôi</h2><p>Chúng tôi cam kết mang đến cho khách hàng những sản phẩm thời trang tốt nhất với dịch vụ tuyệt vời.</p>', 'Tìm hiểu về Haseki Store - cửa hàng thời trang hàng đầu', 1, 1, NOW()),
+('Chính Sách Bảo Mật', 'chinh-sach-bao-mat', '<h2>Chính Sách Bảo Mật Của Haseki Store</h2><p>Chúng tôi cam kết bảo vệ thông tin cá nhân của bạn. Mọi dữ liệu sẽ được mã hóa và bảo mật.</p><h2>Cách Chúng Tôi Sử Dụng Dữ Liệu</h2><p>Dữ liệu của bạn chỉ được sử dụng để cải thiện dịch vụ và không chia sẻ với bên thứ ba.</p>', 'Chính sách bảo mật thông tin khách hàng', 2, 1, NOW()),
+('Điều Khoản Sử Dụng', 'dieu-khoan-su-dung', '<h2>Điều Khoản Sử Dụng</h2><p>Bằng cách sử dụng website này, bạn đồng ý với các điều khoản sau:</p><ul><li>Sử dụng website chỉ cho mục đích hợp pháp</li><li>Không vi phạm quyền sở hữu trí tuệ</li><li>Tuân thủ các luật pháp hiện hành</li></ul>', 'Điều khoản sử dụng website Haseki Store', 3, 1, NOW()),
+('Chính Sách Hoàn Trả', 'chinh-sach-hoan-tra', '<h2>Chính Sách Hoàn Trả 30 Ngày</h2><p>Nếu bạn không hài lòng với sản phẩm, chúng tôi sẽ hoàn trả tiền trong vòng 30 ngày.</p><h2>Điều Kiện Hoàn Trả</h2><ul><li>Sản phẩm phải còn nguyên bao bì</li><li>Chưa qua sử dụng</li><li>Có hoá đơn mua hàng</li></ul>', 'Chính sách hoàn trả 30 ngày', 4, 1, NOW());
 ALTER TABLE `product_images`
   MODIFY `image_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
