@@ -3,6 +3,13 @@
         <!-- Checkout Form -->
         <div class="lg:w-2/3">
             <h1 class="text-3xl font-bold mb-8">Thanh toán</h1>
+
+            <?php if (isset($_GET['error'])): ?>
+                <div class="bg-red-50 border border-red-200 text-red-700 px-5 py-3 rounded-lg mb-6">
+                    <i class="ri-error-warning-line mr-2"></i>
+                    <?php echo htmlspecialchars($_GET['error']); ?>
+                </div>
+            <?php endif; ?>
             
             <form action="index.php?action=process_checkout" method="POST" id="checkout-form">
                 
@@ -75,6 +82,23 @@
                     </div>
                 </div>
 
+                <!-- Voucher -->
+                <div class="bg-white rounded-xl border border-gray-200 p-6 mb-8 shadow-sm">
+                    <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ri-coupon-3-line text-amber-600"></i> Mã voucher</h2>
+                    <div class="flex flex-col gap-3">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nhập mã voucher</label>
+                        <div class="flex flex-col md:flex-row gap-3">
+                            <input type="text" name="voucher_code" id="voucher-code" value="<?php echo htmlspecialchars($voucher_code ?? ''); ?>" placeholder="VD: SALE2026"
+                                class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none uppercase">
+                            <button type="button" id="apply-voucher" class="px-5 py-2 rounded-lg bg-amber-500 text-white font-semibold hover:bg-amber-600 transition-colors">
+                                Áp dụng
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-500">Dán mã và bấm Áp dụng để thấy số tiền giảm.</p>
+                        <p id="voucher-message" class="text-sm text-amber-700 hidden"></p>
+                    </div>
+                </div>
+
                 <!-- Payment Method -->
                 <div class="bg-white rounded-xl border border-gray-200 p-6 mb-8 shadow-sm">
                     <h2 class="text-xl font-bold mb-4 flex items-center gap-2"><i class="ri-secure-payment-line text-purple-600"></i> Phương thức thanh toán</h2>
@@ -139,6 +163,10 @@
                         <span class="font-medium"><?php echo number_format($tax, 0, ',', '.'); ?>₫</span>
                     </div>
                     <div class="flex justify-between">
+                        <span id="discount-label">Giảm giá</span>
+                        <span class="font-medium text-red-500" id="discount-amount">-<?php echo number_format($discount_amount ?? 0, 0, ',', '.'); ?>₫</span>
+                    </div>
+                    <div class="flex justify-between">
                         <span>Phí vận chuyển</span>
                         <span class="font-medium" id="display-shipping">30.000₫</span>
                     </div>
@@ -146,7 +174,7 @@
                 
                 <div class="flex justify-between items-center mb-8">
                     <span class="font-bold text-lg">Tổng cộng</span>
-                    <span class="font-bold text-3xl text-red-600" id="display-total"><?php echo number_format($subtotal + $tax + 30000, 0, ',', '.'); ?>₫</span>
+                    <span class="font-bold text-3xl text-red-600" id="display-total"><?php echo number_format($subtotal + $tax + 30000 - ($discount_amount ?? 0), 0, ',', '.'); ?>₫</span>
                 </div>
                 
                 <button type="button" onclick="document.getElementById('checkout-form').submit();" class="w-full bg-black text-white py-4 rounded-full font-bold hover:bg-gray-800 transition-colors text-lg shadow-lg flex justify-center items-center gap-2">
@@ -160,6 +188,7 @@
 <script>
     const subtotal = <?php echo $subtotal; ?>;
     const tax = <?php echo $tax; ?>;
+    let discountAmount = <?php echo (float)($discount_amount ?? 0); ?>;
 
     function formatCurrency(amount) {
         return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + '₫';
@@ -167,8 +196,101 @@
 
     function updateShipping(fee) {
         document.getElementById('display-shipping').textContent = fee === 0 ? 'Miễn phí' : formatCurrency(fee);
-        const total = subtotal + tax + fee;
-        document.getElementById('display-total').textContent = formatCurrency(total);
+        updateTotals(fee);
+    }
+
+    function updateTotals(fee) {
+        const total = subtotal + tax + fee - discountAmount;
+        document.getElementById('display-total').textContent = formatCurrency(total < 0 ? 0 : total);
+    }
+
+    function getSelectedShippingFee() {
+        const selected = document.querySelector('input[name="shipping_method"]:checked');
+        if (!selected) return 30000;
+
+        if (selected.value === 'fast') return 50000;
+        if (selected.value === 'pickup') return 0;
+        return 30000;
+    }
+
+    const voucherInput = document.getElementById('voucher-code');
+    const applyVoucherBtn = document.getElementById('apply-voucher');
+    const voucherMessage = document.getElementById('voucher-message');
+    const discountDisplay = document.getElementById('discount-amount');
+    const discountLabel = document.getElementById('discount-label');
+
+    function showVoucherMessage(message, isError) {
+        if (!voucherMessage) return;
+        voucherMessage.textContent = message;
+        voucherMessage.classList.remove('hidden');
+        voucherMessage.classList.toggle('text-red-600', isError);
+        voucherMessage.classList.toggle('text-amber-700', !isError);
+    }
+
+    function formatDiscountLabel(type, value, code) {
+        if (!discountLabel) return;
+        const codeText = code ? `${code} - ` : '';
+
+        if (type === 'percent') {
+            discountLabel.textContent = `Giảm giá (${codeText}${value}%)`;
+            return;
+        }
+
+        discountLabel.textContent = `Giảm giá (${codeText}${formatCurrency(value)})`;
+    }
+
+    function handleVoucherApply() {
+        if (!voucherInput) return;
+        const code = voucherInput.value.trim();
+        if (!code) {
+            showVoucherMessage('Vui lòng nhập mã voucher.', true);
+            return;
+        }
+
+        applyVoucherBtn.disabled = true;
+        applyVoucherBtn.textContent = 'Đang áp dụng...';
+
+        fetch('index.php?action=apply_voucher', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+            },
+            body: new URLSearchParams({ voucher_code: code })
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (!data.success) {
+                    discountAmount = 0;
+                    if (discountDisplay) {
+                        discountDisplay.textContent = '-' + formatCurrency(0);
+                    }
+                    if (discountLabel) {
+                        discountLabel.textContent = 'Giảm giá';
+                    }
+                    updateTotals(getSelectedShippingFee());
+                    showVoucherMessage(data.message || 'Không thể áp dụng voucher.', true);
+                    return;
+                }
+
+                discountAmount = Number(data.discount || 0);
+                if (discountDisplay) {
+                    discountDisplay.textContent = '-' + formatCurrency(discountAmount);
+                }
+                formatDiscountLabel(data.discount_type, Number(data.discount_value || 0), data.voucher_code || code);
+                updateTotals(getSelectedShippingFee());
+                showVoucherMessage('Voucher đã được áp dụng.', false);
+            })
+            .catch(() => {
+                showVoucherMessage('Không thể kết nối để áp dụng voucher.', true);
+            })
+            .finally(() => {
+                applyVoucherBtn.disabled = false;
+                applyVoucherBtn.textContent = 'Áp dụng';
+            });
+    }
+
+    if (applyVoucherBtn) {
+        applyVoucherBtn.addEventListener('click', handleVoucherApply);
     }
 
     // Dữ liệu gợi ý 5 Thành phố trực thuộc trung ương

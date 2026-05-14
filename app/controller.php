@@ -828,7 +828,10 @@ class Controller
         $db = $database->getConnection();
 
         // Lấy thông tin đơn hàng và kiểm tra quyền sở hữu (Security check)
-        $orderQuery = "SELECT * FROM orders WHERE order_id = :order_id AND user_id = :user_id";
+        $orderQuery = "SELECT o.*, v.discount_type as voucher_type, v.discount_value as voucher_value
+                  FROM orders o
+                  LEFT JOIN vouchers v ON o.voucher_id = v.voucher_id
+                  WHERE o.order_id = :order_id AND o.user_id = :user_id";
         $orderStmt = $db->prepare($orderQuery);
         $orderStmt->execute(['order_id' => $order_id, 'user_id' => $_SESSION['user_id']]);
         $order = $orderStmt->fetch(PDO::FETCH_ASSOC);
@@ -915,6 +918,16 @@ class Controller
                                 <div class="flex justify-between">
                                     <span class="text-gray-500">Thuế (10%)</span>
                                     <span><?php echo number_format($order['subtotal'] * 0.1, 0, ',', '.'); ?>₫</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500">
+                                        <?php if (!empty($order['voucher_code']) && !empty($order['voucher_type'])): ?>
+                                            Giảm giá (<?= htmlspecialchars($order['voucher_code']) ?> - <?= $order['voucher_type'] === 'percent' ? number_format($order['voucher_value'], 0, ',', '.') . '%' : number_format($order['voucher_value'], 0, ',', '.') . '₫' ?>)
+                                        <?php else: ?>
+                                            Giảm giá
+                                        <?php endif; ?>
+                                    </span>
+                                    <span class="text-red-500">-<?= number_format($order['discount_amount'], 0, ',', '.') ?>₫</span>
                                 </div>
                                 <div class="flex justify-between border-t pt-3 font-bold text-lg text-red-600">
                                     <span>Tổng cộng</span>

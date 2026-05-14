@@ -145,7 +145,7 @@ class PaymentController
         $emailService = new EmailService();
         $emailService->sendOrderConfirmation($order_id);
 
-        header("Location: index.php?action=checkout_success&order_code=" . $order_code);
+        header("Location: index.php?action=checkout_success&order_code=" . $order_code . "&order_id=" . $order_id);
         exit;
     }
 
