@@ -42,14 +42,52 @@
         <p class="text-sm text-gray-500 font-medium">Doanh thu</p>
         <h3 class="text-2xl font-bold mt-1"><?= number_format($stats['total_revenue'], 0, ',', '.') ?>₫</h3>
     </div>
+    <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center text-xl">
+                <i class="ri-archive-line"></i>
+            </div>
+        </div>
+        <p class="text-sm text-gray-500 font-medium">Tổng tồn kho</p>
+        <h3 class="text-2xl font-bold mt-1"><?= number_format($stats['total_stock']) ?></h3>
+    </div>
+
+    <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center text-xl">
+                <i class="ri-error-warning-3-line"></i>
+            </div>
+        </div>
+        <p class="text-sm text-gray-500 font-medium">Hết hàng</p>
+        <h3 class="text-2xl font-bold mt-1 text-rose-600"><?= number_format($stats['out_of_stock']) ?></h3>
+    </div>
 </div>
 
-<!-- Biểu đồ doanh thu -->
-<div class="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm mb-8">
-    <h3 class="text-lg font-bold mb-6">Xu hướng doanh thu (7 ngày qua)</h3>
-    <div class="h-[350px] w-full">
-        <canvas id="revenueChart"></canvas>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+    <!-- Biểu đồ doanh thu -->
+    <div class="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm lg:col-span-2">
+        <h3 class="text-lg font-bold mb-6">Xu hướng doanh thu (7 ngày qua)</h3>
+        <div class="h-[350px] w-full">
+            <canvas id="revenueChart"></canvas>
+        </div>
     </div>
+
+    <!-- Biểu đồ phân bổ tồn kho -->
+    <div class="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm">
+        <h3 class="text-lg font-bold mb-6">Tình trạng kho hàng</h3>
+        <div class="h-[350px] w-full flex items-center justify-center">
+            <canvas id="stockStatusChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 gap-8 mb-8">
+    <!-- Biểu đồ sản phẩm bán chạy -->
+    <h3 class="text-lg font-bold mb-6">Top 10 sản phẩm bán chạy (7 ngày qua)</h3>
+    <div class="h-[350px] w-full">
+        <canvas id="topProductsChart"></canvas>
+    </div>
+</div>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -120,46 +158,125 @@
 <!-- Chart.js Library -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const ctx = document.getElementById('revenueChart').getContext('2d');
-    
-    // Dữ liệu từ PHP truyền sang
-    const labels = <?= json_encode($chartLabels) ?>;
-    const dataValues = <?= json_encode($chartValues) ?>;
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('revenueChart').getContext('2d');
 
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: 'Doanh thu (VND)',
-                data: dataValues,
-                borderColor: '#2563eb', // Blue-600
-                backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                fill: true,
-                tension: 0.4,
-                borderWidth: 3,
-                pointRadius: 4,
-                pointBackgroundColor: '#2563eb'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false }
+        // Dữ liệu từ PHP truyền sang
+        const labels = <?= json_encode($chartLabels) ?>;
+        const dataValues = <?= json_encode($chartValues) ?>;
+        const topProductLabels = <?= json_encode($topProductLabels) ?>;
+        const topProductValues = <?= json_encode($topProductValues) ?>;
+        const stockStatus = <?= json_encode($stockStatus) ?>;
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Doanh thu (VND)',
+                    data: dataValues,
+                    borderColor: '#2563eb', // Blue-600
+                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    borderWidth: 3,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#2563eb'
+                }]
             },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return value.toLocaleString('vi-VN') + '₫';
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString('vi-VN') + '₫';
+                            }
                         }
                     }
                 }
             }
-        }
+        });
+
+        // Biểu đồ sản phẩm bán chạy
+        const ctx2 = document.getElementById('topProductsChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: topProductLabels,
+                datasets: [{
+                    label: 'Số lượng bán ra',
+                    data: topProductValues,
+                    backgroundColor: '#f97316', // Orange-500
+                    borderRadius: 8,
+                    barThickness: 20
+                }]
+            },
+            options: {
+                indexAxis: 'y', // Chuyển thành biểu đồ ngang để dễ đọc tên sản phẩm dài
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    },
+                    y: {
+                        ticks: {
+                            font: {
+                                size: 11
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Biểu đồ Doughnut trạng thái kho hàng
+        const ctxStock = document.getElementById('stockStatusChart').getContext('2d');
+        new Chart(ctxStock, {
+            type: 'doughnut',
+            data: {
+                labels: ['Còn hàng', 'Sắp hết', 'Hết hàng'],
+                datasets: [{
+                    data: [stockStatus.in_stock, stockStatus.low_stock, stockStatus.out_of_stock],
+                    backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                    borderWidth: 0,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20,
+                            font: {
+                                size: 12,
+                                weight: '600'
+                            }
+                        }
+                    }
+                }
+            }
+        });
     });
-});
 </script>

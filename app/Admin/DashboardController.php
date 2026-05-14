@@ -11,7 +11,9 @@ class DashboardController extends AdminBaseController
             'total_users' => $this->db->query("SELECT COUNT(*) FROM users")->fetchColumn(),
             'total_products' => $this->db->query("SELECT COUNT(*) FROM products")->fetchColumn(),
             'total_orders' => $this->db->query("SELECT COUNT(*) FROM orders")->fetchColumn(),
-            'total_revenue' => $this->db->query("SELECT SUM(total_amount) FROM orders WHERE status = 'completed'")->fetchColumn() ?? 0
+            'total_revenue' => $this->db->query("SELECT SUM(total_amount) FROM orders WHERE status = 'completed'")->fetchColumn() ?? 0,
+            'total_stock' => $this->db->query("SELECT SUM(quantity) FROM inventory")->fetchColumn() ?? 0,
+            'out_of_stock' => $this->db->query("SELECT COUNT(*) FROM inventory WHERE available_quantity <= 0")->fetchColumn()
         ];
 
         // 2. Truy vấn lấy danh sách sản phẩm sắp hết hàng (available_quantity <= min_stock_level)
@@ -49,12 +51,35 @@ class DashboardController extends AdminBaseController
             }
         }
 
+        // 3.5. Xử lý dữ liệu sản phẩm bán chạy nhất trong 7 ngày qua
+        $queryTop = "SELECT p.name, SUM(oi.quantity) as total_sold
+                     FROM order_items oi
+                     JOIN orders o ON oi.order_id = o.order_id
+                     JOIN products p ON oi.product_id = p.product_id
+                     WHERE o.status = 'completed'
+                     AND o.created_at >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+                     GROUP BY p.product_id
+                     ORDER BY total_sold DESC
+                     LIMIT 10";
+        $topProductsData = $this->db->query($queryTop)->fetchAll(PDO::FETCH_ASSOC);
+
+        // 3.6. Thống kê trạng thái tồn kho cho biểu đồ
+        $stockStatusQuery = "SELECT 
+            COUNT(CASE WHEN available_quantity > min_stock_level THEN 1 END) as in_stock,
+            COUNT(CASE WHEN available_quantity > 0 AND available_quantity <= min_stock_level THEN 1 END) as low_stock,
+            COUNT(CASE WHEN available_quantity <= 0 THEN 1 END) as out_of_stock
+            FROM inventory";
+        $stockStatus = $this->db->query($stockStatusQuery)->fetch(PDO::FETCH_ASSOC);
+
         // 4. Render view dashboard với đầy đủ dữ liệu
         $this->render('dashboard', [
             'stats' => $stats,
             'lowStockProducts' => $lowStockProducts,
             'chartLabels' => array_column($chartData, 'label'),
-            'chartValues' => array_column($chartData, 'value')
+            'chartValues' => array_column($chartData, 'value'),
+            'topProductLabels' => array_column($topProductsData, 'name'),
+            'topProductValues' => array_column($topProductsData, 'total_sold'),
+            'stockStatus' => $stockStatus
         ]);
     }
 }
