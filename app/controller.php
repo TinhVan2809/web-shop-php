@@ -727,6 +727,12 @@ class Controller
         $stmt->execute();
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        // Lấy danh sách đơn hàng đã mua của người dùng này
+        $orderQuery = "SELECT * FROM orders WHERE user_id = :id ORDER BY created_at DESC";
+        $orderStmt = $db->prepare($orderQuery);
+        $orderStmt->execute(['id' => $id]);
+        $orders = $orderStmt->fetchAll(PDO::FETCH_ASSOC);
+
         include_once PROJECT_ROOT . '/components/header.php';
 
         if (!$user): ?>
@@ -735,7 +741,9 @@ class Controller
             </div>
         <?php else: ?>
             <main class="container mx-auto px-7 py-20 mt-10">
-                <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+                <div class="max-w-4xl mx-auto space-y-8">
+                    <!-- Card Thông tin cá nhân -->
+                    <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
                     <h1 class="text-3xl font-bold mb-8 flex items-center gap-3">
                         <i class="ri-user-settings-line"></i> Thông tin cá nhân
                     </h1>
@@ -767,11 +775,245 @@ class Controller
                         <a href="index.php?action=edit_profile&id=<?php echo $user['user_id']; ?>" class="bg-black text-white px-8 py-2.5 rounded-lg font-bold hover:bg-gray-800 transition-all text-center">Chỉnh sửa</a>
                         <a href="index.php?action=logout" class="border border-red-500 text-red-500 px-8 py-2.5 rounded-lg font-bold hover:bg-red-50 transition-all text-center">Đăng xuất</a>
                     </div>
+                    </div>
+
+                    <!-- Card Lịch sử đơn hàng -->
+                    <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
+                        <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+                            <i class="ri-history-line"></i> Lịch sử đơn hàng
+                        </h2>
+
+                        <?php if (empty($orders)): ?>
+                            <p class="text-gray-500 italic">Bạn chưa có đơn hàng nào.</p>
+                        <?php else: ?>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr class="border-b text-xs text-gray-400 font-bold uppercase tracking-wider">
+                                            <th class="py-3">Mã đơn</th>
+                                            <th class="py-3">Ngày đặt</th>
+                                            <th class="py-3">Tổng tiền</th>
+                                            <th class="py-3 text-center">Trạng thái</th>
+                                            <th class="py-3">Thanh toán</th>
+                                            <th class="py-3 text-right">Hành động</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-50">
+                                        <?php foreach ($orders as $order): ?>
+                                            <tr class="text-sm hover:bg-gray-50 transition-colors">
+                                                <td class="py-4 font-bold text-indigo-600">#<?php echo $order['order_code']; ?></td>
+                                                <td class="py-4 text-gray-600"><?php echo date('d/m/Y', strtotime($order['created_at'])); ?></td>
+                                                <td class="py-4 font-bold"><?php echo number_format($order['total_amount'], 0, ',', '.'); ?>₫</td>
+                                                <td class="py-4 text-center">
+                                                    <span class="px-2 py-1 rounded-full text-[10px] font-bold uppercase <?php 
+                                                        echo $order['status'] === 'completed' ? 'bg-green-100 text-green-700' : ($order['status'] === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700');
+                                                    ?>">
+                                                        <?php echo $order['status']; ?>
+                                                    </span>
+                                                </td>
+                                                <td class="py-4">
+                                                    <span class="px-2 py-1 rounded-md text-[10px] font-bold uppercase <?php 
+                                                        echo $order['payment_status'] === 'paid' ? 'bg-blue-50 text-blue-600' : 'bg-gray-100 text-gray-400';
+                                                    ?>">
+                                                        <?php echo $order['payment_status']; ?>
+                                                    </span>
+                                                </td>
+                                                <td class="py-4 text-right">
+                                                    <a href="index.php?action=order_detail&id=<?php echo $order['order_id']; ?>" class="text-blue-600 hover:underline font-medium">Chi tiết</a>
+                                                    <?php if ($order['status'] === 'pending'): ?>
+                                                        <a href="index.php?action=cancel_order&id=<?php echo $order['order_id']; ?>" onclick="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này?')" class="text-red-500 hover:underline font-medium ml-3">Hủy đơn</a>
+                                                    <?php endif; ?>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php endif; ?>
+                    </div>
                 </div>
             </main>
         <?php endif;
 
         include_once PROJECT_ROOT . '/components/footer.php';
+    }
+
+    public function orderDetail()
+    {
+        if (!isset($_SESSION['user_id'])) {
+            header("Location: index.php?action=login");
+            exit;
+        }
+
+        $order_id = $_GET['id'] ?? null;
+        if (!$order_id) {
+            header("Location: index.php?action=profile&id=" . $_SESSION['user_id']);
+            exit;
+        }
+
+        $database = new Database();
+        $db = $database->getConnection();
+
+        // Lấy thông tin đơn hàng và kiểm tra quyền sở hữu (Security check)
+        $orderQuery = "SELECT * FROM orders WHERE order_id = :order_id AND user_id = :user_id";
+        $orderStmt = $db->prepare($orderQuery);
+        $orderStmt->execute(['order_id' => $order_id, 'user_id' => $_SESSION['user_id']]);
+        $order = $orderStmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$order) {
+            header("Location: index.php?action=profile&id=" . $_SESSION['user_id']);
+            exit;
+        }
+
+        // Lấy danh sách sản phẩm trong đơn hàng
+        $itemsQuery = "SELECT * FROM order_items WHERE order_id = :order_id";
+        $itemsStmt = $db->prepare($itemsQuery);
+        $itemsStmt->execute(['order_id' => $order_id]);
+        $items = $itemsStmt->fetchAll(PDO::FETCH_ASSOC);
+
+        include_once PROJECT_ROOT . '/components/header.php';
+        ?>
+        <main class="container mx-auto px-7 py-20 mt-10">
+            <div class="max-w-4xl mx-auto">
+                <div class="mb-6 flex items-center justify-between">
+                    <a href="index.php?action=profile&id=<?php echo $_SESSION['user_id']; ?>" class="text-gray-500 hover:text-black transition-colors flex items-center gap-2">
+                        <i class="ri-arrow-left-line"></i> Quay lại hồ sơ
+                    </a>
+                    <div class="flex items-center gap-4">
+                        <?php if ($order['status'] === 'pending'): ?>
+                            <a href="index.php?action=cancel_order&id=<?php echo $order['order_id']; ?>" onclick="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này?')" class="bg-red-50 text-red-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-red-100 transition-all flex items-center gap-1">
+                                <i class="ri-close-circle-line"></i> Hủy đơn hàng
+                            </a>
+                        <?php endif; ?>
+                        <h1 class="text-2xl font-bold">Chi tiết đơn hàng #<?php echo $order['order_code']; ?></h1>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Danh sách sản phẩm -->
+                    <div class="md:col-span-2 space-y-4">
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                            <h3 class="font-bold mb-4 border-b pb-2">Sản phẩm đã đặt</h3>
+                            <div class="space-y-4">
+                                <?php foreach ($items as $item): ?>
+                                    <div class="flex gap-4 items-center">
+                                        <img src="/web-shop-php/asset/<?php echo $item['product_image']; ?>" class="w-16 h-16 object-cover rounded-lg border">
+                                        <div class="flex-1">
+                                            <h4 class="font-medium text-sm"><?php echo htmlspecialchars($item['product_name']); ?></h4>
+                                            <p class="text-xs text-gray-500">SKU: <?php echo $item['sku']; ?></p>
+                                            <p class="text-sm font-bold mt-1"><?php echo number_format($item['price'], 0, ',', '.'); ?>₫ x <?php echo $item['quantity']; ?></p>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="font-bold"><?php echo number_format($item['total_price'], 0, ',', '.'); ?>₫</p>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Thông tin nhận hàng & Tổng thanh toán -->
+                    <div class="space-y-6">
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                            <h3 class="font-bold mb-4 border-b pb-2">Thông tin giao hàng</h3>
+                            <div class="text-sm space-y-2">
+                                <p><span class="text-gray-500">Người nhận:</span> <br> <strong><?php echo htmlspecialchars($order['recipient_name']); ?></strong></p>
+                                <p><span class="text-gray-500">Điện thoại:</span> <br> <?php echo htmlspecialchars($order['recipient_phone']); ?></p>
+                                <p><span class="text-gray-500">Địa chỉ:</span> <br> 
+                                    <?php echo htmlspecialchars($order['specific_address']); ?>, 
+                                    <?php echo htmlspecialchars($order['ward_name']); ?>, 
+                                    <?php echo htmlspecialchars($order['district_name']); ?>, 
+                                    <?php echo htmlspecialchars($order['province_name']); ?>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                            <h3 class="font-bold mb-4 border-b pb-2">Tóm tắt thanh toán</h3>
+                            <div class="text-sm space-y-3">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500">Tạm tính</span>
+                                    <span><?php echo number_format($order['subtotal'], 0, ',', '.'); ?>₫</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500">Phí vận chuyển</span>
+                                    <span><?php echo number_format($order['shipping_fee'], 0, ',', '.'); ?>₫</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-500">Thuế (10%)</span>
+                                    <span><?php echo number_format($order['subtotal'] * 0.1, 0, ',', '.'); ?>₫</span>
+                                </div>
+                                <div class="flex justify-between border-t pt-3 font-bold text-lg text-red-600">
+                                    <span>Tổng cộng</span>
+                                    <span><?php echo number_format($order['total_amount'], 0, ',', '.'); ?>₫</span>
+                                </div>
+                                <div class="mt-4 pt-4 border-t space-y-2">
+                                    <div class="flex justify-between text-xs">
+                                        <span class="text-gray-500 uppercase">Trạng thái đơn hàng</span>
+                                        <span class="font-bold"><?php echo strtoupper($order['status']); ?></span>
+                                    </div>
+                                    <div class="flex justify-between text-xs">
+                                        <span class="text-gray-500 uppercase">Thanh toán</span>
+                                        <span class="font-bold text-blue-600"><?php echo strtoupper($order['payment_status']); ?></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <?php
+        include_once PROJECT_ROOT . '/components/footer.php';
+    }
+
+    public function cancelOrder()
+    {
+        if (!isset($_SESSION['user_id'])) {
+            header("Location: index.php?action=login");
+            exit;
+        }
+
+        $order_id = $_GET['id'] ?? null;
+        if (!$order_id) {
+            header("Location: index.php?action=profile&id=" . $_SESSION['user_id']);
+            exit;
+        }
+
+        $database = new Database();
+        $db = $database->getConnection();
+
+        // Kiểm tra quyền sở hữu và trạng thái đơn hàng (Chỉ cho phép hủy khi đang 'pending')
+        $stmt = $db->prepare("SELECT status FROM orders WHERE order_id = :oid AND user_id = :uid");
+        $stmt->execute(['oid' => $order_id, 'uid' => $_SESSION['user_id']]);
+        $order = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($order && $order['status'] === 'pending') {
+            $db->beginTransaction();
+            try {
+                // 1. Cập nhật trạng thái đơn hàng thành 'cancelled'
+                $updateStmt = $db->prepare("UPDATE orders SET status = 'cancelled' WHERE order_id = :oid");
+                $updateStmt->execute(['oid' => $order_id]);
+
+                // 2. Hoàn trả số lượng vào kho (Restock)
+                $itemsStmt = $db->prepare("SELECT product_id, variant_id, quantity FROM order_items WHERE order_id = ?");
+                $itemsStmt->execute([$order_id]);
+                $items = $itemsStmt->fetchAll(PDO::FETCH_ASSOC);
+
+                $updateStock = $db->prepare("UPDATE inventory SET quantity = quantity + :qty WHERE product_id = :pid AND variant_id <=> :vid");
+                foreach ($items as $item) {
+                    $updateStock->execute(['qty' => $item['quantity'], 'pid' => $item['product_id'], 'vid' => $item['variant_id']]);
+                }
+
+                $db->commit();
+            } catch (Exception $e) {
+                $db->rollBack();
+                // Log error if needed
+            }
+        }
+
+        header("Location: index.php?action=profile&id=" . $_SESSION['user_id']);
+        exit;
     }
 
     public function editProfile()
