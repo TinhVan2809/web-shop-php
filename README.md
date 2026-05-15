@@ -42,29 +42,29 @@ Hệ thống bán hàng online là một dự án toàn diện bao gồm:
 
 | # | Tính Năng | Người Thực Hiện | Trạng Thái |
 |---|-----------|-----------------|-----------|
-| 1 | 🏠 Trang Chủ | LỮ VĂN TÍNH | ✅ Done |
-| 2 | 👤 Quản Lý Tài Khoản | LỮ VĂN TÍNH | ✅ Done |
-| 3 | 🔍 Danh Mục & Tìm Kiếm | LỮ VĂN TÍNH | ✅ Done |
-| 4 | 📦 Chi Tiết Sản Phẩm | LỮ VĂN TÍNH | ✅ Done |
-| 5 | 🛒 Giỏ Hàng | TẠ THÁI NGUYỄN | ✅ Done |
-| 6 | 💳 Checkout | TẠ THÁI NGUYỄN | ✅ Done |
-| 7 | 📋 Lịch Sử Đơn Hàng | PHAN NGUYỄN HỮU LỘC | ✅ Done |
-| 8 | ⭐ Đánh Giá & Bình Luận | LÊ DU | ✅ Done |
-| 9 | ❤️ Wishlist | LÊ DU | ✅ Done |
+| 1 | 🏠 Trang Chủ | Lữ Văn Tính | ✅ Done |
+| 2 | 👤 Quản Lý Tài Khoản | Lữ Văn Tính | ✅ Done |
+| 3 | 🔍 Danh Mục & Tìm Kiếm | Lữ Văn Tính | ✅ Done |
+| 4 | 📦 Chi Tiết Sản Phẩm | Lữ Văn Tính | ✅ Done |
+| 5 | 🛒 Giỏ Hàng | Tạ Thái Nguyễn | ✅ Done |
+| 6 | 💳 Checkout | Tạ Thái Nguyễn | ✅ Done |
+| 7 | 📋 Lịch Sử Đơn Hàng | Phan Nguyễn Hữu Lộc | ✅ Done |
+| 8 | ⭐ Đánh Giá & Bình Luận | Lê Du | ✅ Done |
+| 9 | ❤️ Wishlist | Lê Du | ✅ Done |
 
 ### 🔐 Chức Năng Admin (9 tính năng)
 
 | # | Tính Năng | Người Thực Hiện | Trạng Thái |
 |---|-----------|-----------------|-----------|
-| 1 | 👨‍💼 Quản Lý Người Dùng | LỮ HỒ GIA HUY | ✅ Done |
-| 2 | 📦 Quản Lý Sản Phẩm | LỮ HỒ GIA HUY | ✅ Done |
-| 3 | 📊 Quản Lý Đơn Hàng | LỮ HỒ GIA HUY | ✅ Done |
-| 4 | 👥 Quản Lý Khách Hàng | TẠ THÁI NGUYỄN | ✅ Done |
-| 5 | 🎁 Khuyến Mãi & Voucher | HUỲNH VĂN HẢI | ✅ Done |
-| 6 | 📝 Kiểm Duyệt Bình Luận | PHAN NGUYỄN HỮU LỘC | ✅ Done |
-| 7 | 🚚 Giao Hàng & Thanh Toán | HUỲNH VĂN HẢI | ✅ Done |
-| 8 | 📰 CMS (Blog & Banner) | LÊ QUỐC CƯỜNG | ✅ Done |
-| 9 | 📈 Thống Kê & Báo Cáo | LÊ QUỐC CƯỜNG | ✅ Done |
+| 1 | 👨‍💼 Quản Lý Người Dùng | Lữ Hồ Gia Huy | ✅ Done |
+| 2 | 📦 Quản Lý Sản Phẩm | Lữ Hồ Gia Huy | ✅ Done |
+| 3 | 📊 Quản Lý Đơn Hàng | Lữ Hồ Gia Huy | ✅ Done |
+| 4 | 👥 Quản Lý Khách Hàng | Tạ Thái Nguyễn | ✅ Done |
+| 5 | 🎁 Khuyến Mãi & Voucher | Huỳnh Văn Hải | ✅ Done |
+| 6 | 📝 Kiểm Duyệt Bình Luận | Phan Nguyễn Hữu Lộc | ✅ Done |
+| 7 | 🚚 Giao Hàng & Thanh Toán | Huỳnh Văn Hải | ✅ Done |
+| 8 | 📰 CMS (Blog & Banner) | Lê Quốc Cường | ✅ Done |
+| 9 | 📈 Thống Kê & Báo Cáo | Lê Quốc Cường | ✅ Done |
 
 ---
 
@@ -211,15 +211,15 @@ Quản lý:
 
 ## 👥 Các Thành Viên
 
-| MSSV | Họ Tên | Vai Trò | Chức Năng |
-|------|--------|---------|-----------|
-| 227060035 | Nguyễn Thái Dương | Frontend & Backend | Trang chủ, Tài khoản, Danh mục, Chi tiết |
-| 227060015 | Sơn Hoàng Nhân | Backend | Support |
-| 227060059 | Trần Phú Quốc | Backend | Support |
-| 227060169 | Nguyễn Văn Hoài Tâm | Backend | Support |
-| 227060026 | Nguyễn Vũ Trạng | Backend | Support |
-| **227060055** | **Lê Quốc Cường** | **Trưởng Nhóm** | **CMS, Báo Cáo, Project Manager** |
-| 227060014 | Danh Dương Bình Yên | Backend | Support |
+| # | Họ Tên | Vai Trò | Chức Năng |
+|---|--------|---------|-----------|
+| 1 | Lữ Văn Tính | Frontend & Backend | Trang chủ, Quản lý tài khoản, Danh mục & tìm kiếm, Chi tiết sản phẩm |
+| 2 | Tạ Thái Nguyễn | Backend | Giỏ hàng, Checkout, Quản lý khách hàng |
+| 3 | Phan Nguyễn Hữu Lộc | Backend | Quản lý đơn hàng cá nhân, Kiểm duyệt bình luận |
+| 4 | Lê Du | Frontend | Đánh giá & bình luận, Wishlist |
+| 5 | Lữ Hồ Gia Huy | Backend | Quản lý người dùng, Quản lý sản phẩm, Quản lý đơn hàng |
+| 6 | Huỳnh Văn Hải | Backend | Khuyến mãi & mã giảm giá, Giao hàng & thanh toán |
+| **7** | **Lê Quốc Cường** | **Trưởng Nhóm** | **CMS, Báo cáo, Project Manager** |
 
 ---
 
