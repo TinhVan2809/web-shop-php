@@ -184,7 +184,7 @@ blogs, pages
 
 ### Khách Hàng
 ```
-1. Truy cập: http://localhost/web-shop-php/index.php
+1. Truy cập: http://localhost/web-shop-php/public/index.php
 2. Đăng ký / Đăng nhập
 3. Duyệt sản phẩm
 4. Thêm vào giỏ hàng
